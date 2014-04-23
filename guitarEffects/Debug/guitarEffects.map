@@ -1,0 +1,155 @@
+******************************************************************************
+             TMS320C2000 Linker PC v6.2.0                      
+******************************************************************************
+>> Linked Mon Apr 21 23:38:48 2014
+
+OUTPUT FILE NAME:   <guitarEffects.out>
+ENTRY POINT SYMBOL: "_c_int00"  address: 00009000
+
+
+MEMORY CONFIGURATION
+
+         name            origin    length      used     unused   attr    fill
+----------------------  --------  ---------  --------  --------  ----  --------
+PAGE 0:
+  BEGIN                 00000000   00000002  00000000  00000002  RWIX
+  RAMM0                 00000050   000003b0  00000000  000003b0  RWIX
+  RAML0                 00008000   00001000  00000016  00000fea  RWIX
+  RAML1                 00009000   00001000  00000083  00000f7d  RWIX
+  RAML2                 0000a000   00001000  00000000  00001000  RWIX
+  RAML3                 0000b000   00001000  00000000  00001000  RWIX
+  ZONE7A                00200000   0000fc00  00000000  0000fc00  RWIX
+  CSM_RSVD              0033ff80   00000076  00000000  00000076  RWIX
+  CSM_PWL               0033fff8   00000008  00000000  00000008  RWIX
+  ADC_CAL               00380080   00000009  00000000  00000009  RWIX
+  IQTABLES              003fe000   00000b50  00000000  00000b50  RWIX
+  IQTABLES2             003feb50   0000008c  00000000  0000008c  RWIX
+  FPUTABLES             003febdc   000006a0  00000000  000006a0  RWIX
+  BOOTROM               003ff27c   00000d44  00000000  00000d44  RWIX
+  RESET                 003fffc0   00000002  00000000  00000002  RWIX
+
+PAGE 1:
+  BOOT_RSVD             00000002   0000004e  00000000  0000004e  RWIX
+  RAMM1                 00000400   00000400  00000300  00000100  RWIX
+  RAML4                 0000c000   00001000  00000008  00000ff8  RWIX
+  RAML5                 0000d000   00001000  00000000  00001000  RWIX
+  RAML6                 0000e000   00001000  00000000  00001000  RWIX
+  RAML7                 0000f000   00001000  00000000  00001000  RWIX
+  ZONE7B                0020fc00   00000400  00000000  00000400  RWIX
+
+
+SECTION ALLOCATION MAP
+
+ output                                  attributes/
+section   page    origin      length       input sections
+--------  ----  ----------  ----------   ----------------
+.pinit     0    00008000    00000000     UNINITIALIZED
+
+.cinit     0    00008000    00000016     
+                  00008000    0000000a     rts2800_fpu32.lib : _lock.obj (.cinit)
+                  0000800a    0000000a                       : exit.obj (.cinit)
+                  00008014    00000002     --HOLE-- [fill = 0]
+
+.text      0    00009000    00000083     
+                  00009000    00000046     rts2800_fpu32.lib : boot.obj (.text)
+                  00009046    00000019                       : args_main.obj (.text)
+                  0000905f    00000019                       : exit.obj (.text)
+                  00009078    00000009                       : _lock.obj (.text)
+                  00009081    00000002     main.obj (.text)
+
+csm_rsvd   0    0033ff80    00000000     DSECT
+
+csmpasswds 
+*          0    0033fff8    00000000     DSECT
+
+.reset     0    003fffc0    00000002     DSECT
+                  003fffc0    00000002     rts2800_fpu32.lib : boot.obj (.reset)
+
+.stack     1    00000400    00000300     UNINITIALIZED
+                  00000400    00000300     --HOLE--
+
+.ebss      1    0000c000    00000008     UNINITIALIZED
+                  0000c000    00000004     rts2800_fpu32.lib : _lock.obj (.ebss)
+                  0000c004    00000004                       : exit.obj (.ebss)
+
+
+GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
+
+address     data page           name
+--------    ----------------    ----
+00000400      10 (00000400)     __stack
+
+0000c000     300 (0000c000)     __unlock
+0000c002     300 (0000c000)     __lock
+0000c004     300 (0000c000)     ___TI_cleanup_ptr
+0000c006     300 (0000c000)     ___TI_dtors_ptr
+
+
+GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
+
+address    name
+--------   ----
+00009000   .text
+0000905f   C$$EXIT
+00000700   __STACK_END
+00000300   __STACK_SIZE
+00000001   __TI_args_main
+0000c004   ___TI_cleanup_ptr
+0000c006   ___TI_dtors_ptr
+ffffffff   ___binit__
+ffffffff   ___c_args__
+00008000   ___cinit__
+00009083   ___etext__
+ffffffff   ___pinit__
+00009000   ___text__
+00009046   __args_main
+0000c002   __lock
+00009080   __nop
+0000907c   __register_lock
+00009078   __register_unlock
+00000400   __stack
+0000c000   __unlock
+0000905f   _abort
+00009000   _c_int00
+00009061   _exit
+00009081   _main
+ffffffff   binit
+00008000   cinit
+00009083   etext
+ffffffff   pinit
+
+
+GLOBAL SYMBOLS: SORTED BY Symbol Address 
+
+address    name
+--------   ----
+00000001   __TI_args_main
+00000300   __STACK_SIZE
+00000400   __stack
+00000700   __STACK_END
+00008000   ___cinit__
+00008000   cinit
+00009000   .text
+00009000   ___text__
+00009000   _c_int00
+00009046   __args_main
+0000905f   C$$EXIT
+0000905f   _abort
+00009061   _exit
+00009078   __register_unlock
+0000907c   __register_lock
+00009080   __nop
+00009081   _main
+00009083   ___etext__
+00009083   etext
+0000c000   __unlock
+0000c002   __lock
+0000c004   ___TI_cleanup_ptr
+0000c006   ___TI_dtors_ptr
+ffffffff   ___binit__
+ffffffff   ___c_args__
+ffffffff   ___pinit__
+ffffffff   binit
+ffffffff   pinit
+
+[28 symbols]
