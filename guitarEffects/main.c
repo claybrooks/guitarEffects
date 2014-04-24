@@ -209,22 +209,6 @@ interrupt void  adc_isr(void)
 		AdcBufPtr = AdcBuf;								// Rewind the pointer to the beginning
 		FFTStartFlag = 1;								// One frame data ready
 	}
-
-//--- Example: Toggle GPIO18 so we can read it with the ADC
-	if(DEBUG_TOGGLE == 1)
-	{
-		GpioDataRegs.GPATOGGLE.bit.GPIO18 = 1;			// Toggle the pin
-	}
-
-//--- Example: Toggle GPIO34 at a 0.5 sec rate (connected to the LED on the ControlCARD).
-//             (1/48000 sec/sample)*(1 samples/int)*(x interrupts/toggle) = (0.5 sec/toggle)
-//             ==> x = 24000
-	if(GPIO34_count++ > 24000)							// Toggle slowly to see the LED blink
-	{
-		GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;			// Toggle the pin
-		GPIO34_count = 0;								// Reset the counter
-	}
-	
 	return;
 } //end of adc_isr()
 //===========================================================================

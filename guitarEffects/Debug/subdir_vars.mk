@@ -5,22 +5,22 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CMD_SRCS += \
 ../28335_RAM_lnk.cmd \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/cmd/DSP2833x_Headers_nonBIOS.cmd 
+../DSP2833x_Headers_nonBIOS.cmd 
 
 ASM_SRCS += \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_ADC_cal.asm \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_DBGIER.asm \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_usDelay.asm 
+../DSP2833x_ADC_cal.asm \
+../DSP2833x_CodeStartBranch.asm \
+../DSP2833x_DBGIER.asm \
+../DSP2833x_usDelay.asm 
 
 C_SRCS += \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_Adc.c \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_DefaultIsr.c \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_Gpio.c \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_PieCtrl.c \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_PieVect.c \
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_SysCtrl.c \
+../DSP2833x_Adc.c \
+../DSP2833x_DefaultIsr.c \
+../DSP2833x_GlobalVariableDefs.c \
+../DSP2833x_Gpio.c \
+../DSP2833x_PieCtrl.c \
+../DSP2833x_PieVect.c \
+../DSP2833x_SysCtrl.c \
 ../main.c 
 
 OBJS += \
@@ -84,19 +84,19 @@ ASM_DEPS__QUOTED += \
 "DSP2833x_usDelay.pp" 
 
 ASM_SRCS__QUOTED += \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_ADC_cal.asm" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_DBGIER.asm" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_usDelay.asm" 
+"../DSP2833x_ADC_cal.asm" \
+"../DSP2833x_CodeStartBranch.asm" \
+"../DSP2833x_DBGIER.asm" \
+"../DSP2833x_usDelay.asm" 
 
 C_SRCS__QUOTED += \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_Adc.c" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_DefaultIsr.c" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_Gpio.c" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_PieCtrl.c" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_PieVect.c" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_SysCtrl.c" \
+"../DSP2833x_Adc.c" \
+"../DSP2833x_DefaultIsr.c" \
+"../DSP2833x_GlobalVariableDefs.c" \
+"../DSP2833x_Gpio.c" \
+"../DSP2833x_PieCtrl.c" \
+"../DSP2833x_PieVect.c" \
+"../DSP2833x_SysCtrl.c" \
 "../main.c" 
 
 

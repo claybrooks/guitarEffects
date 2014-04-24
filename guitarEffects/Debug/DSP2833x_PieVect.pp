@@ -1,6 +1,6 @@
 # FIXED
 
-DSP2833x_PieVect.obj: E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_PieVect.c
+DSP2833x_PieVect.obj: ../DSP2833x_PieVect.c
 DSP2833x_PieVect.obj: E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/include/DSP2833x_Device.h
 DSP2833x_PieVect.obj: E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/include/DSP2833x_Adc.h
 DSP2833x_PieVect.obj: E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/include/DSP2833x_DevEmu.h
@@ -27,7 +27,7 @@ DSP2833x_PieVect.obj: E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_com
 DSP2833x_PieVect.obj: E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/include/DSP2833x_I2C_defines.h
 DSP2833x_PieVect.obj: E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/include/DSP2833x_DefaultISR.h
 
-E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_common/source/DSP2833x_PieVect.c: 
+../DSP2833x_PieVect.c: 
 E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/include/DSP2833x_Device.h: 
 E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/include/DSP2833x_Adc.h: 
 E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/include/DSP2833x_DevEmu.h: 

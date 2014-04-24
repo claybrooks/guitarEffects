@@ -21,7 +21,7 @@ $(GEN_CMDS__FLAG) \
 "./DSP2833x_Adc.obj" \
 "./DSP2833x_ADC_cal.obj" \
 "../28335_RAM_lnk.cmd" \
-"E:/ti/controlSUITE/device_support/f2833x/v132/DSP2833x_headers/cmd/DSP2833x_Headers_nonBIOS.cmd" \
+"../DSP2833x_Headers_nonBIOS.cmd" \
 -l"E:\ti\controlSUITE\libs\dsp\FPU\v130\lib\C28x_FPU_Lib.lib" \
 -l"C:\ti\ccsv5\tools\compiler\c2000_6.2.0\lib\rts2800_fpu32.lib" \
 
