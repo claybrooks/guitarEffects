@@ -93,6 +93,7 @@
 #include "math.h"
 #include "float.h"
 #include "FPU.h"
+#include "LCD.h "
 
 #define RFFT_STAGES     	9
 #define RFFT_SIZE       	(1 << RFFT_STAGES)

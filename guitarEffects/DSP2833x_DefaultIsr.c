@@ -317,8 +317,8 @@ interrupt void  TINT0_ISR(void)      // CPU-Timer 0
 
   // Next two lines for debug only to halt the processor here
   // Remove after inserting ISR Code
-  asm ("      ESTOP0");
-  for(;;);
+	asm ("      ESTOP0");
+	  for(;;);
 }
 
 
@@ -332,8 +332,7 @@ interrupt void  WAKEINT_ISR(void)    // WD, LOW Power
 
   // Next two lines for debug only to halt the processor here
   // Remove after inserting ISR Code
-  asm ("      ESTOP0");
-  for(;;);
+
 }
 
 
