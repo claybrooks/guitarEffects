@@ -93,7 +93,9 @@
 #include "math.h"
 #include "float.h"
 #include "FPU.h"
-#include "LCD.h "
+#include "LCD.h"
+#include "ADC.h"
+#include "SPI.h"
 
 #define RFFT_STAGES     	9
 #define RFFT_SIZE       	(1 << RFFT_STAGES)
@@ -136,36 +138,30 @@ void main(void){
 
 
 //--- Peripheral Initialization
-	InitAdc();								// Initialize the ADC (FILE: Adc.c)
+									// Initialize the ADC (FILE: Adc.c)
+	initLCD();
+	initSPI();
 
-// Interrupts that are used in this example are re-mapped to
-// ISR functions found within this file.
-   	EALLOW;  // This is needed to write to EALLOW protected register
-   	PieVectTable.ADCINT = &adc_isr;
-   	EDIS;    // This is needed to disable write to EALLOW protected registers
-
-    rfft_adc.Tail = &rfft.OutBuf;			//Link the RFFT_ADC_F32_STRUCT to
-   											//RFFT_F32_STRUCT. Tail pointer of
-   											//RFFT_ADC_F32_STRUCT is passed to
-   											//the OutBuf pointer of RFFT_F32_STRUCT
-    rfft.FFTSize  = RFFT_SIZE;				//Real FFT size
-    rfft.FFTStages = RFFT_STAGES;			//Real FFT stages
-    rfft_adc.InBuf = &AdcBuf[0];			//Input buffer
-    rfft.OutBuf = &RFFToutBuff[0];   		//Output buffer
-    rfft.CosSinBuf = &RFFTF32Coef[0];		//Twiddle factor
-    rfft.MagBuf = &RFFTmagBuff[0];			//Magnitude output buffer
+	 rfft_adc.Tail = &rfft.OutBuf;			//Link the RFFT_ADC_F32_STRUCT to
+											//RFFT_F32_STRUCT. Tail pointer of
+											//RFFT_ADC_F32_STRUCT is passed to
+											//the OutBuf pointer of RFFT_F32_STRUCT
+	rfft.FFTSize  = RFFT_SIZE;				//Real FFT size
+	rfft.FFTStages = RFFT_STAGES;			//Real FFT stages
+	rfft_adc.InBuf = &AdcBuf[0];			//Input buffer
+	rfft.OutBuf = &RFFToutBuff[0];   		//Output buffer
+	rfft.CosSinBuf = &RFFTF32Coef[0];		//Twiddle factor
+	rfft.MagBuf = &RFFTmagBuff[0];			//Magnitude output buffer
 
     RFFT_f32_sincostable(&rfft);  			//Calculate twiddle factor
 
- 	//Clean up output buffer
-    for (i=0; i < RFFT_SIZE; i++) RFFToutBuff[i] = 0;
+ 	//Clean up output buffer and magnitude buffer
+    for (i=0; i < RFFT_SIZE; i++) {
+    	RFFToutBuff[i] = 0;
+    	RFFTmagBuff[i] = 0;
+    }
 
-
-   	//Clean up magnitude buffer
-    for (i=0; i < RFFT_SIZE/2; i++) RFFTmagBuff[i] = 0;
-
-//--- Enable global interrupts
-	asm(" CLRC INTM, DBGM");			// Enable global interrupts and realtime debug
+    initADC();
 
 //--- Main Loop
 	while(1){							// endless loop - wait for an interrupt
@@ -184,11 +180,13 @@ void main(void){
       			}
    			}
    			freq = F_PER_SAMPLE * (float)j;	//Convert normalized digital frequency to analog frequency
+   			printFreq(freq);
 			FFTStartFlag = 0;			   	//Start collecting the next frame of data
 		}
 		asm(" NOP");
 	}
 } //end of main()
+
 
 interrupt void  adc_isr(void)
 {
@@ -203,7 +201,7 @@ interrupt void  adc_isr(void)
 
 //--- Read the ADC result
 	*AdcBufPtr++ = AdcMirror.ADCRESULT0;				// Read the result
-
+	printSPI(AdcMirror.ADCRESULT0);
 //--- Brute-force the circular buffer
 	if( AdcBufPtr == (AdcBuf + ADC_BUF_LEN) )
 	{

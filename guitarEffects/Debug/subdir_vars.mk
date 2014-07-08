@@ -4,14 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CMD_SRCS += \
-../28335_RAM_lnk.cmd \
-../DSP2833x_Headers_nonBIOS.cmd 
+../DSP2833x_Headers_nonBIOS.cmd \
+../KG_RAM_Link1.cmd 
 
 ASM_SRCS += \
 ../DSP2833x_ADC_cal.asm \
 ../DSP2833x_CodeStartBranch.asm \
 ../DSP2833x_DBGIER.asm \
-../DSP2833x_usDelay.asm 
+../DSP2833x_usDelay.asm \
+../RFFT_adc_f32u.asm 
 
 C_SRCS += \
 ../DSP2833x_Adc.c \
@@ -39,13 +40,15 @@ OBJS += \
 ./DSP2833x_Spi.obj \
 ./DSP2833x_SysCtrl.obj \
 ./DSP2833x_usDelay.obj \
+./RFFT_adc_f32u.obj \
 ./WaveIn.obj 
 
 ASM_DEPS += \
 ./DSP2833x_ADC_cal.pp \
 ./DSP2833x_CodeStartBranch.pp \
 ./DSP2833x_DBGIER.pp \
-./DSP2833x_usDelay.pp 
+./DSP2833x_usDelay.pp \
+./RFFT_adc_f32u.pp 
 
 C_DEPS += \
 ./DSP2833x_Adc.pp \
@@ -85,19 +88,22 @@ OBJS__QUOTED += \
 "DSP2833x_Spi.obj" \
 "DSP2833x_SysCtrl.obj" \
 "DSP2833x_usDelay.obj" \
+"RFFT_adc_f32u.obj" \
 "WaveIn.obj" 
 
 ASM_DEPS__QUOTED += \
 "DSP2833x_ADC_cal.pp" \
 "DSP2833x_CodeStartBranch.pp" \
 "DSP2833x_DBGIER.pp" \
-"DSP2833x_usDelay.pp" 
+"DSP2833x_usDelay.pp" \
+"RFFT_adc_f32u.pp" 
 
 ASM_SRCS__QUOTED += \
 "../DSP2833x_ADC_cal.asm" \
 "../DSP2833x_CodeStartBranch.asm" \
 "../DSP2833x_DBGIER.asm" \
-"../DSP2833x_usDelay.asm" 
+"../DSP2833x_usDelay.asm" \
+"../RFFT_adc_f32u.asm" 
 
 C_SRCS__QUOTED += \
 "../DSP2833x_Adc.c" \

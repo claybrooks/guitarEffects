@@ -1,16 +1,15 @@
-void printSPI(int data);
-void initSPI(void);
+void printSPI();
+void initSPI();
 
-void printSPI(int data){
-	EALLOW;
+void printSPI(){
+
 	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
-	SpiaRegs.SPITXBUF = data;
+	SpiaRegs.SPITXBUF = getEFFECT();
 	DELAY_US(2.2);
 	GpioDataRegs.GPADAT.bit.GPIO19 = 1;
 }
 
-void initSPI()
-{
+void initSPI(){
 	InitSpiaGpio();
 	EALLOW;
 	SpiaRegs.SPICCR.bit.SPISWRESET=0; // Reset SPI

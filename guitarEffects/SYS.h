@@ -1,7 +1,3 @@
-#include "DSP28x_Project.h"    				// Device Headerfile and Examples Include File
-interrupt void cpu_timer0_isr(void);
-
-
 void initSYS(){
 	EALLOW;
 	SysCtrlRegs.WDCR = 0x0068;  //Watchdog
@@ -30,15 +26,14 @@ void initINTS(){
 }
 
 
-
-void initTIMER0(){
+/*void initTIMER0(){
 	InitCpuTimers();
 	EALLOW;
-	ConfigCpuTimer(&CpuTimer0, 150, 500000);
+	ConfigCpuTimer(&CpuTimer0, 150, 22.75);
 	CpuTimer0Regs.TCR.all = 0x4001;
 	IER |= M_INT1;
 	PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 	PieVectTable.TINT0 = &cpu_timer0_isr;
 	EINT;   // Enable Global interrupt INTM
 	ERTM;   // Enable Global realtime interrupt DBGM
-}
+}*/

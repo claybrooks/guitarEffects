@@ -2,7 +2,7 @@ void initLCD();
 void printLCD(int data);
 void controlLCD(int data);
 
-int delay = 15000;
+int delay = 11000;
 
 void wait(int temp){
 	while(temp != 0) temp--;
@@ -56,7 +56,7 @@ void printLCD(int data){
 	wait(delay);
 }
 
-void printFreq(int data){
+void printFREQ(int data){
 	controlLCD(0x01);
 
 	unsigned int* array = (unsigned int*)0xA000;
