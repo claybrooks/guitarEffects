@@ -16,7 +16,7 @@ void initADC(){
 
 	// Enable ADCINT in PIE
 	PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
-	PieVectTable.ADCINT = &adc_isr;
+	//PieVectTable.ADCINT = &adc_isr;
 	IER |= M_INT1; // Enable CPU Interrupt 1
 
 	SysCtrlRegs.HISPCP.all = ADC_MODCLK;	// HSPCLK = SYSCLKOUT/ADC_MODCLK
@@ -31,6 +31,7 @@ void initADC(){
 	AdcRegs.ADCTRL1.bit.RESET = 0x0;
 	AdcRegs.ADCTRL1.bit.CONT_RUN = 0x1;
 	AdcRegs.ADCTRL1.bit.CPS = 1;
+	AdcRegs.ADCREFSEL.bit.REF_SEL = 0x0003;
 	//3
 	AdcRegs.ADCTRL3.bit.ADCBGRFDN = 0x3;
 	AdcRegs.ADCTRL3.bit.ADCPWDN = 0x1;
@@ -45,7 +46,7 @@ void initADC(){
 	//6
 	AdcRegs.ADCTRL2.bit.RST_SEQ1 = 0x1;
 	AdcRegs.ADCTRL2.bit.SOC_SEQ1 = 0x1;
-	AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;
+	//AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;
 	EINT;          // Enable Global interrupt INTM
-		ERTM;          // Enable Global realtime interrupt DBGM
+	ERTM;          // Enable Global realtime interrupt DBGM
 }

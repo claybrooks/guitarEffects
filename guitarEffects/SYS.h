@@ -1,3 +1,5 @@
+interrupt void cpu_timer0_isr(void);
+
 void initSYS(){
 	EALLOW;
 	SysCtrlRegs.WDCR = 0x0068;  //Watchdog
@@ -26,7 +28,7 @@ void initINTS(){
 }
 
 
-/*void initTIMER0(){
+void initTIMER0(){
 	InitCpuTimers();
 	EALLOW;
 	ConfigCpuTimer(&CpuTimer0, 150, 22.75);
@@ -36,4 +38,4 @@ void initINTS(){
 	PieVectTable.TINT0 = &cpu_timer0_isr;
 	EINT;   // Enable Global interrupt INTM
 	ERTM;   // Enable Global realtime interrupt DBGM
-}*/
+}

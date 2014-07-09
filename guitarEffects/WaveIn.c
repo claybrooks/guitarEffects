@@ -5,13 +5,16 @@
 #include "EFFECT.h"
 #include "ADC.h"
 
+int temp;
+
+
 int main(){
 	InitSysCtrl();
 	initINTS();
 	initLCD();
 	initSPI();
 	initADC();
-	//initTIMER0();
+	initTIMER0();
 	EALLOW;
 
 	//Switch select for effect;
@@ -26,16 +29,8 @@ int main(){
 	}
 }
 
-/*void cpu_timer0_isr(){
-
-}*/
-
-void adc_isr(void){
+void cpu_timer0_isr(void){
 	setARRAY(AdcRegs.ADCRESULT0);
 	printSPI();
-
-	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;				// Must acknowledge the PIE group
-	//--- Manage the ADC registers
-	AdcRegs.ADCTRL2.bit.RST_SEQ1 = 1;					// Reset SEQ1 to CONV00 state
-	AdcRegs.ADCST.bit.INT_SEQ1_CLR = 1;					// Clear ADC SEQ1 interrupt flag
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
