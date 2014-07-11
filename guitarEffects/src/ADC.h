@@ -1,7 +1,7 @@
 interrupt void adc_isr(void);
 
 #if (CPU_FRQ_150MHZ)     // Default - 150 MHz SYSCLKOUT
-  #define ADC_MODCLK 0xf // HSPCLK = SYSCLKOUT/2*ADC_MODCLK2 = 150/(2*3)   = 25.0 MHz
+  #define ADC_MODCLK 0x3 // HSPCLK = SYSCLKOUT/2*ADC_MODCLK2 = 150/(2*3)   = 25.0 MHz
 #endif
 #if (CPU_FRQ_100MHZ)
   #define ADC_MODCLK 0x2 // HSPCLK = SYSCLKOUT/2*ADC_MODCLK2 = 100/(2*2)   = 25.0 MHz

@@ -1,3 +1,4 @@
+#include "math.h"
 void initLCD();
 void printLCD(int data);
 void controlLCD(int data);
@@ -54,6 +55,59 @@ void printLCD(int data){
 	wait(delay);
 	GpioDataRegs.GPBDAT.bit.GPIO48 = 0;
 	wait(delay);
+}
+
+void printEFFECT(){
+	if(GpioDataRegs.GPADAT.bit.GPIO8 && !GpioDataRegs.GPADAT.bit.GPIO9 && !GpioDataRegs.GPADAT.bit.GPIO10){
+		controlLCD(0x01);
+		printLCD(0x46);	//F
+		printLCD(0x55);	//U
+		printLCD(0x5A);	//Z
+		printLCD(0x5A);	//Z
+	}
+	else if(!GpioDataRegs.GPADAT.bit.GPIO8 && GpioDataRegs.GPADAT.bit.GPIO9 && !GpioDataRegs.GPADAT.bit.GPIO10){
+		controlLCD(0x01);
+		printLCD(0x44);	//D
+		printLCD(0x45);	//E
+		printLCD(0x4C);	//L
+		printLCD(0x41);	//A
+		printLCD(0x59);	//Y
+	}
+	else if(GpioDataRegs.GPADAT.bit.GPIO8 && GpioDataRegs.GPADAT.bit.GPIO9 && !GpioDataRegs.GPADAT.bit.GPIO10){
+		controlLCD(0x01);
+		printLCD(0x46);	//F
+		printLCD(0x4C);	//L
+		printLCD(0x41);	//A
+		printLCD(0x4E);	//N
+		printLCD(0x47);	//G
+		printLCD(0x45);	//E
+	}
+	else if(!GpioDataRegs.GPADAT.bit.GPIO8 && !GpioDataRegs.GPADAT.bit.GPIO9 && GpioDataRegs.GPADAT.bit.GPIO10){
+		controlLCD(0x01);
+		printLCD(0x50);	//P
+		printLCD(0x48);	//H
+		printLCD(0x41);	//A
+		printLCD(0x53);	//S
+		printLCD(0x45);	//E
+		printLCD(0x52);	//R
+	}
+	else if(GpioDataRegs.GPADAT.bit.GPIO8 && !GpioDataRegs.GPADAT.bit.GPIO9 && GpioDataRegs.GPADAT.bit.GPIO10){
+		controlLCD(0x01);
+		printLCD(0x52);	//R
+		printLCD(0x45);	//E
+		printLCD(0x56);	//V
+		printLCD(0x45);	//E
+		printLCD(0x52);	//R
+		printLCD(0x42);	//B
+	}
+	else{
+		controlLCD(0x01);
+		printLCD(0x43);	//C
+		printLCD(0x4C);	//L
+		printLCD(0x45);	//E
+		printLCD(0x41);	//A
+		printLCD(0x4E);	//N
+	}
 }
 
 void printFREQ(int data){

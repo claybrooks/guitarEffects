@@ -23,8 +23,7 @@ C_SRCS += \
 ../DSP2833x_PieCtrl.c \
 ../DSP2833x_PieVect.c \
 ../DSP2833x_Spi.c \
-../DSP2833x_SysCtrl.c \
-../WaveIn.c 
+../DSP2833x_SysCtrl.c 
 
 OBJS += \
 ./DSP2833x_ADC_cal.obj \
@@ -40,8 +39,7 @@ OBJS += \
 ./DSP2833x_Spi.obj \
 ./DSP2833x_SysCtrl.obj \
 ./DSP2833x_usDelay.obj \
-./RFFT_adc_f32u.obj \
-./WaveIn.obj 
+./RFFT_adc_f32u.obj 
 
 ASM_DEPS += \
 ./DSP2833x_ADC_cal.pp \
@@ -59,8 +57,7 @@ C_DEPS += \
 ./DSP2833x_PieCtrl.pp \
 ./DSP2833x_PieVect.pp \
 ./DSP2833x_Spi.pp \
-./DSP2833x_SysCtrl.pp \
-./WaveIn.pp 
+./DSP2833x_SysCtrl.pp 
 
 C_DEPS__QUOTED += \
 "DSP2833x_Adc.pp" \
@@ -71,8 +68,7 @@ C_DEPS__QUOTED += \
 "DSP2833x_PieCtrl.pp" \
 "DSP2833x_PieVect.pp" \
 "DSP2833x_Spi.pp" \
-"DSP2833x_SysCtrl.pp" \
-"WaveIn.pp" 
+"DSP2833x_SysCtrl.pp" 
 
 OBJS__QUOTED += \
 "DSP2833x_ADC_cal.obj" \
@@ -88,8 +84,7 @@ OBJS__QUOTED += \
 "DSP2833x_Spi.obj" \
 "DSP2833x_SysCtrl.obj" \
 "DSP2833x_usDelay.obj" \
-"RFFT_adc_f32u.obj" \
-"WaveIn.obj" 
+"RFFT_adc_f32u.obj" 
 
 ASM_DEPS__QUOTED += \
 "DSP2833x_ADC_cal.pp" \
@@ -114,7 +109,6 @@ C_SRCS__QUOTED += \
 "../DSP2833x_PieCtrl.c" \
 "../DSP2833x_PieVect.c" \
 "../DSP2833x_Spi.c" \
-"../DSP2833x_SysCtrl.c" \
-"../WaveIn.c" 
+"../DSP2833x_SysCtrl.c" 
 
 

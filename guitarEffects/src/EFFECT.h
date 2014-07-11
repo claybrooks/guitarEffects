@@ -2,6 +2,7 @@
 
 void setARRAY(int);
 int getARRAY(int);
+int getEFFECT(void);
 unsigned int* array = (unsigned int*)0xB000;
 int index = 0;
 int delayIndex = 0;
@@ -99,4 +100,11 @@ int getARRAY(int index){
 	else if((index & 0x003) ==  1) return ((*get & 0x000F) << 8) | ((*(get+1) & 0xFF00)>> 8);
 	else if((index & 0x003) ==  2) return ((*get & 0x00FF) << 4) | ((*(get+1) & 0xF000) >> 12);
 	else return *get & 0x0FFF;
+}
+
+void initEFFECTS(){
+	//Switch select for effect;
+	GpioCtrlRegs.GPADIR.bit.GPIO8 = 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO9 = 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO10 = 0;
 }
