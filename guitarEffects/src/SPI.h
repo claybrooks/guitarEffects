@@ -1,10 +1,10 @@
 void printSPI();
 void initSPI();
 
-void printSPI(){
+void printSPI(int val){
 
 	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
-	SpiaRegs.SPITXBUF = 0x8000 | getEFFECT();
+	SpiaRegs.SPITXBUF = 0x8000 |getEFFECT(val);
 	DELAY_US(2);
 	GpioDataRegs.GPADAT.bit.GPIO19 = 1;
 }

@@ -8,6 +8,9 @@ CG_TOOL_ROOT := E:/ti/ccsv6/tools/compiler/c2000_6.2.7
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
+"./src/wah.obj" \
+"./src/butterworth_bp.obj" \
+"./src/bp_iir.obj" \
 "./src/WaveIn.obj" \
 "./RFFT_adc_f32u.obj" \
 "./DSP2833x_usDelay.obj" \
@@ -23,8 +26,8 @@ $(GEN_CMDS__FLAG) \
 "./DSP2833x_CodeStartBranch.obj" \
 "./DSP2833x_Adc.obj" \
 "./DSP2833x_ADC_cal.obj" \
+"../28335_RAM_lnk.cmd" \
 "../DSP2833x_Headers_nonBIOS.cmd" \
-"../KG_RAM_Link1.cmd" \
 -l"libc.a" \
 -l"E:\ti\controlSUITE\libs\dsp\FPU\v130\lib\C28x_FPU_Lib.lib" \
 -l"C:\ti\ccsv5\tools\compiler\c2000_6.2.0\lib\rts2800_fpu32.lib" \
@@ -159,8 +162,8 @@ guitarEffects.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "DSP2833x_Adc.pp" "DSP2833x_CpuTimers.pp" "DSP2833x_DefaultIsr.pp" "DSP2833x_GlobalVariableDefs.pp" "DSP2833x_Gpio.pp" "DSP2833x_PieCtrl.pp" "DSP2833x_PieVect.pp" "DSP2833x_Spi.pp" "DSP2833x_SysCtrl.pp" "src\WaveIn.pp" 
-	-$(RM) "DSP2833x_ADC_cal.obj" "DSP2833x_Adc.obj" "DSP2833x_CodeStartBranch.obj" "DSP2833x_CpuTimers.obj" "DSP2833x_DBGIER.obj" "DSP2833x_DefaultIsr.obj" "DSP2833x_GlobalVariableDefs.obj" "DSP2833x_Gpio.obj" "DSP2833x_PieCtrl.obj" "DSP2833x_PieVect.obj" "DSP2833x_Spi.obj" "DSP2833x_SysCtrl.obj" "DSP2833x_usDelay.obj" "RFFT_adc_f32u.obj" "src\WaveIn.obj" 
+	-$(RM) "DSP2833x_Adc.pp" "DSP2833x_CpuTimers.pp" "DSP2833x_DefaultIsr.pp" "DSP2833x_GlobalVariableDefs.pp" "DSP2833x_Gpio.pp" "DSP2833x_PieCtrl.pp" "DSP2833x_PieVect.pp" "DSP2833x_Spi.pp" "DSP2833x_SysCtrl.pp" "src\WaveIn.pp" "src\bp_iir.pp" "src\butterworth_bp.pp" "src\wah.pp" 
+	-$(RM) "DSP2833x_ADC_cal.obj" "DSP2833x_Adc.obj" "DSP2833x_CodeStartBranch.obj" "DSP2833x_CpuTimers.obj" "DSP2833x_DBGIER.obj" "DSP2833x_DefaultIsr.obj" "DSP2833x_GlobalVariableDefs.obj" "DSP2833x_Gpio.obj" "DSP2833x_PieCtrl.obj" "DSP2833x_PieVect.obj" "DSP2833x_Spi.obj" "DSP2833x_SysCtrl.obj" "DSP2833x_usDelay.obj" "RFFT_adc_f32u.obj" "src\WaveIn.obj" "src\bp_iir.obj" "src\butterworth_bp.obj" "src\wah.obj" 
 	-$(RM) "DSP2833x_ADC_cal.pp" "DSP2833x_CodeStartBranch.pp" "DSP2833x_DBGIER.pp" "DSP2833x_usDelay.pp" "RFFT_adc_f32u.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

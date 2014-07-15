@@ -1,23 +1,5 @@
 interrupt void cpu_timer0_isr(void);
-interrupt void xint1_isr(void);
-void initSYS(){
-	EALLOW;
-	SysCtrlRegs.WDCR = 0x0068;  //Watchdog
-	SysCtrlRegs.LOSPCP.all = 0x1;  //Low speed clock
-}
-
-void initPLL(){
-	EALLOW;
-	while(SysCtrlRegs.PLLSTS.bit.MCLKSTS == 1){}
-	if(SysCtrlRegs.PLLSTS.bit.DIVSEL == 2 || SysCtrlRegs.PLLSTS.bit.DIVSEL == 3){
-		SysCtrlRegs.PLLSTS.bit.DIVSEL = 0;
-	}
-	SysCtrlRegs.PLLSTS.bit.MCLKOFF = 1;
-	SysCtrlRegs.PLLCR.all = 0xA;
-	while(SysCtrlRegs.PLLSTS.bit.PLLLOCKS != 1){}
-	SysCtrlRegs.PLLSTS.bit.MCLKOFF = 0;
-	SysCtrlRegs.PLLSTS.bit.DIVSEL = 3;
-}
+//interrupt void xint1_isr(void);
 
 void initINTS(){
 	InitPieCtrl();
@@ -29,7 +11,7 @@ void initINTS(){
 	GpioCtrlRegs.GPADIR.bit.GPIO11 = 0;
 }
 
-void initXINT1(){
+/*void initXINT1(){
 	EALLOW;
 	//Mode toggle interrupt on GPIO 11
 	PieVectTable.XINT1 = &xint1_isr;
@@ -47,7 +29,7 @@ void initXINT1(){
 	if(GpioDataRegs.GPADAT.bit.GPIO11 == 0) XIntruptRegs.XINT1CR.bit.POLARITY = 1;      // Rising edge interrupt
 	else XIntruptRegs.XINT1CR.bit.POLARITY = 0;
 	XIntruptRegs.XINT1CR.bit.ENABLE = 1;        // Enable Xint1
-}
+}*/
 
 void updateTIMER0(float time){
 	ConfigCpuTimer(&CpuTimer0, 150, time);
