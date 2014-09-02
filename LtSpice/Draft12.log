@@ -1,0 +1,25 @@
+Circuit: * E:\git\guitarEffects\LtSpice\Draft12.asc
+
+WARNING: Node NC_01 is floating.
+
+WARNING: Less than two connections to node NC_01.  This node is used by C2.
+Direct Newton iteration for .op point succeeded.
+
+Date: Tue Jul 15 22:01:37 2014
+Total elapsed time: 0.110 seconds.
+
+tnom = 27
+temp = 27
+method = modified trap
+totiter = 2143
+traniter = 2124
+tranpoints = 1063
+accept = 1058
+rejected = 5
+matrix size = 19
+fillins = 6
+solver = Normal
+Matrix Compiler1: 1.27 KB object code size  0.3/0.2/[0.1]
+Matrix Compiler2: off  [0.2]/0.2/0.2
+
+

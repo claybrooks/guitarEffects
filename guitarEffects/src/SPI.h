@@ -4,8 +4,9 @@ void initSPI();
 void printSPI(int val){
 
 	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
-	SpiaRegs.SPITXBUF = 0x8000 |getEFFECT(val);
-	DELAY_US(2);
+	//SpiaRegs.SPITXBUF = 0xC000 |getEFFECT(val);
+	SpiaRegs.SPITXBUF = 0x8000 | getEFFECT(val);
+	DELAY_US(3);
 	GpioDataRegs.GPADAT.bit.GPIO19 = 1;
 }
 

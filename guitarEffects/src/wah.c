@@ -1,20 +1,25 @@
-#include "butterworth_bp.h"
+//#include "butterworth_bp.h"
+#include "bp_iir.h"
 #include "wah.h"
 
-static int centerFrequency;		//Variable center frequency
-static int counter;			//Counter for variable centerFrequency
-static int limit;	//Max for counter
-static int incDecToggle;
-static int maxFrequency;		//Max frequency to sweep to
-static int minFrequency;		//Min frequency to sweep from
-static int frequencyStep;			//Steps for the frequency sweep
-static struct bp_filter bp;	//Filter structure
+#define freq_step 50
+#define maxf 1200
+#define minf 400
+#define sampling 48000
 
-void initWAH(int effect_rate, long sampling, int maxf, int minf, int Q, int freq_step){
+static int centerFrequency;	//Variable center frequency
+static int counter;			//Counter for variable centerFrequency
+static int limit;			//Max for counter
+static int incDecToggle;
+static int maxFrequency;	//Max frequency to sweep to
+static int minFrequency;	//Min frequency to sweep from
+
+void initWAH(int effect_rate, int Q){
         //wah process variables
         centerFrequency = 0;
         counter = effect_rate;
         incDecToggle = 0;
+		index = 0;
 
         //Rate at which the center frequency sweeps
         limit = effect_rate;
@@ -24,21 +29,15 @@ void initWAH(int effect_rate, long sampling, int maxf, int minf, int Q, int freq
         maxFrequency = (maxf - minf)/freq_step;
 
         //Initialize registers to steady state
-		bp.y[2] = 0;
-		bp.y[1] = 0;
-		bp.y[0] = 0;
-		bp.x[2] = 0;
-		bp.x[1] = 0;
-		bp.x[0] = 0;
-
-        initBP(sampling, Q, freq_step, minf);
-        frequencyStep = freq_step;
+		int i;
+		for(i = 0; i < NCoef+1; i++){
+			y[i] = 0;
+			x[i] = 0;
+		}
 }
 
 double getWAH(int val) {
-      return filterBP(val,&bp)*1000 + 0x4f0;
-
-
+      return filterBP(val,index);
 }
 
 void sweepWAH(void) {
@@ -46,12 +45,12 @@ void sweepWAH(void) {
         if (!--counter) {
         	//If the current center frequency is the min frequency, increment up
 			if (!incDecToggle) {
-					loadBP(&bp,(centerFrequency+=frequencyStep));
+					index++;
 					//If you hit max freq, toggle incDecToggle to start decrementing the step
 					if (centerFrequency > maxFrequency) incDecToggle = 1;
 			}
 			else if (incDecToggle) {
-					loadBP(&bp,(centerFrequency-=frequencyStep));
+					index--;
 					if (centerFrequency == minFrequency) incDecToggle = 0;
 			}
 			counter = limit;
