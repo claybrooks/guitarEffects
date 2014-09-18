@@ -9,7 +9,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.Texas Instruments XDS100v1 USB Emulator_0/C28xx" value="guitarEffects"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:guitarEffects}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS100v1 USB Emulator/C28xx" value="E:/git\guitarEffects\guitarEffects\Debug\guitarEffects.out"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS100v1 USB Emulator_0/C28xx" value="E:/git\guitarEffects\guitarEffects\Debug\guitarEffects.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS100v1 USB Emulator_0/C28xx" value="E:/Documents\Clone\guitarEffects\guitarEffects\Debug\guitarEffects.out"/>
 <mapAttribute key="com.ti.ccstudio.debug.ui.displayFormats">
 <mapEntry key="Texas Instruments XDS100v1 USB Emulator_0/C28xx@##separator##@0" value="16-Bit Hex - TI Style"/>
 <mapEntry key="Texas Instruments XDS100v1 USB Emulator_0/C28xx@##separator##@1" value="16-Bit Hex - TI Style"/>

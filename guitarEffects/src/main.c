@@ -1,27 +1,27 @@
 #include "DSP28x_Project.h"    				// Device Headerfile and Examples Include File
-#include "LCD.h"
-#include "SPI.h"
-#include "SYS.h"
-#include "EFFECT.h"
-#include "ADC.h"
+#include "lcd.h"
+#include "spi.h"
+#include "sys.h"
+#include "effect.h"
+#include "adc.h"
 
 //#include "../src/FFT.h"
 
-int updateLCD = -1;
+//int updateLCD = -1;
 
 int main(){
 		InitSysCtrl();
 //Initialize Interrupts
 		initINTS();
 //Initialize Effects
-		GpioCtrlRegs.GPADIR.bit.GPIO8 = 0;
-		GpioCtrlRegs.GPADIR.bit.GPIO9 = 0;
-		GpioCtrlRegs.GPADIR.bit.GPIO10 = 0;
-		initWAH(500,4);
+		//GpioCtrlRegs.GPADIR.bit.GPIO8 = 0;
+		//GpioCtrlRegs.GPADIR.bit.GPIO9 = 0;
+		//GpioCtrlRegs.GPADIR.bit.GPIO10 = 0;
+		//initWAH(500,4);
 //Initialize FFT
 		//initFFT();
 //Initialize LCD
-		initLCD();
+		//initLCD();
 //Initialize SPI
 		initSPI();
 //Initialize ADC
@@ -30,20 +30,21 @@ int main(){
 		initTIMER0();
 //Initialize External Interrupt 1
 		//initXINT1()
+		asm(" CLRC INTM, DBGM");
 
 	EALLOW;
 	while(1){	// endless loop - wait for an interrupt
-		if(updateLCD != (GpioDataRegs.GPADAT.bit.GPIO10 + GpioDataRegs.GPADAT.bit.GPIO9 + GpioDataRegs.GPADAT.bit.GPIO8)){
-			updateLCD = GpioDataRegs.GPADAT.bit.GPIO10 + GpioDataRegs.GPADAT.bit.GPIO9 + GpioDataRegs.GPADAT.bit.GPIO8;
-			printEFFECT();
-		}
+		//if(updateLCD != (GpioDataRegs.GPADAT.bit.GPIO10 + GpioDataRegs.GPADAT.bit.GPIO9 + GpioDataRegs.GPADAT.bit.GPIO8)){
+		//	updateLCD = GpioDataRegs.GPADAT.bit.GPIO10 + GpioDataRegs.GPADAT.bit.GPIO9 + GpioDataRegs.GPADAT.bit.GPIO8;
+		//	printEFFECT();
+		//}
 	}
 }
 
 void cpu_timer0_isr(void){
-
 	printSPI(AdcRegs.ADCRESULT0 >> 4);
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+
 }
 
 /*void xint1_isr(void){

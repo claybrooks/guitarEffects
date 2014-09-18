@@ -44,8 +44,7 @@ void updateTIMER0(float time){
 void initTIMER0(){
 	InitCpuTimers();
 	EALLOW;
-	if(GpioDataRegs.GPADAT.bit.GPIO11 == 0) ConfigCpuTimer(&CpuTimer0, 150, 20.833f);
-	else ConfigCpuTimer(&CpuTimer0, 150, 1000.0f);
+	ConfigCpuTimer(&CpuTimer0, 150,20.833f);
 	CpuTimer0Regs.TCR.all = 0x4001;
 	IER |= M_INT1;
 	PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
