@@ -1,4 +1,3 @@
-#include "DSP28x_Project.h"    				// Device Headerfile and Examples Include File
 #include "lcd.h"
 #include "spi.h"
 #include "sys.h"
@@ -7,7 +6,6 @@
 
 //#include "../src/FFT.h"
 void INITIALIZE(){
-		InitSysCtrl();
 	//Initialize Interrupts
 		initINTS();
 	//Initialize Effects
@@ -26,8 +24,6 @@ void INITIALIZE(){
 	//Initialize Timer 0
 		initTIMER0();
 	//Initialize External Interrupt 1
-		//initXINT1()
+		//initXINT1();
 		asm(" CLRC INTM, DBGM");
-
-	EALLOW;
 }

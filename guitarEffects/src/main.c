@@ -1,11 +1,15 @@
 #include "initialize.h"
+#include "DSP28x_Project.h"
+
+int updateCode = -1;
 
 int main(){
-
+	InitSysCtrl();
 	INITIALIZE();
-
 	while(1){
-
+		if(updateCode != -1){
+			updateCode = updateLCD(updateCode);
+		}
 	}
 }
 
@@ -16,6 +20,6 @@ void cpu_timer0_isr(void){
 
 void xint1_isr(void){
 	int input = ((GpioDataRegs.GPADAT.all) & 0xFFF00000) >> 20;
-	if(input == 0x0800) clearPipeline();
-	else handleInput(input&0x03FF);
+	handleInput(input);
+	updateCode = MAIN;
 }
