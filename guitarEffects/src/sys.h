@@ -11,25 +11,26 @@ void initINTS(){
 	GpioCtrlRegs.GPADIR.bit.GPIO11 = 0;
 }
 
-/*void initXINT1(){
+void initXINT1(){
 	EALLOW;
 	//Mode toggle interrupt on GPIO 11
 	PieVectTable.XINT1 = &xint1_isr;
 
-	PieCtrlRegs.PIECTRL.bit.ENPIE = 1;          // Enable the PIE block
-	PieCtrlRegs.PIEIER1.bit.INTx4 = 1;          // Enable PIE Gropu 1 INT4
+	PieCtrlRegs.PIECTRL.bit.ENPIE = 1;		// Enable the PIE block
+	PieCtrlRegs.PIEIER1.bit.INTx4 = 1;		// Enable PIE Group 1 INT4
+	PieCtrlRegs.PIEIER1.all
 
-	GpioCtrlRegs.GPAMUX1.bit.GPIO11 = 0;         // GPIO
-	GpioCtrlRegs.GPADIR.bit.GPIO11 = 0;          // input
-	GpioCtrlRegs.GPAQSEL1.bit.GPIO11 = 0;        // Xint1 Synch to SYSCLKOUT only
+	GpioCtrlRegs.GPAMUX2.all &= 0x000F;		//Set GPIO20-31 to 0
 
+	GpioCtrlRegs.GPADIR.all &= 0x000FFFFF;	//GPIO20-31 to input (0)
 
-	GpioIntRegs.GPIOXINT1SEL.bit.GPIOSEL = 11;
+	GpioCtrlRegs.GPAQSEL2.all &= 0x000F;	//Synch to SYSCLKOUT GPIO20-31
 
-	if(GpioDataRegs.GPADAT.bit.GPIO11 == 0) XIntruptRegs.XINT1CR.bit.POLARITY = 1;      // Rising edge interrupt
-	else XIntruptRegs.XINT1CR.bit.POLARITY = 0;
+	GpioIntRegs.GPIOXINT1SEL.bit.GPIOSEL = 0x1F;	//GPIO 31 as interrupt
+
+	XIntruptRegs.XINT1CR.bit.POLARITY = 1;      // Rising edge interrupt
 	XIntruptRegs.XINT1CR.bit.ENABLE = 1;        // Enable Xint1
-}*/
+}
 
 void updateTIMER0(float time){
 	ConfigCpuTimer(&CpuTimer0, 150, time);

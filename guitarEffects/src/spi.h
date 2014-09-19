@@ -2,7 +2,7 @@ void printSPI();
 void initSPI();
 
 void printSPI(int val){
-
+	val = processEFFECT(val);
 	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
 	SpiaRegs.SPITXBUF = 0x4000 | val;
 	DELAY_US(2);

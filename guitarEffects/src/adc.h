@@ -25,3 +25,7 @@ void initADC(){
 	  // Start SEQ1
 	      AdcRegs.ADCTRL2.all = 0x2000;
 }
+
+int getAdc(){
+	return AdcRegs.ADCRESULT0 >> 4;
+}
