@@ -1,5 +1,9 @@
 #include "wah.h"
 #define PI 3.1415926
+
+void queueEffect(int);
+void handleInput(int);
+
 long tremoloCount = 0;
 long frequency = 2205;
 int control = 0;
@@ -20,8 +24,8 @@ int numEffects = 0;
 #define DELAY		8
 #define PITCH_SHIFT	9
 
-void handInput(int input){
-	int effect = log(input)/log(2);	//Effect that wants to be set or turned off
+void handleInput(int input){
+	int effect = (int)log(input)/log(2);	//Effect that wants to be set or turned off
 	int i;
 	for(i = 0; i < numEffects; i++){
 		//If already queued toggle state
@@ -37,20 +41,16 @@ void handInput(int input){
 
 void queueEffect(int effect){
 	pipeline[numEffects] = effect;
-	turnOnEffect(numEffects);
+	on_off[numEffects] = 1;
 	numEffects++;
 }
 
-void turnOffEffect(int index){
-
-}
-void turnOnEffect(int index){
-	on_off[index] = 1;
-}
-
 void clearPipeline(){
-	pipeline = {0,0,0,0,0,0,0,0,0,0};
-	on_off = {0,0,0,0,0,0,0,0,0,0};
+	int i;
+	for(i = 0; i < 10; i++){
+		pipeline[i] = 0;
+		on_off[i] = 0;
+	}
 	numEffects = 0;
 }
 
@@ -64,7 +64,6 @@ int processEffect(int val){
 		//MODULATION::Chorus, Ensemble, Flanger, pitch shift
 		//DELAY:: Delay, Tape echo, Analog Delay,
 		//REVERB:: Hall, Room, Spring
-		//COMP/EFX
 
 		effect = pipeline[index];
 		on = on_off[index];

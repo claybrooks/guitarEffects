@@ -1,5 +1,5 @@
 interrupt void cpu_timer0_isr(void);
-//interrupt void xint1_isr(void);
+interrupt void xint1_isr(void);
 
 void initINTS(){
 	InitPieCtrl();
@@ -18,7 +18,7 @@ void initXINT1(){
 
 	PieCtrlRegs.PIECTRL.bit.ENPIE = 1;		// Enable the PIE block
 	PieCtrlRegs.PIEIER1.bit.INTx4 = 1;		// Enable PIE Group 1 INT4
-	PieCtrlRegs.PIEIER1.all
+	PieCtrlRegs.PIEIER1.bit.INTx4 = 1;
 
 	GpioCtrlRegs.GPAMUX2.all &= 0x000F;		//Set GPIO20-31 to 0
 
