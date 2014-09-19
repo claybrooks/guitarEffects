@@ -9,8 +9,14 @@ CG_TOOL_ROOT := E:/ti/ccsv6/tools/compiler/c2000_6.2.7
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
 "./src/wah.obj" \
+"./src/sys.obj" \
+"./src/spi.obj" \
 "./src/main.obj" \
+"./src/lcd.obj" \
+"./src/fft.obj" \
+"./src/effect.obj" \
 "./src/bp_iir.obj" \
+"./src/adc.obj" \
 "./RFFT_adc_f32u.obj" \
 "./DSP2833x_usDelay.obj" \
 "./DSP2833x_SysCtrl.obj" \
@@ -161,8 +167,8 @@ guitarEffects.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "DSP2833x_Adc.pp" "DSP2833x_CpuTimers.pp" "DSP2833x_DefaultIsr.pp" "DSP2833x_GlobalVariableDefs.pp" "DSP2833x_Gpio.pp" "DSP2833x_PieCtrl.pp" "DSP2833x_PieVect.pp" "DSP2833x_Spi.pp" "DSP2833x_SysCtrl.pp" "src\bp_iir.pp" "src\main.pp" "src\wah.pp" 
-	-$(RM) "DSP2833x_ADC_cal.obj" "DSP2833x_Adc.obj" "DSP2833x_CodeStartBranch.obj" "DSP2833x_CpuTimers.obj" "DSP2833x_DBGIER.obj" "DSP2833x_DefaultIsr.obj" "DSP2833x_GlobalVariableDefs.obj" "DSP2833x_Gpio.obj" "DSP2833x_PieCtrl.obj" "DSP2833x_PieVect.obj" "DSP2833x_Spi.obj" "DSP2833x_SysCtrl.obj" "DSP2833x_usDelay.obj" "RFFT_adc_f32u.obj" "src\bp_iir.obj" "src\main.obj" "src\wah.obj" 
+	-$(RM) "DSP2833x_Adc.pp" "DSP2833x_CpuTimers.pp" "DSP2833x_DefaultIsr.pp" "DSP2833x_GlobalVariableDefs.pp" "DSP2833x_Gpio.pp" "DSP2833x_PieCtrl.pp" "DSP2833x_PieVect.pp" "DSP2833x_Spi.pp" "DSP2833x_SysCtrl.pp" "src\adc.pp" "src\bp_iir.pp" "src\effect.pp" "src\fft.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "src\wah.pp" 
+	-$(RM) "DSP2833x_ADC_cal.obj" "DSP2833x_Adc.obj" "DSP2833x_CodeStartBranch.obj" "DSP2833x_CpuTimers.obj" "DSP2833x_DBGIER.obj" "DSP2833x_DefaultIsr.obj" "DSP2833x_GlobalVariableDefs.obj" "DSP2833x_Gpio.obj" "DSP2833x_PieCtrl.obj" "DSP2833x_PieVect.obj" "DSP2833x_Spi.obj" "DSP2833x_SysCtrl.obj" "DSP2833x_usDelay.obj" "RFFT_adc_f32u.obj" "src\adc.obj" "src\bp_iir.obj" "src\effect.obj" "src\fft.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "src\wah.obj" 
 	-$(RM) "DSP2833x_ADC_cal.pp" "DSP2833x_CodeStartBranch.pp" "DSP2833x_DBGIER.pp" "DSP2833x_usDelay.pp" "RFFT_adc_f32u.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

@@ -1,4 +1,5 @@
 #include "initialize.h"
+
 int main(){
 
 	INITIALIZE();
@@ -9,12 +10,12 @@ int main(){
 }
 
 void cpu_timer0_isr(void){
-	printSPI(getAdc());
+	printSPI(processEffect(getAdc()));
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
 void xint1_isr(void){
 	int input = ((GpioDataRegs.GPADAT.all) & 0xFFF00000) >> 20;
 	if(input == 0x0800) clearPipeline();
-	else handleInput(input&0xCFFF);
+	else handleInput(input&0x03FF);
 }
