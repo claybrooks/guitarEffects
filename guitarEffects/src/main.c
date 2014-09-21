@@ -1,25 +1,27 @@
 #include "initialize.h"
 #include "DSP28x_Project.h"
 
-int updateCode = -1;
+int screen = -1, input = 0, sample;
 
 int main(){
 	InitSysCtrl();
-	INITIALIZE();
+	initialize();
 	while(1){
-		if(updateCode != -1){
-			updateCode = updateLCD(updateCode);
+		if(screen > -1){
+			updateLCD(screen);
+			screen = -1;
 		}
 	}
 }
 
-void cpu_timer0_isr(void){
-	printSPI(processEffect(getAdc()));
+interrupt void cpu_timer0_isr(void){
+	sample = getAdc();
+	//process(0x0AAA);
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
-void xint1_isr(void){
-	int input = ((GpioDataRegs.GPADAT.all) & 0xFFF00000) >> 20;
-	handleInput(input);
-	updateCode = MAIN;
+interrupt void xint1_isr(void){
+	input = (GpioDataRegs.GPADAT.all & 0x0000FF00) >> 8;
+	if(input!= 0)handle(input);
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
