@@ -1,5 +1,5 @@
-#ifndef __AUTOWAH_H__
-#define __AUTOWAH_H__
+#ifndef __WAH__
+#define __WAH__
 
 extern void initWAH(int effect_rate, int Q);
 extern double getWAH(int xin);
