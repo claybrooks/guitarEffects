@@ -57,7 +57,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.linkerID.LIBRARY.790134915" name="Include library file or command file as input (--library, -l)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.linkerID.LIBRARY" valueType="libs">
 									<listOptionValue builtIn="false" value="&quot;libc.a&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;E:\ti\controlSUITE\libs\dsp\FPU\v130\lib\C28x_FPU_Lib.lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\ti\ccsv5\tools\compiler\c2000_6.2.0\lib\rts2800_fpu32.lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;E:\ti\ccsv6\tools\compiler\c2000_6.2.7\lib\rts2800_fpu32.lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.linkerID.SEARCH_PATH.74165712" name="Add &lt;dir&gt; to library search path (--search_path, -i)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.linkerID.SEARCH_PATH" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${CG_TOOL_ROOT}/lib&quot;"/>
