@@ -1,5 +1,6 @@
 #include "effect.h"
 #include "math.h"
+#include "DSP28x_Project.h"
 
 //Type definition, like a #define but more of a variable
 typedef int FUNC(int, struct params*);
@@ -85,32 +86,36 @@ int process(int sample){
 }
 
 int processDelay(int sample, struct params* p){
-	return 0;
+	return sample;
 }
 int processDistortion(int sample, struct params* p){
-	return 0;
+	return sample;
 }
 int processCrunch(int sample, struct params* p){
-	return 0;
+	return sample;
 }
 int processTremolo(int sample, struct params* p){
-	return 0;
+	float adcmax = 0x8CA0;
+	float pedalLevel = AdcRegs.ADCRESULT1;
+	float result = pedalLevel/adcmax;
+	return sample * (result);
+
 }
 int processWah(int sample, struct params* p){
-	return 0;
+	return sample;
 }
 int processPhaser(int sample, struct params* p){
-	return 0;
+	return sample;
 }
 int processFlange(int sample, struct params* p){
-	return 0;
+	return sample;
 }
 int processReverb(int sample, struct params* p){
-	return 0;
+	return sample;
 }
 int processChorus(int sample, struct params* p){
-	return 0;
+	return sample;
 }
 int processPitchShift(int sample, struct params* p){
-	return 0;
+	return sample;
 }

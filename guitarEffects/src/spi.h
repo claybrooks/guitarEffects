@@ -1,7 +1,7 @@
 #ifndef __SPI__
 #define __SPI__
 
-void printSPI(int);
+void writeSPI(int);
 void initSPI(void);
 
 #endif

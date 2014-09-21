@@ -1,4 +1,5 @@
 #include "initialize.h"
+#include "spi.h"
 #include "DSP28x_Project.h"
 
 int screen = -1, input = 0, sample;
@@ -16,7 +17,7 @@ int main(){
 
 interrupt void cpu_timer0_isr(void){
 	sample = getAdc();
-	//process(0x0AAA);
+	writeSPI(process(sample));
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 

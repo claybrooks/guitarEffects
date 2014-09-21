@@ -6,7 +6,8 @@
  */
 #include "spi.h"
 #include "DSP28x_Project.h"
-void printSPI(int val){
+
+void writeSPI(int val){
 	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
 	SpiaRegs.SPITXBUF = 0x4000 | val;
 	DELAY_US(2);

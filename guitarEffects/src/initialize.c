@@ -11,13 +11,13 @@ void initialize(){
 	//initFFT();
 
 	//Initialize LCD
-	//initLCD();
+	initLCD();
 
 	//Initialize SPI
-	//initSPI();
+	initSPI();
 
 	//Initialize ADC
-	//initADC();
+	initADC();
 
 	//Initialize Timer 0
 	initTIMER0();
