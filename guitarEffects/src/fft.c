@@ -14,6 +14,10 @@ volatile uint16_t FFTStartFlag = 0;	// One frame data ready flag
 
 uint16_t DEBUG_TOGGLE = 1;			// Used in realtime mode investigation
 
+RFFT_ADC_F32_STRUCT rfft_adc;
+RFFT_F32_STRUCT rfft;
+
+
 void initFFT(){
 	/*
 	 * Link the Link the RFFT_ADC_F32_STRUCT to RFFT_F32_STRUCT.
@@ -54,16 +58,15 @@ int findFREQ(){
 	freq = F_PER_SAMPLE * (float)j;	//Convert normalized digital frequency to analog frequency
 	FFTStartFlag = 0;			   	//Start collecting the next frame of data
 	return freq;
-
 }
 
-void storeFFT(){
+void storeFFT(int sample){
 	static uint16_t *AdcBufPtr = AdcBuf;		// Pointer to ADC data buffer
 
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;		// Must acknowledge the PIE group
 
 	//--- Read the ADC result
-	*AdcBufPtr++ = AdcMirror.ADCRESULT0;		// Read the result
+	*AdcBufPtr++ = sample;		// Read the result
 
 	//--- Brute-force the circular buffer
 	if( AdcBufPtr == (AdcBuf + ADC_BUF_LEN) ){

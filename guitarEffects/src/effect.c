@@ -43,17 +43,6 @@ int toggleOn_Off(int effect){
 }
 
 //Eliminates need to call log(input)/log(2).  Simple lookup will be faster
-int indexLookup(int input){
-	if(input == 1) return 0;
-	else if(input == 2) return 1;
-	else if(input == 4) return 2;
-	else if(input == 8) return 3;
-	else if(input == 16) return 4;
-	else if(input == 32) return 5;
-	else if(input == 64) return 6;
-	else if(input == 128) return 7;
-	else return 8;
-}
 
 void queueEffect(int effect){
 	location[effect] = numQueued;		//Set location of the effect in the location array, basically where is effect stored in queue?

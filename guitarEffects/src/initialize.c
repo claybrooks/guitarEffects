@@ -1,4 +1,9 @@
 #include "initialize.h"
+#include "lcd.h"
+#include "spi.h"
+#include "sys.h"
+#include "adc.h"
+#include "effect.h"
 
 void initialize(){
 	//Initialize Interrupts

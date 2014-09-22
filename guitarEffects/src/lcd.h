@@ -8,7 +8,9 @@
 #ifndef LCD_H_
 #define LCD_H_
 
-#define MAIN 0
+#define CLEAR 	0
+#define MAIN	1
+#define TUNER 	2
 
 void 	initLCD(void);
 void 	printLCD(int);
