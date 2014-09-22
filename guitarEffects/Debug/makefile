@@ -8,29 +8,30 @@ CG_TOOL_ROOT := E:/ti/ccsv6/tools/compiler/c2000_6.2.7
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
-"./includes/RFFT_adc_f32u.obj" \
-"./includes/DSP2833x_usDelay.obj" \
-"./includes/DSP2833x_SysCtrl.obj" \
-"./includes/DSP2833x_Spi.obj" \
-"./includes/DSP2833x_PieVect.obj" \
-"./includes/DSP2833x_PieCtrl.obj" \
-"./includes/DSP2833x_Gpio.obj" \
-"./includes/DSP2833x_GlobalVariableDefs.obj" \
-"./includes/DSP2833x_DefaultIsr.obj" \
-"./includes/DSP2833x_DBGIER.obj" \
-"./includes/DSP2833x_CpuTimers.obj" \
-"./includes/DSP2833x_CodeStartBranch.obj" \
-"./includes/DSP2833x_Adc.obj" \
-"./includes/DSP2833x_ADC_cal.obj" \
-"./src/wah.obj" \
-"./src/sys.obj" \
-"./src/spi.obj" \
-"./src/main.obj" \
-"./src/lcd.obj" \
-"./src/initialize.obj" \
-"./src/fft.obj" \
-"./src/effect.obj" \
 "./src/adc.obj" \
+"./src/effect.obj" \
+"./src/fft.obj" \
+"./src/handler.obj" \
+"./src/initialize.obj" \
+"./src/lcd.obj" \
+"./src/main.obj" \
+"./src/spi.obj" \
+"./src/sys.obj" \
+"./src/wah.obj" \
+"./includes/DSP2833x_ADC_cal.obj" \
+"./includes/DSP2833x_Adc.obj" \
+"./includes/DSP2833x_CodeStartBranch.obj" \
+"./includes/DSP2833x_CpuTimers.obj" \
+"./includes/DSP2833x_DBGIER.obj" \
+"./includes/DSP2833x_DefaultIsr.obj" \
+"./includes/DSP2833x_GlobalVariableDefs.obj" \
+"./includes/DSP2833x_Gpio.obj" \
+"./includes/DSP2833x_PieCtrl.obj" \
+"./includes/DSP2833x_PieVect.obj" \
+"./includes/DSP2833x_Spi.obj" \
+"./includes/DSP2833x_SysCtrl.obj" \
+"./includes/DSP2833x_usDelay.obj" \
+"./includes/RFFT_adc_f32u.obj" \
 "../KG_RAM_Link1.cmd" \
 "../includes/DSP2833x_Headers_nonBIOS.cmd" \
 -l"libc.a" \
@@ -169,8 +170,8 @@ guitarEffects.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "src\adc.pp" "src\effect.pp" "src\fft.pp" "src\initialize.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "src\wah.pp" "includes\DSP2833x_Adc.pp" "includes\DSP2833x_CpuTimers.pp" "includes\DSP2833x_DefaultIsr.pp" "includes\DSP2833x_GlobalVariableDefs.pp" "includes\DSP2833x_Gpio.pp" "includes\DSP2833x_PieCtrl.pp" "includes\DSP2833x_PieVect.pp" "includes\DSP2833x_Spi.pp" "includes\DSP2833x_SysCtrl.pp" 
-	-$(RM) "src\adc.obj" "src\effect.obj" "src\fft.obj" "src\initialize.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "src\wah.obj" "includes\DSP2833x_ADC_cal.obj" "includes\DSP2833x_Adc.obj" "includes\DSP2833x_CodeStartBranch.obj" "includes\DSP2833x_CpuTimers.obj" "includes\DSP2833x_DBGIER.obj" "includes\DSP2833x_DefaultIsr.obj" "includes\DSP2833x_GlobalVariableDefs.obj" "includes\DSP2833x_Gpio.obj" "includes\DSP2833x_PieCtrl.obj" "includes\DSP2833x_PieVect.obj" "includes\DSP2833x_Spi.obj" "includes\DSP2833x_SysCtrl.obj" "includes\DSP2833x_usDelay.obj" "includes\RFFT_adc_f32u.obj" 
+	-$(RM) "src\adc.pp" "src\effect.pp" "src\fft.pp" "src\handler.pp" "src\initialize.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "src\wah.pp" "includes\DSP2833x_Adc.pp" "includes\DSP2833x_CpuTimers.pp" "includes\DSP2833x_DefaultIsr.pp" "includes\DSP2833x_GlobalVariableDefs.pp" "includes\DSP2833x_Gpio.pp" "includes\DSP2833x_PieCtrl.pp" "includes\DSP2833x_PieVect.pp" "includes\DSP2833x_Spi.pp" "includes\DSP2833x_SysCtrl.pp" 
+	-$(RM) "src\adc.obj" "src\effect.obj" "src\fft.obj" "src\handler.obj" "src\initialize.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "src\wah.obj" "includes\DSP2833x_ADC_cal.obj" "includes\DSP2833x_Adc.obj" "includes\DSP2833x_CodeStartBranch.obj" "includes\DSP2833x_CpuTimers.obj" "includes\DSP2833x_DBGIER.obj" "includes\DSP2833x_DefaultIsr.obj" "includes\DSP2833x_GlobalVariableDefs.obj" "includes\DSP2833x_Gpio.obj" "includes\DSP2833x_PieCtrl.obj" "includes\DSP2833x_PieVect.obj" "includes\DSP2833x_Spi.obj" "includes\DSP2833x_SysCtrl.obj" "includes\DSP2833x_usDelay.obj" "includes\RFFT_adc_f32u.obj" 
 	-$(RM) "includes\DSP2833x_ADC_cal.pp" "includes\DSP2833x_CodeStartBranch.pp" "includes\DSP2833x_DBGIER.pp" "includes\DSP2833x_usDelay.pp" "includes\RFFT_adc_f32u.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

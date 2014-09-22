@@ -1,14 +1,20 @@
-#ifndef __INITIALIZE__
-#define __INITIALIZE__
+/*
+ * initialize.h
+ *
+ *  Created on: Sep 22, 2014
+ *      Author: brks9622
+ */
 
+#ifndef INITIALIZE_H_
+#define INITIALIZE_H_
 
 #include "lcd.h"
 #include "spi.h"
 #include "sys.h"
 #include "adc.h"
 #include "effect.h"
+//#include "fft.h"
 
-//#include "../src/FFT.h"
 void initialize();
 
-#endif
+#endif /* INITIALIZE_H_ */

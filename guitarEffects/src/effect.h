@@ -1,8 +1,13 @@
-//#include "wah.h"
-#ifndef __EFFECT__
-#define __EFFECT__
-#define PI 3.1415926
+/*
+ * effect.h
+ *
+ *  Created on: Sep 22, 2014
+ *      Author: brks9622
+ */
+#ifndef EFFECT_H_
+#define EFFECT_H_
 
+#define PI 3.1415926
 struct params{
 	int tremoloCount;
 };
@@ -20,12 +25,11 @@ int processChorus(int, struct params*);
 int processDelay(int, struct params*);
 int processPitchShift(int, struct params*);
 
-void queueEffect(int (*f)(int, struct params*));
-void clearPipeline();
-int process(int val);
-void handle(int input);
-void initEffects();
-int indexLookup(int);
+void	queueEffect(int);	//Sticks effect into queue
+void 	clearPipeline();	//Clears the queue
+int 	process(int);		//Process the effects in the queue, FIFO
+void 	initEffects();		//Initialize registers
+int 	indexLookup(int);	//Maps GPIO input to an effect
+int 	toggleOn_Off(int);	//Toggles effect on/off once its in the queue
 
-
-#endif /* EFFECT */
+#endif /* EFFECT_H_ */

@@ -1,5 +1,6 @@
 #include "initialize.h"
 #include "spi.h"
+#include "handler.h"
 #include "DSP28x_Project.h"
 
 int screen = -1, input = 0, sample;
