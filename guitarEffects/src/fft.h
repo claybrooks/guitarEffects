@@ -21,7 +21,7 @@
 #define F_PER_SAMPLE        1000.0L/(float)RFFT_SIZE  //Internal sampling rate is 48kHz
 
 void initFFT();
-int findFREQ();
-void storeFFT(int);
+int findFrequency();
+int storeFFT(int);			//Return true if FFT ready to compute
 
 #endif /* FFT_H_ */

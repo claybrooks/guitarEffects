@@ -42,7 +42,7 @@ void initFFT(){
 	for (i=0; i < RFFT_SIZE/2; i++) RFFTmagBuff[i] = 0;
 }
 
-int findFREQ(){
+int findFrequency(){
 	RFFT_adc_f32u(&rfft_adc);   // This version of FFT doesn't need buffer alignment
 	RFFT_f32_mag(&rfft);		// Calculate spectrum amplitude
 	int i = 0, j = 1, freq = RFFTmagBuff[1];
@@ -60,7 +60,7 @@ int findFREQ(){
 	return freq;
 }
 
-void storeFFT(int sample){
+int storeFFT(int sample){
 	static uint16_t *AdcBufPtr = AdcBuf;		// Pointer to ADC data buffer
 
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;		// Must acknowledge the PIE group
@@ -73,5 +73,5 @@ void storeFFT(int sample){
 		AdcBufPtr = AdcBuf;						// Rewind the pointer to the beginning
 		FFTStartFlag = 1;						// One frame data ready
 	}
-	return;
+	return FFTStartFlag;
 }

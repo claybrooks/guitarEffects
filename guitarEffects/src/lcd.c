@@ -8,10 +8,45 @@
 #include "math.h"
 #include "DSP28x_Project.h"
 
-#define DELAY 11000
+#define DELAYLCD 11000
 
-int updateLCD(int update){
-	return -1;
+int mainDisplay[10];
+int mainDisplay_show[10];
+int numInMainDisplay;
+
+void updateLCD(int update){
+	//Clear Screen, called by a reset on the queue
+	if(update == CLEAR){
+
+	}
+	else if(update >= DELAY && update <= PITCHSHIFT){
+			//Initialize Variables
+		int i = 0, inMainDisplay;
+		//Loop through mainDisplay to see if the effect is already set to print to LCD
+		for(;i<numInMainDisplay;i++){
+			//If it is in main display, break
+			if(mainDisplay[i] == update){
+				inMainDisplay = 1;
+				break;
+			}
+		}
+		//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
+		//where update == delay through pitch shift values defined in lcd.h
+		if(!inMainDisplay){
+			mainDisplay[numInMainDisplay] = update;
+			mainDisplay_show[numInMainDisplay] = 1;
+			numInMainDisplay++;
+		}
+		else{
+			//If its already in main display, its already in the queue, so toggle the effect on/off, toggle
+			//the display on/off
+			mainDisplay_show[i] ^= 1;
+		}
+	}
+
+	else{
+		printFreq(update);
+	}
 }
 
 void wait(int temp){
@@ -19,6 +54,11 @@ void wait(int temp){
 }
 
 void initLCD(){
+	int i = 0;
+	for(;i<10;i++){
+		mainDisplay[i] = 0;
+		mainDisplay_show[i] = 0;
+	}
 	EALLOW;
 	GpioCtrlRegs.GPADIR.bit.GPIO0 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO1 = 0x1;
@@ -48,25 +88,25 @@ void initLCD(){
 void controlLCD(int data){
 	GpioDataRegs.GPBDAT.bit.GPIO49 = 0;
 	GpioDataRegs.GPADAT.all = data;
-	wait(DELAY);
+	wait(DELAYLCD);
 	GpioDataRegs.GPBDAT.bit.GPIO48 = 1;
-	wait(DELAY);
+	wait(DELAYLCD);
 	GpioDataRegs.GPBDAT.bit.GPIO48 = 0;
-	wait(DELAY);
+	wait(DELAYLCD);
 
 }
 
 void printLCD(int data){
 	GpioDataRegs.GPBDAT.bit.GPIO49 = 1;
 	GpioDataRegs.GPADAT.all = data;
-	wait(DELAY);
+	wait(DELAYLCD);
 	GpioDataRegs.GPBDAT.bit.GPIO48 = 1;
-	wait(DELAY);
+	wait(DELAYLCD);
 	GpioDataRegs.GPBDAT.bit.GPIO48 = 0;
-	wait(DELAY);
+	wait(DELAYLCD);
 }
 
-void printFREQ(int data){
+void printFreq(int data){
 	controlLCD(0x01);
 
 	unsigned int* array = (unsigned int*)0xA000;

@@ -29,7 +29,7 @@ int handle(int input){
 	}
 	//Switch to tuning function
 	else if(input == 0x0040){
-		return TUNER
+		return TUNER;
 	}
 	//Look to either queue effect or toggle state
 	else{
@@ -39,5 +39,5 @@ int handle(int input){
 		int effect = indexLookup(input);
 		//toggleOn_Off return 1 if it can be toggled, else 0 meaning its not in queue;
 		if(!toggleOn_Off(effect)) queueEffect(effect);		//queue the effect
-		return MAIN;
+		return effect;
 	}
