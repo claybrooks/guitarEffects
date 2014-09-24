@@ -8,21 +8,24 @@
 #ifndef LCD_H_
 #define LCD_H_
 
-#define DELAY 		1
-#define DISTORTION 	2
-#define CRUNCH 		3
-#define TREMOLO 	4
-#define WAH 		5
-#define PHASER 		6
-#define FLANGE 		7
-#define REVERB 		8
-#define CHORUS 		9
-#define PITCHSHIFT 	10
+#define DELAY 		0
+#define DISTORTION 	1
+#define CRUNCH 		2
+#define TREMOLO 	3
+#define WAH 		4
+#define PHASER 		5
+#define FLANGE 		6
+#define REVERB 		7
+#define CHORUS 		8
+#define PITCHSHIFT 	9
+#define MAIN 		10
 #define CLEAR 		14
 #define TUNER 		15
 
 void 	initLCD(void);
 void 	printLCD(int);
+void 	addToLCD(int);
+void 	toggleLCD(int,int,int);
 void 	controlLCD(int);
 void	updateLCD(int);
 void 	printFreq(int);

@@ -41,3 +41,4 @@ int handle(int input){
 		if(!toggleOn_Off(effect)) queueEffect(effect);		//queue the effect
 		return effect;
 	}
+}

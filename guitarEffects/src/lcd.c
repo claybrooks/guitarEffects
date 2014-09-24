@@ -10,14 +10,18 @@
 
 #define DELAYLCD 11000
 
+//Similar to queue system as pipeline.  mainDisplay contains what could possibly be printed to screen.
+//mainDisplay_show holds whether or not it is printed to screen (on_off[]);
 int mainDisplay[10];
 int mainDisplay_show[10];
 int numInMainDisplay;
 
+//Eventually parses code and tells the printLCD() what to print
 void updateLCD(int update){
 	//Clear Screen, called by a reset on the queue
 	if(update == CLEAR){
-
+		numInMainDisplay = 0;
+		controlLCD(0x01);
 	}
 	else if(update >= DELAY && update <= PITCHSHIFT){
 			//Initialize Variables
@@ -36,11 +40,17 @@ void updateLCD(int update){
 			mainDisplay[numInMainDisplay] = update;
 			mainDisplay_show[numInMainDisplay] = 1;
 			numInMainDisplay++;
+
+			//Send toLCD(effect to be printed)
+			addToLCD(update);
+			printLCD(0x20);
 		}
 		else{
 			//If its already in main display, its already in the queue, so toggle the effect on/off, toggle
 			//the display on/off
 			mainDisplay_show[i] ^= 1;
+
+			toggleLCD(update, i, mainDisplay_show[i]);
 		}
 	}
 
@@ -48,6 +58,96 @@ void updateLCD(int update){
 		printFreq(update);
 	}
 }
+
+
+void addToLCD(int effect){
+	if(effect == DELAY){
+		printLCD(0x44);
+		printLCD(0x45);
+	}
+	else if(effect == DISTORTION){
+		printLCD(0x44);
+		printLCD(0x49);
+	}
+	else if(effect == CRUNCH){
+		printLCD(0x43);
+		printLCD(0x52);
+	}
+	else if(effect == TREMOLO){
+		printLCD(0x54);
+		printLCD(0x52);
+	}
+	else if(effect == WAH){
+		printLCD(0x57);
+		printLCD(0x41);
+	}
+	else if(effect == PHASER){
+		printLCD(0x50);
+		printLCD(0x48);
+	}
+	else if(effect == FLANGE){
+		printLCD(0x46);
+		printLCD(0x4B);
+	}
+	else if(effect == REVERB){
+		printLCD(0x52);
+		printLCD(0x45);
+	}
+	else if(effect == CHORUS){
+		printLCD(0x43);
+		printLCD(0x48);
+	}
+	else if(effect == PITCHSHIFT){
+		printLCD(0x50);
+		printLCD(0x53);
+	}
+}
+
+void toggleLCD(int effect, int index, int on){
+	controlLCD(0x02); //Return cursor to home;
+
+	//Shift to beggining of section that needs to be changed
+	int i;
+	for(i = 0;i<index*3;i++){
+		controlLCD(0x14);
+	}
+
+	//Went from off to on, reprint effect in proper spot.  Fill in proper vales
+	if(on){
+		addToLCD(effect);
+	}
+
+	//Went from on to off, remove effect from spot
+	else{
+		printLCD(0x20);
+		printLCD(0x20);
+	}
+
+	controlLCD(0x02); //Return cursor to home;
+	for(i = 0;i<numInMainDisplay*3;i++){
+			controlLCD(0x14);
+	}
+}
+
+void printFreq(int data){
+	controlLCD(0x01);
+
+	unsigned int* array = (unsigned int*)0xA000;
+	int counter = 0;
+	while(data >= 1){
+		counter += 1;
+		*array = fmod(data, 10);
+		data  = data / 10;
+		array += 1;
+	}
+	array -= 1;
+	for(; counter > 0; counter--, array--){
+		printLCD(*array+0x30);
+	}
+}
+
+
+
 
 void wait(int temp){
 	while(temp != 0) temp--;
@@ -59,6 +159,7 @@ void initLCD(){
 		mainDisplay[i] = 0;
 		mainDisplay_show[i] = 0;
 	}
+	numInMainDisplay = 0;
 	EALLOW;
 	GpioCtrlRegs.GPADIR.bit.GPIO0 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO1 = 0x1;
@@ -104,21 +205,4 @@ void printLCD(int data){
 	wait(DELAYLCD);
 	GpioDataRegs.GPBDAT.bit.GPIO48 = 0;
 	wait(DELAYLCD);
-}
-
-void printFreq(int data){
-	controlLCD(0x01);
-
-	unsigned int* array = (unsigned int*)0xA000;
-	int counter = 0;
-	while(data >= 1){
-		counter += 1;
-		*array = fmod(data, 10);
-		data  = data / 10;
-		array += 1;
-	}
-	array -= 1;
-	for(; counter > 0; counter--, array--){
-		printLCD(*array+0x30);
-	}
 }

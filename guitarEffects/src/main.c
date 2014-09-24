@@ -40,8 +40,9 @@ interrupt void cpu_timer0_isr(void){
 		}
 	}
 	else{
-		sample = getAdc();
-		writeSPI(process(sample));
+		process(sample);
+		//sample = getAdc();
+		//writeSPI(process(sample));
 		PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 	}
 }

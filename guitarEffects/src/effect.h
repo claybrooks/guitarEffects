@@ -9,17 +9,6 @@
 
 #define PI 3.1415926
 
-#define DELAY 		1
-#define DISTORTION 	2
-#define CRUNCH 		3
-#define TREMOLO 	4
-#define WAH 		5
-#define PHASER 		6
-#define FLANGE 		7
-#define REVERB 		8
-#define CHORUS 		9
-#define PITCHSHIFT 	10;
-
 struct params{
 	int tremoloCount;
 };

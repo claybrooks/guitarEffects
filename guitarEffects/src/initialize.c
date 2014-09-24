@@ -13,7 +13,7 @@ void initialize(){
 	initEffects();
 
 	//Initialize FFT
-	//initFFT();
+	initFFT();
 
 	//Initialize LCD
 	initLCD();
