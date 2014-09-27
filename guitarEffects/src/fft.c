@@ -12,15 +12,13 @@ uint16_t AdcBuf[ADC_BUF_LEN];		// ADC buffer allocation
 
 volatile uint16_t FFTStartFlag = 0;	// One frame data ready flag
 
-uint16_t DEBUG_TOGGLE = 1;			// Used in realtime mode investigation
-
 RFFT_ADC_F32_STRUCT rfft_adc;
 RFFT_F32_STRUCT rfft;
 
 
 void initFFT(){
 	/*
-	 * Link the Link the RFFT_ADC_F32_STRUCT to RFFT_F32_STRUCT.
+	 * Link the RFFT_ADC_F32_STRUCT to RFFT_F32_STRUCT.
 	 * Tail pointer of RFFT_ADC_F32_STRUCT is passed to the OutBuf pointer
 	 * of RFFT_F32_STRUCT.
 	 */

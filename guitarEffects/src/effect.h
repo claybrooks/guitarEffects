@@ -10,7 +10,7 @@
 #define PI 3.1415926
 
 struct params{
-	int tremoloCount;
+	int tremoloCounter, tremoloRate, tremoloCount, tremoloLimit;
 };
 
 int processDelay(int,struct params*);

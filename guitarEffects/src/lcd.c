@@ -8,24 +8,24 @@
 #include "math.h"
 #include "DSP28x_Project.h"
 
-#define DELAYLCD 11000
+#define DELAYLCD 15000
 
 //Similar to queue system as pipeline.  mainDisplay contains what could possibly be printed to screen.
 //mainDisplay_show holds whether or not it is printed to screen (on_off[]);
 int mainDisplay[10];
 int mainDisplay_show[10];
-int numInMainDisplay;
+int numInMainDisplay, tunerScreen;
 
 //Eventually parses code and tells the printLCD() what to print
 void updateLCD(int update){
 	//Clear Screen, called by a reset on the queue
-	if(update == CLEAR){
+	if(update == CLEAR && !tunerScreen){
 		numInMainDisplay = 0;
 		controlLCD(0x01);
 	}
-	else if(update >= DELAY && update <= PITCHSHIFT){
+	else if((update >= TREMOLO && update <= FLANGE) && !tunerScreen){
 			//Initialize Variables
-		int i = 0, inMainDisplay;
+		int i = 0, inMainDisplay = 0;
 		//Loop through mainDisplay to see if the effect is already set to print to LCD
 		for(;i<numInMainDisplay;i++){
 			//If it is in main display, break
@@ -53,17 +53,41 @@ void updateLCD(int update){
 			toggleLCD(update, i, mainDisplay_show[i]);
 		}
 	}
-
-	else{
+	else if(update == TUNER){
+		if(tunerScreen){
+			tunerScreen = 0;
+			controlLCD(0x01);
+			int i;
+			for(i = 0; i < numInMainDisplay; i++){
+				if(mainDisplay_show[i])addToLCD(mainDisplay[i]);
+				else{
+					printLCD(0x20);
+					printLCD(0x20);
+				}
+				printLCD(0x20);
+			}
+		}
+		else{
+			tunerScreen = 1;
+			controlLCD(0x01);
+			printLCD(0x54);	//T
+			printLCD(0x55);	//U
+			printLCD(0x4E);	//N
+			printLCD(0x45);	//E
+			printLCD(0x52);	//R
+			printLCD(0x3A);	//:
+		}
+	}
+	else if(tunerScreen == 1){
 		printFreq(update);
 	}
 }
 
 
 void addToLCD(int effect){
-	if(effect == DELAY){
-		printLCD(0x44);
-		printLCD(0x45);
+	if(effect == TREMOLO){
+		printLCD(0x54);
+		printLCD(0x52);
 	}
 	else if(effect == DISTORTION){
 		printLCD(0x44);
@@ -73,9 +97,9 @@ void addToLCD(int effect){
 		printLCD(0x43);
 		printLCD(0x52);
 	}
-	else if(effect == TREMOLO){
-		printLCD(0x54);
-		printLCD(0x52);
+	else if(effect == DELAY){
+		printLCD(0x44);
+		printLCD(0x45);
 	}
 	else if(effect == WAH){
 		printLCD(0x57);
@@ -89,7 +113,7 @@ void addToLCD(int effect){
 		printLCD(0x46);
 		printLCD(0x4B);
 	}
-	else if(effect == REVERB){
+	/*else if(effect == REVERB){
 		printLCD(0x52);
 		printLCD(0x45);
 	}
@@ -100,7 +124,7 @@ void addToLCD(int effect){
 	else if(effect == PITCHSHIFT){
 		printLCD(0x50);
 		printLCD(0x53);
-	}
+	}*/
 }
 
 void toggleLCD(int effect, int index, int on){
@@ -129,8 +153,14 @@ void toggleLCD(int effect, int index, int on){
 	}
 }
 
+
 void printFreq(int data){
-	controlLCD(0x01);
+	controlLCD(0xB8); //Second line;
+	int i;
+	for(i = 0; i < 3; i++){
+		printLCD(0x20);	//clear previous frequency. theres gotta be a better way
+	}
+	controlLCD(0xB8); //Second line;
 
 	unsigned int* array = (unsigned int*)0xA000;
 	int counter = 0;
@@ -144,6 +174,8 @@ void printFreq(int data){
 	for(; counter > 0; counter--, array--){
 		printLCD(*array+0x30);
 	}
+
+	controlLCD(0x02); //Return cursor to home;
 }
 
 
@@ -155,6 +187,7 @@ void wait(int temp){
 
 void initLCD(){
 	int i = 0;
+	tunerScreen = 0;
 	for(;i<10;i++){
 		mainDisplay[i] = 0;
 		mainDisplay_show[i] = 0;
@@ -175,9 +208,9 @@ void initLCD(){
 	//RS = 49
 	//8 Bit Mode
 	//Write 3F for 1st function set
-	controlLCD(0x3F);
+	controlLCD(0x38);
 	//Write 3F for 2nd function set
-	controlLCD(0x3F);
+	controlLCD(0x38);
 	//Write 0F, D = 1 for display on, C = 1 for cursor on, B = 1 for blinking on
 	controlLCD(0x0F);
 	//Write 01 to clear display

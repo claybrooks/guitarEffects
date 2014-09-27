@@ -3,12 +3,10 @@
 #include "spi.h"
 #include "sys.h"
 #include "adc.h"
+#include "fft.h"
 #include "effect.h"
 
 void initialize(){
-	//Initialize Interrupts
-	initINTS();
-
 	//Initialize Effects
 	initEffects();
 
@@ -24,10 +22,8 @@ void initialize(){
 	//Initialize ADC
 	initADC();
 
-	//Initialize Timer 0
-	initTIMER0();
+	//Initialize Interrupts
+	initINTS();
 
-	//Initialize External Interrupt 1
-	initXINT1();
 	asm(" CLRC INTM, DBGM");
 }

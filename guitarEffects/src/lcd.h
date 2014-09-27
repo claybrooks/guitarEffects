@@ -8,10 +8,10 @@
 #ifndef LCD_H_
 #define LCD_H_
 
-#define DELAY 		0
+#define TREMOLO		0
 #define DISTORTION 	1
 #define CRUNCH 		2
-#define TREMOLO 	3
+#define DELAY	 	3
 #define WAH 		4
 #define PHASER 		5
 #define FLANGE 		6

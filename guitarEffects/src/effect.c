@@ -6,10 +6,10 @@
 typedef int FUNC(int, struct params*);
 
 //Create FUNC variables
-FUNC processDelay,processDistortion,processCrunch,processTremolo,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift;
+FUNC processTremolo,processDistortion,processCrunch,processDelay,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[10] = {processDelay,processDistortion,processCrunch,processTremolo,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift};
+FUNC *list[10] = {processTremolo,processDistortion,processCrunch,processDelay,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift};
 
 /*The indices of this array map  directly to the list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
@@ -32,6 +32,11 @@ static struct params params;
 
 void initEffects(){
 	clearPipeline();		//Clear the queue
+	//Tremolo
+	params.tremoloCounter = 0;
+	params.tremoloCount = 0;
+	params.tremoloRate = 0;
+	params.tremoloLimit = 0;
 }
 
 int toggleOn_Off(int effect){
@@ -50,6 +55,7 @@ void queueEffect(int effect){
 	on_off[numQueued] = 1;				//Turn effect on, makes sense for the user
 	numQueued++;						//Increase numQueued
 }
+
 
 void clearPipeline(){
 	int i;
@@ -79,11 +85,18 @@ int processCrunch(int sample, struct params* p){
 	return sample;
 }
 int processTremolo(int sample, struct params* p){
-	float adcmax = 0x8CA0;
-	float pedalLevel = AdcRegs.ADCRESULT1;
-	float result = pedalLevel/adcmax;
-	return sample * (result);
+	//float adcmax = 0x8CA0;
+	//float pedalLevel = AdcRegs.ADCRESULT1;
+	p->tremoloLimit = 8000;
 
+
+	if(p->tremoloCounter >= p->tremoloLimit) p->tremoloCount = -1;
+	else if(!p->tremoloCounter) p->tremoloCount = 1;
+
+	p->tremoloCounter+=p->tremoloCount;
+	double temp = (double)p->tremoloCounter/(double)p->tremoloLimit;//*(double)sample;
+
+	return (int)(temp*(double)sample);
 }
 int processWah(int sample, struct params* p){
 	return sample;

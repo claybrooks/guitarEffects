@@ -28,7 +28,6 @@ $(GEN_CMDS__FLAG) \
 "./src/main.obj" \
 "./src/lcd.obj" \
 "./src/initialize.obj" \
-"./src/handler.obj" \
 "./src/fft.obj" \
 "./src/effect.obj" \
 "./src/adc.obj" \
@@ -157,7 +156,7 @@ all: guitarEffects.out
 guitarEffects.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: C2000 Linker'
-	"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/bin/cl2000" -v28 -ml -mt --float_support=fpu32 -g --diag_warning=225 --display_error_number --diag_wrap=off -z -m"guitarEffects.map" --stack_size=0x300 --warn_sections -i"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/lib" -i"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/include" --reread_libs --display_error_number --diag_wrap=off --xml_link_info="guitarEffects_linkInfo.xml" --rom_model -o "guitarEffects.out" $(ORDERED_OBJS)
+	"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/bin/cl2000" -v28 -ml -mt --float_support=fpu32 -Ooff --opt_for_speed=1 -g --diag_warning=225 --display_error_number --diag_wrap=off -z -m"guitarEffects.map" --stack_size=0x300 --warn_sections -i"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/lib" -i"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/include" --reread_libs --display_error_number --diag_wrap=off --xml_link_info="guitarEffects_linkInfo.xml" --rom_model -o "guitarEffects.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -170,8 +169,8 @@ guitarEffects.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "src\adc.pp" "src\effect.pp" "src\fft.pp" "src\handler.pp" "src\initialize.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "src\wah.pp" "includes\DSP2833x_Adc.pp" "includes\DSP2833x_CpuTimers.pp" "includes\DSP2833x_DefaultIsr.pp" "includes\DSP2833x_GlobalVariableDefs.pp" "includes\DSP2833x_Gpio.pp" "includes\DSP2833x_PieCtrl.pp" "includes\DSP2833x_PieVect.pp" "includes\DSP2833x_Spi.pp" "includes\DSP2833x_SysCtrl.pp" 
-	-$(RM) "src\adc.obj" "src\effect.obj" "src\fft.obj" "src\handler.obj" "src\initialize.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "src\wah.obj" "includes\DSP2833x_ADC_cal.obj" "includes\DSP2833x_Adc.obj" "includes\DSP2833x_CodeStartBranch.obj" "includes\DSP2833x_CpuTimers.obj" "includes\DSP2833x_DBGIER.obj" "includes\DSP2833x_DefaultIsr.obj" "includes\DSP2833x_GlobalVariableDefs.obj" "includes\DSP2833x_Gpio.obj" "includes\DSP2833x_PieCtrl.obj" "includes\DSP2833x_PieVect.obj" "includes\DSP2833x_Spi.obj" "includes\DSP2833x_SysCtrl.obj" "includes\DSP2833x_usDelay.obj" "includes\RFFT_adc_f32u.obj" 
+	-$(RM) "src\adc.pp" "src\effect.pp" "src\fft.pp" "src\initialize.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "src\wah.pp" "includes\DSP2833x_Adc.pp" "includes\DSP2833x_CpuTimers.pp" "includes\DSP2833x_DefaultIsr.pp" "includes\DSP2833x_GlobalVariableDefs.pp" "includes\DSP2833x_Gpio.pp" "includes\DSP2833x_PieCtrl.pp" "includes\DSP2833x_PieVect.pp" "includes\DSP2833x_Spi.pp" "includes\DSP2833x_SysCtrl.pp" 
+	-$(RM) "src\adc.obj" "src\effect.obj" "src\fft.obj" "src\initialize.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "src\wah.obj" "includes\DSP2833x_ADC_cal.obj" "includes\DSP2833x_Adc.obj" "includes\DSP2833x_CodeStartBranch.obj" "includes\DSP2833x_CpuTimers.obj" "includes\DSP2833x_DBGIER.obj" "includes\DSP2833x_DefaultIsr.obj" "includes\DSP2833x_GlobalVariableDefs.obj" "includes\DSP2833x_Gpio.obj" "includes\DSP2833x_PieCtrl.obj" "includes\DSP2833x_PieVect.obj" "includes\DSP2833x_Spi.obj" "includes\DSP2833x_SysCtrl.obj" "includes\DSP2833x_usDelay.obj" "includes\RFFT_adc_f32u.obj" 
 	-$(RM) "includes\DSP2833x_ADC_cal.pp" "includes\DSP2833x_CodeStartBranch.pp" "includes\DSP2833x_DBGIER.pp" "includes\DSP2833x_usDelay.pp" "includes\RFFT_adc_f32u.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

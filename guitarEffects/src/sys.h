@@ -13,7 +13,7 @@ interrupt void xint1_isr(void);
 
 void initINTS();
 void initXINT1();
-void updateTIMER0(float time);
-void initTIMER0();
+void updateTimer0(float time);
+void initTimer0();
 
 #endif /* SYS_H_ */

@@ -16,9 +16,9 @@
 #define RFFT_SIZE			(1 << RFFT_STAGES)
 
 #define ADC_BUF_LEN			RFFT_SIZE	// ADC buffer length
-#define ADC_SAMPLE_PERIOD   3124       	// 3124 = (3125-1) = 48 KHz sampling w/ 150 MHz SYSCLKOUT
+#define ADC_SAMPLE_PERIOD   150000       	// 3124 = (3125-1) = 1 KHz sampling w/ 150 MHz SYSCLKOUT
 
-#define F_PER_SAMPLE        1000.0L/(float)RFFT_SIZE  //Internal sampling rate is 48kHz
+#define F_PER_SAMPLE        1000.0L/(float)RFFT_SIZE  //Internal sampling rate is 1kHz
 
 void initFFT();
 int findFrequency();
