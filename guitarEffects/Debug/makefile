@@ -31,7 +31,7 @@ $(GEN_CMDS__FLAG) \
 "./src/fft.obj" \
 "./src/effect.obj" \
 "./src/adc.obj" \
-"../KG_RAM_Link1.cmd" \
+"../28335_RAM_lnk.cmd" \
 "../includes/DSP2833x_Headers_nonBIOS.cmd" \
 -l"libc.a" \
 -l"E:\ti\controlSUITE\libs\dsp\FPU\v130\lib\C28x_FPU_Lib.lib" \

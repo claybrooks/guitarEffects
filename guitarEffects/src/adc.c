@@ -24,5 +24,5 @@ void initADC(){
 }
 
 int getAdc(){
-	return AdcRegs.ADCRESULT0;
+	return AdcRegs.ADCRESULT0>>4;
 }

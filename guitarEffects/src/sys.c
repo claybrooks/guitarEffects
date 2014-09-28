@@ -8,24 +8,11 @@
 #include "DSP28x_Project.h"
 
 void initINTS(){
-	/*
-	 * Move Pie Vect Table To RAM
-	 */
-		PieCtrlRegs.PIECTRL.bit.ENPIE = 0; // Disable the PIE
-		asm(" EALLOW"); // Enable EALLOW protected register access
-		memcpy((void *)0x000D00, &PieVectTableInit, 256);
-		asm(" EDIS"); // Disable EALLOW protected register access
-	/*
-	 *
-	 */
-
-
-
-
 	InitPieCtrl();
 	// Disable CPU interrupts and clear all CPU interrupt flags:
 	IER = 0x0000;
 	IFR = 0x0000;
+	InitCpuTimers();
 	InitPieVectTable();
 	EALLOW;
 	//Timer0

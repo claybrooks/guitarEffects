@@ -13,9 +13,10 @@ int indexLookup(int);
 int screen = 0, screenUpdate = 0, input = 0, sample = 0, tuner = 0;
 
 int main(){
-
 	InitSysCtrl();
 	initialize();
+	GpioCtrlRegs.GPAMUX1.bit.GPIO14 = 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO14 = 1;
 	while(1){
 	}
 }
@@ -36,6 +37,7 @@ int main(){
 
 
 interrupt void cpu_timer0_isr(void){
+	GpioDataRegs.GPADAT.bit.GPIO14 ^= GpioDataRegs.GPADAT.bit.GPIO14;
 	if(tuner){
 		if(storeFFT(getAdc())){
 			printFreq(findFrequency());	//Here, screen represents frequency
@@ -47,6 +49,7 @@ interrupt void cpu_timer0_isr(void){
 		writeSPI(process(sample));
 		PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 	}
+
 }
 
 interrupt void xint1_isr(void){

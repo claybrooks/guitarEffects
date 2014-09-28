@@ -1,10 +1,10 @@
 ******************************************************************************
              TMS320C2000 Linker PC v6.2.7                      
 ******************************************************************************
->> Linked Sat Sep 27 16:31:28 2014
+>> Linked Sun Sep 28 17:19:49 2014
 
 OUTPUT FILE NAME:   <guitarEffects.out>
-ENTRY POINT SYMBOL: "_c_int00"  address: 00009d1f
+ENTRY POINT SYMBOL: "_c_int00"  address: 00009d31
 
 
 MEMORY CONFIGURATION
@@ -13,10 +13,9 @@ MEMORY CONFIGURATION
 ----------------------  --------  ---------  --------  --------  ----  --------
 PAGE 0:
   BEGIN                 00000000   00000002  00000002  00000000  RWIX
-  BOOT_RSVD             00000002   0000004e  0000004e  00000000  RWIX
   RAMM0                 00000050   000003b0  00000000  000003b0  RWIX
-  RAML0                 00008000   00001000  00000004  00000ffc  RWIX
-  RAML1                 00009000   00001000  00000fc7  00000039  RWIX
+  RAML0                 00008000   00001000  00000052  00000fae  RWIX
+  RAML1                 00009000   00001000  00000fdf  00000021  RWIX
   RAML2                 0000a000   00001000  00000000  00001000  RWIX
   RAML3                 0000b000   00001000  00000000  00001000  RWIX
   ZONE7A                00200000   0000fc00  00000000  0000fc00  RWIX
@@ -30,6 +29,7 @@ PAGE 0:
   RESET                 003fffc0   00000002  00000000  00000002  RWIX
 
 PAGE 1:
+  BOOT_RSVD             00000002   0000004e  00000000  0000004e  RWIX
   RAMM1                 00000400   00000400  00000300  00000100  RWIX
   DEV_EMU               00000880   00000180  000000d0  000000b0  RWIX
   FLASH_REGS            00000a80   00000060  00000008  00000058  RWIX
@@ -97,60 +97,57 @@ codestart
 *          0    00000000    00000002     
                   00000000    00000002     DSP2833x_CodeStartBranch.obj (codestart)
 
-.cinit     0    00000002    0000004e     
-                  00000002    00000017     effect.obj (.cinit)
-                  00000019    00000014     main.obj (.cinit)
-                  0000002d    0000000a     rts2800_fpu32.lib : _lock.obj (.cinit)
-                  00000037    0000000a                       : exit.obj (.cinit)
-                  00000041    00000009     fft.obj (.cinit)
-                  0000004a    00000004     rts2800_fpu32.lib : errno.obj (.cinit)
-                  0000004e    00000002     --HOLE-- [fill = 0]
+.pinit     0    00008000    00000000     UNINITIALIZED
 
-ramfuncs   0    00008000    00000004     
-                  00008000    00000004     DSP2833x_usDelay.obj (ramfuncs)
+.cinit     0    00008000    0000004e     
+                  00008000    00000017     effect.obj (.cinit)
+                  00008017    00000014     main.obj (.cinit)
+                  0000802b    0000000a     rts2800_fpu32.lib : _lock.obj (.cinit)
+                  00008035    0000000a                       : exit.obj (.cinit)
+                  0000803f    00000009     fft.obj (.cinit)
+                  00008048    00000004     rts2800_fpu32.lib : errno.obj (.cinit)
+                  0000804c    00000002     --HOLE-- [fill = 0]
 
-.text      0    00009000    00000fc7     
+ramfuncs   0    0000804e    00000004     
+                  0000804e    00000004     DSP2833x_usDelay.obj (ramfuncs)
+
+.text      0    00009000    00000fdf     
                   00009000    00000319     DSP2833x_DefaultIsr.obj (.text:retain)
                   00009319    000001e5     lcd.obj (.text)
                   000094fe    00000138     C28x_FPU_Lib.lib : RFFT_adc_f32.obj (.text)
                   00009636    000000f7     DSP2833x_SysCtrl.obj (.text)
                   0000972d    000000e8     effect.obj (.text)
-                  00009815    000000b5     fft.obj (.text)
-                  000098ca    000000b4     main.obj (.text:retain)
-                  0000997e    0000009e     RFFT_adc_f32u.obj (.text)
-                  00009a1c    00000088     rts2800_fpu32.lib : fs_div.obj (.text)
-                  00009aa4    00000083                       : fd_mpy.obj (.text)
-                  00009b27    00000074     DSP2833x_CpuTimers.obj (.text)
-                  00009b9b    00000068     C28x_FPU_Lib.lib : RFFT_f32_sincostable.obj (.text)
-                  00009c03    00000063     sys.obj (.text)
-                  00009c66    00000061     rts2800_fpu32.lib : cos.obj (.text)
-                  00009cc7    00000058                       : sin.obj (.text)
-                  00009d1f    00000046                       : boot.obj (.text)
-                  00009d65    00000044     C28x_FPU_Lib.lib : RFFT_f32_mag.obj (.text)
-                  00009da9    0000002e     rts2800_fpu32.lib : fmod.obj (.text)
-                  00009dd7    0000002b     spi.obj (.text)
-                  00009e02    0000002a     main.obj (.text)
-                  00009e2c    00000028     DSP2833x_PieCtrl.obj (.text)
-                  00009e54    00000027     adc.obj (.text)
-                  00009e7b    00000026     DSP2833x_Spi.obj (.text)
-                  00009ea1    00000001     --HOLE-- [fill = 0]
-                  00009ea2    00000023     rts2800_fpu32.lib : sqrt.obj (.text)
-                  00009ec5    00000022                       : i_div.obj (.text)
-                  00009ee7    00000021                       : fd_toi.obj (.text)
-                  00009f08    00000020     DSP2833x_PieVect.obj (.text)
-                  00009f28    0000001c     rts2800_fpu32.lib : fs_tofd.obj (.text)
-                  00009f44    0000001a                       : modf.obj (.text)
-                  00009f5e    00000019                       : args_main.obj (.text)
-                  00009f77    00000019                       : exit.obj (.text)
-                  00009f90    00000014     DSP2833x_Adc.obj (.text)
-                  00009fa4    0000000f     initialize.obj (.text)
-                  00009fb3    00000009     rts2800_fpu32.lib : _lock.obj (.text)
-                  00009fbc    00000008     DSP2833x_CodeStartBranch.obj (.text)
-                  00009fc4    00000003     DSP2833x_DBGIER.obj (.text)
-
-.data      0    0000a000    00000000     UNINITIALIZED
-
-.bss       0    0000b000    00000000     UNINITIALIZED
+                  00009815    000000c4     main.obj (.text:retain)
+                  000098d9    000000b5     fft.obj (.text)
+                  0000998e    0000009e     RFFT_adc_f32u.obj (.text)
+                  00009a2c    00000088     rts2800_fpu32.lib : fs_div.obj (.text)
+                  00009ab4    00000083                       : fd_mpy.obj (.text)
+                  00009b37    00000074     DSP2833x_CpuTimers.obj (.text)
+                  00009bab    00000068     C28x_FPU_Lib.lib : RFFT_f32_sincostable.obj (.text)
+                  00009c13    00000065     sys.obj (.text)
+                  00009c78    00000061     rts2800_fpu32.lib : cos.obj (.text)
+                  00009cd9    00000058                       : sin.obj (.text)
+                  00009d31    00000046                       : boot.obj (.text)
+                  00009d77    00000044     C28x_FPU_Lib.lib : RFFT_f32_mag.obj (.text)
+                  00009dbb    00000030     main.obj (.text)
+                  00009deb    0000002e     rts2800_fpu32.lib : fmod.obj (.text)
+                  00009e19    0000002b     spi.obj (.text)
+                  00009e44    00000028     DSP2833x_PieCtrl.obj (.text)
+                  00009e6c    00000028     adc.obj (.text)
+                  00009e94    00000026     DSP2833x_Spi.obj (.text)
+                  00009eba    00000023     rts2800_fpu32.lib : sqrt.obj (.text)
+                  00009edd    00000022                       : i_div.obj (.text)
+                  00009eff    00000021                       : fd_toi.obj (.text)
+                  00009f20    00000020     DSP2833x_PieVect.obj (.text)
+                  00009f40    0000001c     rts2800_fpu32.lib : fs_tofd.obj (.text)
+                  00009f5c    0000001a                       : modf.obj (.text)
+                  00009f76    00000019                       : args_main.obj (.text)
+                  00009f8f    00000019                       : exit.obj (.text)
+                  00009fa8    00000014     DSP2833x_Adc.obj (.text)
+                  00009fbc    0000000f     initialize.obj (.text)
+                  00009fcb    00000009     rts2800_fpu32.lib : _lock.obj (.text)
+                  00009fd4    00000008     DSP2833x_CodeStartBranch.obj (.text)
+                  00009fdc    00000003     DSP2833x_DBGIER.obj (.text)
 
 csm_rsvd   0    0033ff80    00000000     DSECT
 
@@ -503,11 +500,11 @@ address     data page           name
 0000cd01     334 (0000cd00)     _tunerScreen
 0000cd02     334 (0000cd00)     _mainDisplay_show
 0000cd0c     334 (0000cd00)     _mainDisplay
-0000cd16     334 (0000cd00)     _screen
-0000cd17     334 (0000cd00)     _sample
-0000cd18     334 (0000cd00)     _tuner
-0000cd19     334 (0000cd00)     _screenUpdate
-0000cd1a     334 (0000cd00)     _input
+0000cd16     334 (0000cd00)     _tuner
+0000cd17     334 (0000cd00)     _input
+0000cd18     334 (0000cd00)     _sample
+0000cd19     334 (0000cd00)     _screen
+0000cd1a     334 (0000cd00)     _screenUpdate
 0000cd1c     334 (0000cd00)     __unlock
 0000cd1e     334 (0000cd00)     __lock
 0000cd20     334 (0000cd00)     ___TI_cleanup_ptr
@@ -524,22 +521,20 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 
 address    name
 --------   ----
-0000b000   .bss
-0000a000   .data
 00009000   .text
-00009f77   C$$EXIT
-00009aa4   FD$$MPY
-00009ee7   FD$$TOI
-00009a1c   FS$$DIV
-00009f28   FS$$TOFD
-00009ec5   I$$DIV
-00009ed6   I$$MOD
+00009f8f   C$$EXIT
+00009ab4   FD$$MPY
+00009eff   FD$$TOI
+00009a2c   FS$$DIV
+00009f40   FS$$TOFD
+00009edd   I$$DIV
+00009eee   I$$MOD
 000090e6   _ADCINT_ISR
 00380080   _ADC_cal
 0000c040   _AdcBuf
 00000b00   _AdcMirror
 00007100   _AdcRegs
-00009b60   _ConfigCpuTimer
+00009b70   _ConfigCpuTimer
 0000cce4   _CpuTimer0
 00000c00   _CpuTimer0Regs
 0000ccd4   _CpuTimer1
@@ -556,7 +551,7 @@ address    name
 00009229   _DINTCH4_ISR
 00009233   _DINTCH5_ISR
 0000923d   _DINTCH6_ISR
-00008000   _DSP28x_usDelay
+0000804e   _DSP28x_usDelay
 00000880   _DevEmuRegs
 00009649   _DisableDog
 00001000   _DmaRegs
@@ -609,7 +604,7 @@ address    name
 000091c5   _EQEP2_INT_ISR
 00006b00   _EQep1Regs
 00006b40   _EQep2Regs
-00009e4b   _EnableInterrupts
+00009e63   _EnableInterrupts
 0000c000   _FFTStartFlag
 00000a80   _FlashRegs
 00006f80   _GpioCtrlRegs
@@ -621,15 +616,15 @@ address    name
 0000903c   _ILLEGAL_ISR
 00009000   _INT13_ISR
 0000900a   _INT14_ISR
-00009f90   _InitAdc
-00009b27   _InitCpuTimers
+00009fa8   _InitAdc
+00009b37   _InitCpuTimers
 000096a1   _InitPeripheralClocks
-00009e2c   _InitPieCtrl
-00009f08   _InitPieVectTable
+00009e44   _InitPieCtrl
+00009f20   _InitPieVectTable
 00009651   _InitPll
-00009e7b   _InitSpi
-00009e7c   _InitSpiGpio
-00009e7f   _InitSpiaGpio
+00009e94   _InitSpi
+00009e95   _InitSpiGpio
+00009e98   _InitSpiaGpio
 00009636   _InitSysCtrl
 000092fb   _LUF_ISR
 000092f1   _LVF_ISR
@@ -647,9 +642,9 @@ address    name
 0000d000   _PieVectTableInit
 0000c880   _RFFTF32Coef
 000094fe   _RFFT_adc_f32
-0000997e   _RFFT_adc_f32u
-00009d65   _RFFT_f32_mag
-00009b9b   _RFFT_f32_sincostable
+0000998e   _RFFT_adc_f32u
+00009d77   _RFFT_f32_mag
+00009bab   _RFFT_f32_sincostable
 0000c240   _RFFTmagBuff
 0000c480   _RFFToutBuff
 0000901e   _RTOSINT_ISR
@@ -667,7 +662,7 @@ address    name
 00007750   _ScibRegs
 00007770   _ScicRegs
 0000963f   _ServiceDog
-00009fc4   _SetDBGIER
+00009fdc   _SetDBGIER
 00007040   _SpiaRegs
 00007010   _SysCtrlRegs
 000090f0   _TINT0_ISR
@@ -699,49 +694,45 @@ address    name
 0000cd20   ___TI_cleanup_ptr
 0000cd22   ___TI_dtors_ptr
 ffffffff   ___binit__
-0000b000   ___bss__
 ffffffff   ___c_args__
-00000002   ___cinit__
-0000a000   ___data__
-0000a000   ___edata__
-0000b000   ___end__
-00009fc7   ___etext__
+00008000   ___cinit__
+00009fdf   ___etext__
 ffffffff   ___pinit__
 00009000   ___text__
-00009f5e   __args_main
+00009f76   __args_main
 0000cd1e   __lock
-00009fbb   __nop
-00009fb7   __register_lock
-00009fb3   __register_unlock
+00009fd3   __nop
+00009fcf   __register_lock
+00009fcb   __register_unlock
 00000400   __stack
 0000cd1c   __unlock
-00009f77   _abort
+00009f8f   _abort
 000093c4   _addToLCD
-00009d1f   _c_int00
+00009d31   _c_int00
 00009776   _clearPipeline
 000094c8   _controlLCD
-00009c66   _cos
-000098ca   _cpu_timer0_isr
+00009c78   _cos
+00009815   _cpu_timer0_isr
 0000ccfd   _errno
-00009f79   _exit
-00009856   _findFrequency
-00009da9   _fmod
-00009e77   _getAdc
-00009e07   _indexLookup
-00009e54   _initADC
+00009f91   _exit
+0000991a   _findFrequency
+00009deb   _fmod
+00009e8f   _getAdc
+00009dc6   _indexLookup
+00009e6c   _initADC
 0000972d   _initEffects
-00009815   _initFFT
-00009c03   _initINTS
+000098d9   _initFFT
+00009c13   _initINTS
 00009483   _initLCD
-00009deb   _initSPI
-00009fa4   _initialize
-0000cd1a   _input
+00009e2d   _initSPI
+00009fbc   _initialize
+0000cd17   _input
 0000cc9a   _list
 0000cc8f   _location
-00009e02   _main
+00009dbb   _main
 0000cd0c   _mainDisplay
 0000cd02   _mainDisplay_show
-00009f44   _modf
+00009f5c   _modf
 0000cd00   _numInMainDisplay
 0000cc80   _numQueued
 0000cc85   _on_off
@@ -764,27 +755,25 @@ ffffffff   ___pinit__
 0000c004   _rfft_adc
 0000958e   _rfft_adc_f32_Stages4andUp
 0000930f   _rsvd_ISR
-0000cd17   _sample
-0000cd16   _screen
-0000cd19   _screenUpdate
-00009cc7   _sin
-00009ea2   _sqrt
-000098ae   _storeFFT
+0000cd18   _sample
+0000cd19   _screen
+0000cd1a   _screenUpdate
+00009cd9   _sin
+00009eba   _sqrt
+00009972   _storeFFT
 00009406   _toggleLCD
 00009736   _toggleOn_Off
-0000cd18   _tuner
+0000cd16   _tuner
 0000cd01   _tunerScreen
 00009319   _updateLCD
-00009c55   _updateTimer0
+00009c67   _updateTimer0
 0000947a   _wait
-00009dd7   _writeSPI
-00009910   _xint1_isr
+00009e19   _writeSPI
+0000986b   _xint1_isr
 ffffffff   binit
-00000002   cinit
+00008000   cinit
 00000000   code_start
-0000a000   edata
-0000b000   end
-00009fc7   etext
+00009fdf   etext
 ffffffff   pinit
 
 
@@ -794,8 +783,6 @@ address    name
 --------   ----
 00000000   code_start
 00000001   __TI_args_main
-00000002   ___cinit__
-00000002   cinit
 00000300   __STACK_SIZE
 00000400   __stack
 00000700   __STACK_END
@@ -847,7 +834,9 @@ address    name
 00007750   _ScibRegs
 00007770   _ScicRegs
 00007900   _I2caRegs
-00008000   _DSP28x_usDelay
+00008000   ___cinit__
+00008000   cinit
+0000804e   _DSP28x_usDelay
 00009000   .text
 00009000   _INT13_ISR
 00009000   ___text__
@@ -960,62 +949,54 @@ address    name
 00009806   _processReverb
 0000980b   _processChorus
 00009810   _processPitchShift
-00009815   _initFFT
-00009856   _findFrequency
-000098ae   _storeFFT
-000098ca   _cpu_timer0_isr
-00009910   _xint1_isr
-0000997e   _RFFT_adc_f32u
-00009a1c   FS$$DIV
-00009aa4   FD$$MPY
-00009b27   _InitCpuTimers
-00009b60   _ConfigCpuTimer
-00009b9b   _RFFT_f32_sincostable
-00009c03   _initINTS
-00009c55   _updateTimer0
-00009c66   _cos
-00009cc7   _sin
-00009d1f   _c_int00
-00009d65   _RFFT_f32_mag
-00009da9   _fmod
-00009dd7   _writeSPI
-00009deb   _initSPI
-00009e02   _main
-00009e07   _indexLookup
-00009e2c   _InitPieCtrl
-00009e4b   _EnableInterrupts
-00009e54   _initADC
-00009e77   _getAdc
-00009e7b   _InitSpi
-00009e7c   _InitSpiGpio
-00009e7f   _InitSpiaGpio
-00009ea2   _sqrt
-00009ec5   I$$DIV
-00009ed6   I$$MOD
-00009ee7   FD$$TOI
-00009f08   _InitPieVectTable
-00009f28   FS$$TOFD
-00009f44   _modf
-00009f5e   __args_main
-00009f77   C$$EXIT
-00009f77   _abort
-00009f79   _exit
-00009f90   _InitAdc
-00009fa4   _initialize
-00009fb3   __register_unlock
-00009fb7   __register_lock
-00009fbb   __nop
-00009fc4   _SetDBGIER
-00009fc7   ___etext__
-00009fc7   etext
-0000a000   .data
-0000a000   ___data__
-0000a000   ___edata__
-0000a000   edata
-0000b000   .bss
-0000b000   ___bss__
-0000b000   ___end__
-0000b000   end
+00009815   _cpu_timer0_isr
+0000986b   _xint1_isr
+000098d9   _initFFT
+0000991a   _findFrequency
+00009972   _storeFFT
+0000998e   _RFFT_adc_f32u
+00009a2c   FS$$DIV
+00009ab4   FD$$MPY
+00009b37   _InitCpuTimers
+00009b70   _ConfigCpuTimer
+00009bab   _RFFT_f32_sincostable
+00009c13   _initINTS
+00009c67   _updateTimer0
+00009c78   _cos
+00009cd9   _sin
+00009d31   _c_int00
+00009d77   _RFFT_f32_mag
+00009dbb   _main
+00009dc6   _indexLookup
+00009deb   _fmod
+00009e19   _writeSPI
+00009e2d   _initSPI
+00009e44   _InitPieCtrl
+00009e63   _EnableInterrupts
+00009e6c   _initADC
+00009e8f   _getAdc
+00009e94   _InitSpi
+00009e95   _InitSpiGpio
+00009e98   _InitSpiaGpio
+00009eba   _sqrt
+00009edd   I$$DIV
+00009eee   I$$MOD
+00009eff   FD$$TOI
+00009f20   _InitPieVectTable
+00009f40   FS$$TOFD
+00009f5c   _modf
+00009f76   __args_main
+00009f8f   C$$EXIT
+00009f8f   _abort
+00009f91   _exit
+00009fa8   _InitAdc
+00009fbc   _initialize
+00009fcb   __register_unlock
+00009fcf   __register_lock
+00009fd3   __nop
+00009fdc   _SetDBGIER
+00009fdf   ___etext__
+00009fdf   etext
 0000c000   _FFTStartFlag
 0000c004   _rfft_adc
 0000c008   _rfft
@@ -1036,11 +1017,11 @@ address    name
 0000cd01   _tunerScreen
 0000cd02   _mainDisplay_show
 0000cd0c   _mainDisplay
-0000cd16   _screen
-0000cd17   _sample
-0000cd18   _tuner
-0000cd19   _screenUpdate
-0000cd1a   _input
+0000cd16   _tuner
+0000cd17   _input
+0000cd18   _sample
+0000cd19   _screen
+0000cd1a   _screenUpdate
 0000cd1c   __unlock
 0000cd1e   __lock
 0000cd20   ___TI_cleanup_ptr
@@ -1055,4 +1036,4 @@ ffffffff   ___pinit__
 ffffffff   binit
 ffffffff   pinit
 
-[262 symbols]
+[254 symbols]
