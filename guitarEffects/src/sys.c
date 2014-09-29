@@ -4,7 +4,7 @@
  *  Created on: Sep 19, 2014
  *      Author: Clay
  */
-#include "sys.h"
+#include "../include/sys.h"
 #include "DSP28x_Project.h"
 
 void initINTS(){

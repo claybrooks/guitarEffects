@@ -4,13 +4,13 @@
  *  Created on: Sep 19, 2014
  *      Author: Clay
  */
-#include "lcd.h"
+#include "../include/lcd.h"
 #include "math.h"
 #include "DSP28x_Project.h"
 
 #define DELAYLCD 15000
 
-//Similar to queue system as pipeline.  mainDisplay contains what could possibly be printed to screen.
+//Similar to queue system.  mainDisplay contains what could possibly be printed to screen.
 //mainDisplay_show holds whether or not it is printed to screen (on_off[]);
 int mainDisplay[10];
 int mainDisplay_show[10];
@@ -18,11 +18,12 @@ int numInMainDisplay, tunerScreen;
 
 //Eventually parses code and tells the printLCD() what to print
 void updateLCD(int update){
-	//Clear Screen, called by a reset on the queue
+	//Clear Screen, called by a reset on the queue. Block input if on tuner screen
 	if(update == CLEAR && !tunerScreen){
 		numInMainDisplay = 0;
 		controlLCD(0x01);
 	}
+	//Block input if on tuner scree
 	else if((update >= TREMOLO && update <= FLANGE) && !tunerScreen){
 			//Initialize Variables
 		int i = 0, inMainDisplay = 0;
@@ -35,7 +36,7 @@ void updateLCD(int update){
 			}
 		}
 		//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
-		//where update == delay through pitch shift values defined in lcd.h
+		//where update == tremolo through pitch shift values defined in lcd.h
 		if(!inMainDisplay){
 			mainDisplay[numInMainDisplay] = update;
 			mainDisplay_show[numInMainDisplay] = 1;

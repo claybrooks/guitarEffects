@@ -1,4 +1,10 @@
 eclipse.preferences.version=1
+encoding//Debug/DSP2833x/cmd/subdir_rules.mk=UTF-8
+encoding//Debug/DSP2833x/cmd/subdir_vars.mk=UTF-8
+encoding//Debug/DSP2833x/src/subdir_rules.mk=UTF-8
+encoding//Debug/DSP2833x/src/subdir_vars.mk=UTF-8
+encoding//Debug/cmd/subdir_rules.mk=UTF-8
+encoding//Debug/cmd/subdir_vars.mk=UTF-8
 encoding//Debug/includes/subdir_rules.mk=UTF-8
 encoding//Debug/includes/subdir_vars.mk=UTF-8
 encoding//Debug/makefile=UTF-8

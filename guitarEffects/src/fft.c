@@ -1,7 +1,7 @@
 #include "DSP28x_Project.h"
 #include "math.h"
 #include "fpu_rfft.h"
-#include "fft.h"
+#include "../include/fft.h"
 
 float RFFToutBuff[RFFT_SIZE];		//Calculated FFT result
 float RFFTF32Coef[RFFT_SIZE];    	//Coefficient table buffer

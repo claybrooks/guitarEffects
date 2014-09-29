@@ -4,7 +4,7 @@
  *  Created on: Sep 19, 2014
  *      Author: Clay
  */
-#include "spi.h"
+#include "../include/spi.h"
 #include "DSP28x_Project.h"
 
 void writeSPI(int val){

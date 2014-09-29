@@ -1,6 +1,6 @@
 //#include "butterworth_bp.h"
-#include "bp_iir.h"
-#include "wah.h"
+#include "../include/bp_iir.h"
+#include "../include/wah.h"
 
 #define freq_step 50
 #define maxf 1200
