@@ -94,7 +94,9 @@ int processCrunch(int sample, struct params* p){
 }
 int processTremolo(int sample, struct params* p){
 	//Sets rate at which the effect runs
-	p->tremoloLimit = 7000;
+	double max = 0x0572;
+	double pedal = AdcRegs.ADCRESULT1>>4;
+	p->tremoloLimit = (double)4000*(pedal/max)+ 3000;
 
 	//Count up or down, if it hits upper limit then count up else count down
 	if(p->tremoloCounter >= p->tremoloLimit) p->tremoloCount = -1;
