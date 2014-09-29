@@ -32,7 +32,9 @@ int main(){
 
 interrupt void cpu_timer0_isr(void){
 	//Tuner      //Will return true if frequency is ready to find
-	if(tuner) if(storeFFT(getAdc())) printFreq(findFrequency());
+	if(tuner){
+		if(storeFFT(getAdc())) printFreq(findFrequency());
+	}
 
 	//Play through amp
 	else writeSPI(process(getAdc()));
@@ -43,22 +45,19 @@ interrupt void cpu_timer0_isr(void){
 }
 
 interrupt void xint1_isr(void){
-	//Software debounce
-	DELAY_US(50000);
-
 	//Get user input, shift for clearer comparisons
-	int input = (GpioDataRegs.GPADAT.all & 0x0000F00) >> 8;
+	int input = (GpioDataRegs.GPADAT.all & 0x000FF00) >> 8;
 
 	//Takes care of weird calls to xint1_isr with no button push
 	if(input!= 0){
 		//Clear pipeline of all effects/ clear screen
-		if(input == 0x0008){
+		if(input == 0x0080){
 			clearPipeline();
 			updateLCD(CLEAR);
 		}
 
 		//Switch to tuning function
-		else if(input == 0x0004){
+		else if(input == 0x0040){
 			tuner ^= 1;			//signal for timer0 to not sample out to SPI
 			updateLCD(TUNER);	//Update LCD to tuner screen
 			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution

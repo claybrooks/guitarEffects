@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<LOG_ROOT>
+	<PROJECT NAME="guitarEffects">
+		<CBX_INST_ENTRY INSTANCE_NAME="|gutiarEffects|clk_div:inst|lpm_add_sub:Add0" CBX_FILE_NAME="add_sub_loh.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|gutiarEffects|debounce:inst9|lpm_add_sub:Add0" CBX_FILE_NAME="add_sub_koh.tdf"/>
+	</PROJECT>
+</LOG_ROOT>

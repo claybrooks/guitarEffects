@@ -1,0 +1,86 @@
+|gutiarEffects
+xintrup <= debounce:inst9.result
+clk_in => clk_div:inst.clk_in
+GPIO_15 => XOR8:inst11.IN8
+GPIO_8 => XOR8:inst11.IN1
+GPIO_14 => XOR8:inst11.IN7
+GPIO_13 => XOR8:inst11.IN6
+GPIO_12 => XOR8:inst11.IN5
+GPIO_11 => XOR8:inst11.IN4
+GPIO_10 => XOR8:inst11.IN3
+GPIO_9 => XOR8:inst11.IN2
+
+
+|gutiarEffects|debounce:inst9
+clk => result~reg0.CLK
+clk => counter_out[0].CLK
+clk => counter_out[1].CLK
+clk => counter_out[2].CLK
+clk => counter_out[3].CLK
+clk => counter_out[4].CLK
+clk => counter_out[5].CLK
+clk => counter_out[6].CLK
+clk => counter_out[7].CLK
+clk => counter_out[8].CLK
+clk => counter_out[9].CLK
+clk => counter_out[10].CLK
+clk => counter_out[11].CLK
+clk => counter_out[12].CLK
+clk => counter_out[13].CLK
+clk => counter_out[14].CLK
+clk => counter_out[15].CLK
+clk => flipflops[0].CLK
+clk => flipflops[1].CLK
+button => flipflops[0].DATAIN
+result <= result~reg0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|gutiarEffects|clk_div:inst
+clk_in => clk.CLK
+clk_in => counter[0].CLK
+clk_in => counter[1].CLK
+clk_in => counter[2].CLK
+clk_in => counter[3].CLK
+clk_in => counter[4].CLK
+clk_in => counter[5].CLK
+clk_in => counter[6].CLK
+clk_in => counter[7].CLK
+clk_in => counter[8].CLK
+clk_in => counter[9].CLK
+clk_in => counter[10].CLK
+clk_in => counter[11].CLK
+clk_in => counter[12].CLK
+clk_in => counter[13].CLK
+clk_in => counter[14].CLK
+clk_in => counter[15].CLK
+clk_in => counter[16].CLK
+clk_in => counter[17].CLK
+clk_in => counter[18].CLK
+clk_in => counter[19].CLK
+clk_in => counter[20].CLK
+clk_in => counter[21].CLK
+clk_in => counter[22].CLK
+clk_in => counter[23].CLK
+clk_in => counter[24].CLK
+clk_in => counter[25].CLK
+clk_in => counter[26].CLK
+clk_in => counter[27].CLK
+clk_in => counter[28].CLK
+clk_in => counter[29].CLK
+clk_in => counter[30].CLK
+clk_in => counter[31].CLK
+clk_out <= clk.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|gutiarEffects|XOR8:inst11
+OUT <= 54.DB_MAX_OUTPUT_PORT_TYPE
+IN1 => 33.IN0
+IN2 => 33.IN1
+IN3 => 39.IN1
+IN4 => 48.IN0
+IN5 => 16.IN0
+IN6 => 16.IN1
+IN7 => 19.IN0
+IN8 => 19.IN1
+
+

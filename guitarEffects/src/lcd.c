@@ -110,11 +110,11 @@ void addToLCD(int effect){
 		printLCD(0x50);
 		printLCD(0x48);
 	}
-	else if(effect == FLANGE){
+	/*else if(effect == FLANGE){
 		printLCD(0x46);
 		printLCD(0x4B);
 	}
-	/*else if(effect == REVERB){
+	else if(effect == REVERB){
 		printLCD(0x52);
 		printLCD(0x45);
 	}

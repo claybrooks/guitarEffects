@@ -102,7 +102,7 @@ int processTremolo(int sample, struct params* p){
 	p->tremoloCounter+=p->tremoloCount;
 
 	//Calculate new tremolo sample
-	double temp = (double)p->tremoloCounter/(double)p->tremoloLimit*(double)sample;
+	double temp = (double)p->tremoloCounter/(double)p->tremoloLimit;//*(double)sample;
 
 	return (int)(temp*(double)sample);
 }
