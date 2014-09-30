@@ -13,6 +13,7 @@ int tuner = 0;
 
 int main(){
 	InitSysCtrl();
+
 	initialize();
 	while(1){
 		//Wait for interrupts

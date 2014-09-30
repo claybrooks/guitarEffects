@@ -35,6 +35,7 @@ void updateLCD(int update){
 				break;
 			}
 		}
+		if(numInMainDisplay == 3) controlLCD(0xB8); //Second line;
 		//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
 		//where update == tremolo through pitch shift values defined in lcd.h
 		if(!inMainDisplay){
@@ -58,8 +59,11 @@ void updateLCD(int update){
 		if(tunerScreen){
 			tunerScreen = 0;
 			controlLCD(0x01);
+			int temp = numInMainDisplay;
+			numInMainDisplay = 0;
 			int i;
-			for(i = 0; i < numInMainDisplay; i++){
+			for(i = 0; i < temp; i++, numInMainDisplay++){
+				if(numInMainDisplay == 3) controlLCD(0xB8); //Second line;
 				if(mainDisplay_show[i])addToLCD(mainDisplay[i]);
 				else{
 					printLCD(0x20);
@@ -86,6 +90,8 @@ void updateLCD(int update){
 
 
 void addToLCD(int effect){
+		printLCD(numInMainDisplay + 0x30);
+		printLCD(0x3A);
 	if(effect == TREMOLO){
 		printLCD(0x54);
 		printLCD(0x52);
@@ -111,7 +117,7 @@ void addToLCD(int effect){
 		printLCD(0x48);
 	}
 	/*else if(effect == FLANGE){
-		printLCD(0x46);
+	 *	printLCD(0x46);
 		printLCD(0x4B);
 	}
 	else if(effect == REVERB){
@@ -130,10 +136,9 @@ void addToLCD(int effect){
 
 void toggleLCD(int effect, int index, int on){
 	controlLCD(0x02); //Return cursor to home;
-
 	//Shift to beggining of section that needs to be changed
 	int i;
-	for(i = 0;i<index*3;i++){
+	for(i = 0;i<index*5;i++){
 		controlLCD(0x14);
 	}
 
@@ -144,12 +149,12 @@ void toggleLCD(int effect, int index, int on){
 
 	//Went from on to off, remove effect from spot
 	else{
-		printLCD(0x20);
-		printLCD(0x20);
+		for(i = 0; i < 4; i++) printLCD(0x20);
+
 	}
 
 	controlLCD(0x02); //Return cursor to home;
-	for(i = 0;i<numInMainDisplay*3;i++){
+	for(i = 0;i<numInMainDisplay*5;i++){
 			controlLCD(0x14);
 	}
 }
@@ -208,12 +213,12 @@ void initLCD(){
 	//E = 48
 	//RS = 49
 	//8 Bit Mode
-	//Write 3F for 1st function set
+	//Write 38 for 1st function set
 	controlLCD(0x38);
-	//Write 3F for 2nd function set
+	//Write 38 for 2nd function set
 	controlLCD(0x38);
-	//Write 0F, D = 1 for display on, C = 1 for cursor on, B = 1 for blinking on
-	controlLCD(0x0F);
+	//Write 0C, D = 1 for display on, C = 0 for cursor off, B = 0 for blinking off
+	controlLCD(0x0C);
 	//Write 01 to clear display
 	controlLCD(0x01);
 	//Entry mode set for inc and no shift

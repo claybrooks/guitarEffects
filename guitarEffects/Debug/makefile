@@ -22,6 +22,7 @@ $(GEN_CMDS__FLAG) \
 "./DSP2833x/src/DSP2833x_CodeStartBranch.obj" \
 "./DSP2833x/src/DSP2833x_Adc.obj" \
 "./DSP2833x/src/DSP2833x_ADC_cal.obj" \
+"./include/Flash.obj" \
 "./src/sys.obj" \
 "./src/spi.obj" \
 "./src/main.obj" \
@@ -30,7 +31,7 @@ $(GEN_CMDS__FLAG) \
 "./src/fft.obj" \
 "./src/effect.obj" \
 "./src/adc.obj" \
-"../cmd/28335_RAM_lnk.cmd" \
+"../cmd/KG_RAM_Link1.cmd" \
 "../DSP2833x/cmd/DSP2833x_Headers_nonBIOS.cmd" \
 -l"libc.a" \
 -l"E:\ti\controlSUITE\libs\dsp\FPU\v130\lib\C28x_FPU_Lib.lib" \
@@ -44,10 +45,12 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/subdir_vars.mk
+-include include/subdir_vars.mk
 -include cmd/subdir_vars.mk
 -include DSP2833x/src/subdir_vars.mk
 -include DSP2833x/cmd/subdir_vars.mk
 -include src/subdir_rules.mk
+-include include/subdir_rules.mk
 -include cmd/subdir_rules.mk
 -include DSP2833x/src/subdir_rules.mk
 -include DSP2833x/cmd/subdir_rules.mk
@@ -157,7 +160,7 @@ all: guitarEffects.out
 guitarEffects.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: C2000 Linker'
-	"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/bin/cl2000" -v28 -ml -mt --float_support=fpu32 -Ooff --opt_for_speed=1 -g --diag_warning=225 --display_error_number --diag_wrap=off -z -m"guitarEffects.map" --stack_size=0x300 --warn_sections -i"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/lib" -i"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/include" --reread_libs --display_error_number --diag_wrap=off --xml_link_info="guitarEffects_linkInfo.xml" --rom_model -o "guitarEffects.out" $(ORDERED_OBJS)
+	"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/bin/cl2000" -v28 -ml -mt --float_support=fpu32 -Ooff -g --diag_warning=225 --display_error_number --diag_wrap=off -z -m"guitarEffects.map" --stack_size=0x300 --warn_sections -i"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/lib" -i"E:/ti/ccsv6/tools/compiler/c2000_6.2.7/include" --reread_libs --display_error_number --diag_wrap=off --xml_link_info="guitarEffects_linkInfo.xml" --rom_model -o "guitarEffects.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -170,8 +173,8 @@ guitarEffects.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "src\adc.pp" "src\effect.pp" "src\fft.pp" "src\initialize.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "DSP2833x\src\DSP2833x_Adc.pp" "DSP2833x\src\DSP2833x_CpuTimers.pp" "DSP2833x\src\DSP2833x_DefaultIsr.pp" "DSP2833x\src\DSP2833x_GlobalVariableDefs.pp" "DSP2833x\src\DSP2833x_Gpio.pp" "DSP2833x\src\DSP2833x_PieCtrl.pp" "DSP2833x\src\DSP2833x_PieVect.pp" "DSP2833x\src\DSP2833x_Spi.pp" "DSP2833x\src\DSP2833x_SysCtrl.pp" 
-	-$(RM) "src\adc.obj" "src\effect.obj" "src\fft.obj" "src\initialize.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "DSP2833x\src\DSP2833x_ADC_cal.obj" "DSP2833x\src\DSP2833x_Adc.obj" "DSP2833x\src\DSP2833x_CodeStartBranch.obj" "DSP2833x\src\DSP2833x_CpuTimers.obj" "DSP2833x\src\DSP2833x_DBGIER.obj" "DSP2833x\src\DSP2833x_DefaultIsr.obj" "DSP2833x\src\DSP2833x_GlobalVariableDefs.obj" "DSP2833x\src\DSP2833x_Gpio.obj" "DSP2833x\src\DSP2833x_PieCtrl.obj" "DSP2833x\src\DSP2833x_PieVect.obj" "DSP2833x\src\DSP2833x_Spi.obj" "DSP2833x\src\DSP2833x_SysCtrl.obj" "DSP2833x\src\DSP2833x_usDelay.obj" "DSP2833x\src\RFFT_adc_f32u.obj" 
+	-$(RM) "src\adc.pp" "src\effect.pp" "src\fft.pp" "src\initialize.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "include\Flash.pp" "DSP2833x\src\DSP2833x_Adc.pp" "DSP2833x\src\DSP2833x_CpuTimers.pp" "DSP2833x\src\DSP2833x_DefaultIsr.pp" "DSP2833x\src\DSP2833x_GlobalVariableDefs.pp" "DSP2833x\src\DSP2833x_Gpio.pp" "DSP2833x\src\DSP2833x_PieCtrl.pp" "DSP2833x\src\DSP2833x_PieVect.pp" "DSP2833x\src\DSP2833x_Spi.pp" "DSP2833x\src\DSP2833x_SysCtrl.pp" 
+	-$(RM) "src\adc.obj" "src\effect.obj" "src\fft.obj" "src\initialize.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "include\Flash.obj" "DSP2833x\src\DSP2833x_ADC_cal.obj" "DSP2833x\src\DSP2833x_Adc.obj" "DSP2833x\src\DSP2833x_CodeStartBranch.obj" "DSP2833x\src\DSP2833x_CpuTimers.obj" "DSP2833x\src\DSP2833x_DBGIER.obj" "DSP2833x\src\DSP2833x_DefaultIsr.obj" "DSP2833x\src\DSP2833x_GlobalVariableDefs.obj" "DSP2833x\src\DSP2833x_Gpio.obj" "DSP2833x\src\DSP2833x_PieCtrl.obj" "DSP2833x\src\DSP2833x_PieVect.obj" "DSP2833x\src\DSP2833x_Spi.obj" "DSP2833x\src\DSP2833x_SysCtrl.obj" "DSP2833x\src\DSP2833x_usDelay.obj" "DSP2833x\src\RFFT_adc_f32u.obj" 
 	-$(RM) "DSP2833x\src\DSP2833x_ADC_cal.pp" "DSP2833x\src\DSP2833x_CodeStartBranch.pp" "DSP2833x\src\DSP2833x_DBGIER.pp" "DSP2833x\src\DSP2833x_usDelay.pp" "DSP2833x\src\RFFT_adc_f32u.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

@@ -3,7 +3,7 @@
 #include "../include/spi.h"
 #include "../include/sys.h"
 #include "../include/adc.h"
-#include "../include/fft.h"
+//#include "../include/fft.h"
 #include "../include/effect.h"
 
 void initialize(){
@@ -11,7 +11,7 @@ void initialize(){
 	initEffects();
 
 	//Initialize FFT
-	initFFT();
+	//initFFT();
 
 	//Initialize LCD
 	initLCD();
