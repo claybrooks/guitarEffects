@@ -13,19 +13,25 @@ void writeSPI(int val){
 	DELAY_US(2);
 	GpioDataRegs.GPADAT.bit.GPIO19 = 1;
 }
+int readSPI(){
+	GpioDataRegs.GPADAT.bit.GPIO19 = 1;  //LRCIN, 1 = Left channel, 0 = right channel
+	return 0;
+}
 
 void initSPI(){
 	InitSpiaGpio();
 	EALLOW;
 	SpiaRegs.SPICCR.bit.SPISWRESET=0; 		// Reset SPI
 
-	SpiaRegs.SPICCR.all=0x000F;       		// 12-bit character
-	SpiaRegs.SPICTL.bit.MASTER_SLAVE = 1;   // Master mode enabled
+	SpiaRegs.SPICCR.bit.SPICHAR =  0xF;		//16-bit character
+
+	SpiaRegs.SPICTL.bit.MASTER_SLAVE = 0;   // Slave mode enabled
 	SpiaRegs.SPICTL.bit.TALK = 1; 			// Transmit capability enabled
 	SpiaRegs.SPISTS.all=0x0000;
-	SpiaRegs.SPIBRR = 0x0000;           	// Baud rate ~ 10 MHz
+	SpiaRegs.SPIBRR = 30;           	// Baud rate ~  16.6666MHz
 	SpiaRegs.SPICCR.bit.CLKPOLARITY = 1;  	// falling edge with delay
 	SpiaRegs.SPICTL.bit.CLK_PHASE = 1;
+	SpiaRegs.SPICTL.bit.SPIINTENA = 1;
 
 	SpiaRegs.SPICCR.bit.SPISWRESET=1;  		// Enable SPI
 }

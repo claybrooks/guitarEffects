@@ -9,6 +9,7 @@
 #define SPI_H_
 
 void writeSPI(int);
+int readSPI();
 void initSPI(void);
 
 #endif /* SPI_H_ */

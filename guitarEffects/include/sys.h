@@ -10,6 +10,9 @@
 
 interrupt void cpu_timer0_isr(void);
 interrupt void xint1_isr(void);
+interrupt void adc_isr(void);
+interrupt void cpu_timer1_isr(void);
+interrupt void epwm5_isr(void);
 
 void initINTS();
 void initXINT1();

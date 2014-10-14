@@ -103,8 +103,8 @@ S64_DEPS__QUOTED :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 src \
-include \
 cmd \
+DSP2833x_Audio_App/AIC23_driver_source \
 DSP2833x/src \
 DSP2833x/cmd \
 

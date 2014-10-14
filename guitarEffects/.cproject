@@ -36,9 +36,9 @@
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_LEVEL.953598005" name="Optimization level (--opt_level, -O)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_LEVEL" value="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_LEVEL.off" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_FOR_SPEED.681925918" name="Speed vs. size trade-offs (--opt_for_speed, -mf)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_FOR_SPEED" value="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_FOR_SPEED._none" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.INCLUDE_PATH.1286621251" name="Add dir to #include search path (--include_path, -I)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.INCLUDE_PATH" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;E:\ti\controlSUITE\device_support\f2833x\v133\DSP2833x_common\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CG_TOOL_ROOT}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;E:\ti\controlSUITE\device_support\f2833x\v133\DSP2833x_headers\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/DSP2833x_Audio_App/AIC23_driver_include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/DSP2833x/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;E:\ti\controlSUITE\libs\dsp\FPU\v1_40_00_00\include&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DEBUGGING_MODEL.2135370688" name="Debugging model" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DEBUGGING_MODEL" value="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DEBUGGING_MODEL.SYMDEBUG__DWARF" valueType="enumerated"/>
@@ -76,7 +76,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="cmd/F28335_nonBIOS_flash.cmd|src/wah.c|Effects.c|F28335.cmd|src/bp_iir.c|src/butterworth_bp.c|DSP2833x_Headers_nonBIOS.cmd|F28335_nonBIOS_ram.cmd|KG_RAM_Link1.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="DSP2833x_Audio_App/AIC23_project|DSP2833x_Audio_App/DSP2833x_headers|DSP2833x_Audio_App/DSP2833x_headers/cmd|DSP2833x_Audio_App/DSP2833x_common/cmd|src/fft.c|src/sys.c|src/effect.c|cmd/F28335_nonBIOS_flash.cmd|src/wah.c|Effects.c|F28335.cmd|src/bp_iir.c|src/butterworth_bp.c|DSP2833x_Headers_nonBIOS.cmd|F28335_nonBIOS_ram.cmd|KG_RAM_Link1.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -8,7 +8,7 @@
 #include "math.h"
 #include "DSP28x_Project.h"
 
-#define DELAYLCD 15000
+#define DELAYLCD 7000
 
 //Similar to queue system.  mainDisplay contains what could possibly be printed to screen.
 //mainDisplay_show holds whether or not it is printed to screen (on_off[]);
@@ -17,7 +17,7 @@ int mainDisplay_show[10];
 int numInMainDisplay, tunerScreen;
 
 //Eventually parses code and tells the printLCD() what to print
-void updateLCD(int update){
+/*void updateLCD(int update){
 	//Clear Screen, called by a reset on the queue. Block input if on tuner screen
 	if(update == CLEAR && !tunerScreen){
 		numInMainDisplay = 0;
@@ -86,7 +86,7 @@ void updateLCD(int update){
 	else if(tunerScreen == 1){
 		printFreq(update);
 	}
-}
+}*/
 
 
 void addToLCD(int effect){
@@ -160,7 +160,7 @@ void toggleLCD(int effect, int index, int on){
 }
 
 
-void printFreq(int data){
+/*void printFreq(int data){
 	controlLCD(0xB8); //Second line;
 	int i;
 	for(i = 0; i < 3; i++){
@@ -182,9 +182,7 @@ void printFreq(int data){
 	}
 
 	controlLCD(0x02); //Return cursor to home;
-}
-
-
+}*/
 
 
 void wait(int temp){
@@ -208,6 +206,7 @@ void initLCD(){
 	GpioCtrlRegs.GPADIR.bit.GPIO5 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO6 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO7 = 0x1;
+	GpioCtrlRegs.GPADIR.bit.GPIO24 = 0x1;
 	GpioCtrlRegs.GPBDIR.bit.GPIO48 = 0x1;
 	GpioCtrlRegs.GPBDIR.bit.GPIO49 = 0x1;
 	//E = 48
@@ -226,6 +225,7 @@ void initLCD(){
 }
 
 void controlLCD(int data){
+	GpioDataRegs.GPADAT.bit.GPIO24 = 0;
 	GpioDataRegs.GPBDAT.bit.GPIO49 = 0;
 	GpioDataRegs.GPADAT.all = data;
 	wait(DELAYLCD);
@@ -237,6 +237,7 @@ void controlLCD(int data){
 }
 
 void printLCD(int data){
+	GpioDataRegs.GPADAT.bit.GPIO24 = 0;
 	GpioDataRegs.GPBDAT.bit.GPIO49 = 1;
 	GpioDataRegs.GPADAT.all = data;
 	wait(DELAYLCD);

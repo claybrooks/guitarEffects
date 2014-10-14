@@ -4,26 +4,27 @@
 #include "../include/sys.h"
 #include "../include/adc.h"
 //#include "../include/fft.h"
-#include "../include/effect.h"
+//#include "../include/effect.h"
 
 void initialize(){
 	//Initialize Effects
-	initEffects();
+	//initEffects();
 
 	//Initialize FFT
 	//initFFT();
 
 	//Initialize LCD
-	initLCD();
+	//initLCD();
 
 	//Initialize SPI
-	initSPI();
+	//initSPI();
 
 	//Initialize ADC
-	initADC();
+	//initADC();
+
 
 	//Initialize Interrupts
-	initINTS();
+	//initINTS();
 
 	asm(" CLRC INTM, DBGM");
 }

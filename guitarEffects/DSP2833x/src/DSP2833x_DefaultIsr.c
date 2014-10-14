@@ -692,8 +692,8 @@ interrupt void MRINTB_ISR(void)     // McBSP-B
 
   // Next two lines for debug only to halt the processor here
   // Remove after inserting ISR Code
-  asm ("      ESTOP0");
-  for(;;);
+	int rdata=McbspaRegs.DRR1.all;
+	   PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
 
 // INT6.4
@@ -707,7 +707,7 @@ interrupt void MXINTB_ISR(void)     // McBSP-B
   // Next two lines for debug only to halt the processor here
   // Remove after inserting ISR Code
   asm ("      ESTOP0");
-  for(;;);
+  PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
 
 // INT6.5
@@ -720,8 +720,10 @@ interrupt void MRINTA_ISR(void)     // McBSP-A
 
   // Next two lines for debug only to halt the processor here
   // Remove after inserting ISR Code
-   asm ("      ESTOP0");
-   for(;;);
+
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
+
+
 }
 
 // INT6.6
@@ -734,8 +736,10 @@ interrupt void MXINTA_ISR(void)     // McBSP-A
 
   // Next two lines for debug only to halt the processor here
   // Remove after inserting ISR Code
-   asm ("      ESTOP0");
-   for(;;);
+	int rdata=McbspaRegs.DRR1.all;
+	asm("     NOP");
+	McbspaRegs.DXR1.all= rdata;
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
 
 // INT6.7 - Reserved

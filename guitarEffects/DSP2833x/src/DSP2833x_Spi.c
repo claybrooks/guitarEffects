@@ -77,7 +77,7 @@ void InitSpiaGpio()
     GpioCtrlRegs.GPAQSEL2.bit.GPIO16 = 0; // Asynch input GPIO16 (SPISIMOA)
     GpioCtrlRegs.GPAQSEL2.bit.GPIO17 = 0; // Asynch input GPIO17 (SPISOMIA)
     GpioCtrlRegs.GPAQSEL2.bit.GPIO18 = 0; // Asynch input GPIO18 (SPICLKA)
-    //GpioCtrlRegs.GPAQSEL2.bit.GPIO19 = 3; // Asynch input GPIO19 (SPISTEA)
+    GpioCtrlRegs.GPAQSEL2.bit.GPIO19 = 3; // Asynch input GPIO19 (SPISTEA)
 
 //    GpioCtrlRegs.GPBQSEL2.bit.GPIO54 = 3; // Asynch input GPIO16 (SPISIMOA)
 //    GpioCtrlRegs.GPBQSEL2.bit.GPIO55 = 3; // Asynch input GPIO17 (SPISOMIA)

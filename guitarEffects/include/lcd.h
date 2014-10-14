@@ -29,5 +29,7 @@ void 	toggleLCD(int,int,int);
 void 	controlLCD(int);
 void	updateLCD(int);
 void 	printFreq(int);
+void 	busyCheck();
+void 	entryMode();
 
 #endif /* LCD_H_ */
