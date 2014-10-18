@@ -29,5 +29,9 @@
 			<name>INSTALLROOT_2833X_V132</name>
 			<value>$%7BPARENT-3-PROJECT_LOC%7D/ti/controlSUITE/device_support/f2833x/v132</value>
 		</variable>
+		<variable>
+			<name>INSTALLROOT_2833X_V1321</name>
+			<value>$%7BPARENT-2-CCS_INSTALL_ROOT%7D/controlSUITE/device_support/f2833x/v133</value>
+		</variable>
 	</variableList>
 </projectDescription>

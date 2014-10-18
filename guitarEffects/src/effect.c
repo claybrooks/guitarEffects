@@ -1,7 +1,7 @@
 #include "../include/effect.h"
 #include "math.h"
 #include "DSP28x_Project.h"
-
+/*
 //Type definition for process*Effect* method prototypes
 typedef int FUNC(int, struct params*);
 
@@ -15,7 +15,7 @@ FUNC *list[10] = {processTremolo,processDistortion,processCrunch,processDelay,pr
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
  * where that effect is located in the pipeline array. Increase in mem usage for speed gain, don't have to iterate through *list to find
  * the right effect.
- */
+
 int location[10];
 
 //Array of FUNC's, this is the queue set by the user.
@@ -42,9 +42,9 @@ void initEffects(){
 }
 
 int toggleOn_Off(int effect){
-	//If location[] == -1, then the effect is not in the queue so return 0 to signal
+	//If location[] == 0, then the effect is not in the queue so return 0 to signal
 	//that this effect needs to be queued up.  Else just toggle the state.
-	if(location[effect] != -1){
+	if(location[effect] != 0){
 		on_off[location[effect]] ^= 1;
 		return 1;
 	}
@@ -52,10 +52,11 @@ int toggleOn_Off(int effect){
 }
 
 void queueEffect(int effect){
-	location[effect] = numQueued;		//Set location of the effect in the location array, corresponds to the index in the queue
-	pipeline[numQueued] = list[effect];	//queue function pointer into the pipeline
-	on_off[numQueued] = 1;				//Turn effect on, makes sense for the user
-	numQueued++;						//Increase numQueued
+	numQueued++;							//Increase numQueued
+	location[effect] = numQueued-1;			//Set location of the effect in the location array, corresponds to the index in the queue, -1 because we inc numQueued first
+	pipeline[numQueued-1] = list[effect];	//queue function pointer into the pipeline, -1 because we inc numQueued first
+	on_off[numQueued-1] = 1;					//Turn effect on, makes sense for the user
+
 }
 
 
@@ -63,7 +64,7 @@ void clearPipeline(){
 	//Clear location/on_off arrays
 	int i;
 	for(i=0; i < 10; i++){
-		location[i] = -1;
+		location[i] = 0;
 		on_off[i] = 0;
 	}
 	numQueued = 0;
@@ -77,7 +78,7 @@ int process(int sample){
 	}
 	return sample;
 }
-
+*/
 /*
  * Processing functions
  */
