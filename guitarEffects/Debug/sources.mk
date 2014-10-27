@@ -104,7 +104,6 @@ S64_DEPS__QUOTED :=
 SUBDIRS := \
 src \
 cmd \
-DSP2833x_Audio_App/AIC23_driver_source \
 DSP2833x/src \
 DSP2833x/cmd \
 

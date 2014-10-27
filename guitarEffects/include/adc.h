@@ -12,8 +12,6 @@
 #define ADC_CKPS   0x1	// ADC module clock = HSPCLK/2*ADC_CKPS   = 25.0MHz/(1*2) = 12.5MHz
 #define ADC_SHCLK  0xA  // S/H width in ADC module periods                        = 16 ADC clocks
 
-void initADC();
-int getAdc();
-
+void initAdc();
 
 #endif /* ADC_H_ */

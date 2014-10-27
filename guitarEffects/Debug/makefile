@@ -25,11 +25,13 @@ $(GEN_CMDS__FLAG) \
 "./DSP2833x/src/DSP2833x_CodeStartBranch.obj" \
 "./DSP2833x/src/DSP2833x_Adc.obj" \
 "./DSP2833x/src/DSP2833x_ADC_cal.obj" \
-"./DSP2833x_Audio_App/AIC23_driver_source/AIC23_SPI_control.obj" \
-"./DSP2833x_Audio_App/AIC23_driver_source/AIC23.obj" \
+"./src/sys.obj" \
+"./src/spi.obj" \
 "./src/main.obj" \
+"./src/initialize.obj" \
 "./src/effect.obj" \
 "./src/eeprom.obj" \
+"./src/adc.obj" \
 "../cmd/KG_RAM_Link1.cmd" \
 "../DSP2833x/cmd/DSP2833x_Headers_nonBIOS.cmd" \
 -l"libc.a" \
@@ -45,12 +47,10 @@ RMDIR := RMDIR /S/Q
 -include sources.mk
 -include src/subdir_vars.mk
 -include cmd/subdir_vars.mk
--include DSP2833x_Audio_App/AIC23_driver_source/subdir_vars.mk
 -include DSP2833x/src/subdir_vars.mk
 -include DSP2833x/cmd/subdir_vars.mk
 -include src/subdir_rules.mk
 -include cmd/subdir_rules.mk
--include DSP2833x_Audio_App/AIC23_driver_source/subdir_rules.mk
 -include DSP2833x/src/subdir_rules.mk
 -include DSP2833x/cmd/subdir_rules.mk
 -include objects.mk
@@ -172,8 +172,8 @@ guitarEffects.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "src\eeprom.pp" "src\effect.pp" "src\main.pp" "DSP2833x_Audio_App\AIC23_driver_source\AIC23.pp" "DSP2833x_Audio_App\AIC23_driver_source\AIC23_SPI_control.pp" "DSP2833x\src\DSP2833x_Adc.pp" "DSP2833x\src\DSP2833x_CpuTimers.pp" "DSP2833x\src\DSP2833x_DefaultIsr.pp" "DSP2833x\src\DSP2833x_EPwm.pp" "DSP2833x\src\DSP2833x_GlobalVariableDefs.pp" "DSP2833x\src\DSP2833x_Gpio.pp" "DSP2833x\src\DSP2833x_I2C.pp" "DSP2833x\src\DSP2833x_Mcbsp.pp" "DSP2833x\src\DSP2833x_PieCtrl.pp" "DSP2833x\src\DSP2833x_PieVect.pp" "DSP2833x\src\DSP2833x_Spi.pp" "DSP2833x\src\DSP2833x_SysCtrl.pp" 
-	-$(RM) "src\eeprom.obj" "src\effect.obj" "src\main.obj" "DSP2833x_Audio_App\AIC23_driver_source\AIC23.obj" "DSP2833x_Audio_App\AIC23_driver_source\AIC23_SPI_control.obj" "DSP2833x\src\DSP2833x_ADC_cal.obj" "DSP2833x\src\DSP2833x_Adc.obj" "DSP2833x\src\DSP2833x_CodeStartBranch.obj" "DSP2833x\src\DSP2833x_CpuTimers.obj" "DSP2833x\src\DSP2833x_DBGIER.obj" "DSP2833x\src\DSP2833x_DefaultIsr.obj" "DSP2833x\src\DSP2833x_EPwm.obj" "DSP2833x\src\DSP2833x_GlobalVariableDefs.obj" "DSP2833x\src\DSP2833x_Gpio.obj" "DSP2833x\src\DSP2833x_I2C.obj" "DSP2833x\src\DSP2833x_Mcbsp.obj" "DSP2833x\src\DSP2833x_PieCtrl.obj" "DSP2833x\src\DSP2833x_PieVect.obj" "DSP2833x\src\DSP2833x_Spi.obj" "DSP2833x\src\DSP2833x_SysCtrl.obj" "DSP2833x\src\DSP2833x_usDelay.obj" "DSP2833x\src\RFFT_adc_f32u.obj" 
+	-$(RM) "src\adc.pp" "src\eeprom.pp" "src\effect.pp" "src\initialize.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "DSP2833x\src\DSP2833x_Adc.pp" "DSP2833x\src\DSP2833x_CpuTimers.pp" "DSP2833x\src\DSP2833x_DefaultIsr.pp" "DSP2833x\src\DSP2833x_EPwm.pp" "DSP2833x\src\DSP2833x_GlobalVariableDefs.pp" "DSP2833x\src\DSP2833x_Gpio.pp" "DSP2833x\src\DSP2833x_I2C.pp" "DSP2833x\src\DSP2833x_Mcbsp.pp" "DSP2833x\src\DSP2833x_PieCtrl.pp" "DSP2833x\src\DSP2833x_PieVect.pp" "DSP2833x\src\DSP2833x_Spi.pp" "DSP2833x\src\DSP2833x_SysCtrl.pp" 
+	-$(RM) "src\adc.obj" "src\eeprom.obj" "src\effect.obj" "src\initialize.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "DSP2833x\src\DSP2833x_ADC_cal.obj" "DSP2833x\src\DSP2833x_Adc.obj" "DSP2833x\src\DSP2833x_CodeStartBranch.obj" "DSP2833x\src\DSP2833x_CpuTimers.obj" "DSP2833x\src\DSP2833x_DBGIER.obj" "DSP2833x\src\DSP2833x_DefaultIsr.obj" "DSP2833x\src\DSP2833x_EPwm.obj" "DSP2833x\src\DSP2833x_GlobalVariableDefs.obj" "DSP2833x\src\DSP2833x_Gpio.obj" "DSP2833x\src\DSP2833x_I2C.obj" "DSP2833x\src\DSP2833x_Mcbsp.obj" "DSP2833x\src\DSP2833x_PieCtrl.obj" "DSP2833x\src\DSP2833x_PieVect.obj" "DSP2833x\src\DSP2833x_Spi.obj" "DSP2833x\src\DSP2833x_SysCtrl.obj" "DSP2833x\src\DSP2833x_usDelay.obj" "DSP2833x\src\RFFT_adc_f32u.obj" 
 	-$(RM) "DSP2833x\src\DSP2833x_ADC_cal.pp" "DSP2833x\src\DSP2833x_CodeStartBranch.pp" "DSP2833x\src\DSP2833x_DBGIER.pp" "DSP2833x\src\DSP2833x_usDelay.pp" "DSP2833x\src\RFFT_adc_f32u.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

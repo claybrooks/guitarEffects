@@ -66,7 +66,7 @@ void init_mcbsp_spi()
     McbspbRegs.XCR2.bit.XDATDLY=01;      // FSX setup time 1 in master mode. 0 for slave mode (Transmit)
 
 	McbspbRegs.RCR1.bit.RWDLEN1=2;       // 16-bit word
-    McbspbRegs.XCR1.bit.XWDLEN1=2;       // 16-bit word
+    McbspbRegs.XCR1.bit.XWDLEN1=4;       // 16-bit word
 
     McbspbRegs.SRGR2.all=0x2000; 	 	 // CLKSM=1, FPER = 1 CLKG periods
     McbspbRegs.SRGR1.all= 0x0063;	     // Frame Width = 1 CLKG period, CLKGDV=99 baud rate = 3.75 MHz/(99+1)= 375 kHz
@@ -79,7 +79,7 @@ void init_mcbsp_spi()
     EDIS;
 }
 
-void mcbsp_xmit(int a)
+void mcbsp_xmit(Uint32 a)
 {   while (McbspbRegs.SPCR2.bit.XRDY == 0){}
     McbspbRegs.DXR1.all=a;
 }

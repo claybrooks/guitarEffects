@@ -7,8 +7,10 @@
 
 #ifndef SPI_H_
 #define SPI_H_
-
-void writeSPI(int);
+#include "DSP28x_Project.h"
+extern void init_mcbsp_spi();
+void mcbsp_xmit(Uint32 a);
+void write_dac(int);
 int readSPI();
 void initSPI(void);
 

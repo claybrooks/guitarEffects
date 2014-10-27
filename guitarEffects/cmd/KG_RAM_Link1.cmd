@@ -77,7 +77,7 @@ SECTIONS
       re-directs execution to the start of user code.  */
    codestart        : > BEGIN,     PAGE = 0
    ramfuncs         : > RAML0,     PAGE = 0  
-   .text            : > RAML1,     PAGE = 0
+   .text            : >>RAML1 | RAML2,     PAGE = 0
 /*   .cinit           : > RAML0,     PAGE = 0		*/
 /*   .pinit           : > RAML0,     PAGE = 0		*/
    .switch          : > RAML0,     PAGE = 0

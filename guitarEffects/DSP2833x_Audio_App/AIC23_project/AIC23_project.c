@@ -133,7 +133,7 @@ interrupt void local_D_INTCH2_ISR(void); // Channel 2 Tx ISR
 //===============================================================
 
 #define MIC 0      // 0 = line input, 1 = microphone input
-#define I2S_SEL 0  // 0 = normal DSP McBSP dig. interface, 1 = I2S interface
+#define I2S_SEL 1 // 0 = normal DSP McBSP dig. interface, 1 = I2S interface
 
 //===============================================================
 
@@ -158,20 +158,50 @@ Uint32 k = 0;
 
 void main(void)
 {
-   EALLOW;
+
+
+	EALLOW;
 
 // Step 1. Initialize System Control:
 // PLL, WatchDog, enable Peripheral Clocks
     InitSysCtrl();
 // Step 2. Initalize GPIO:
 // For this example, enable the GPIO PINS for McBSP operation.
-	InitMcbspGpio();
+
+	InitMcbspaGpio();
+	InitMcbspbGpio();
+	//EPWM clocking
+					InitEPwm1Gpio();
+					EALLOW;
+					SysCtrlRegs.PCLKCR0.bit.TBCLKSYNC = 0;
+					EPwm1Regs.TBPRD = 6;           // Set timer period 801 TBCLKs
+					EPwm1Regs.TBPHS.half.TBPHS = 0x0000;           // Phase is 0
+					EPwm1Regs.TBCTR = 0x0000;                      // Clear counter
+					// Set Compare values
+					EPwm1Regs.CMPA.half.CMPA = 3;     // Set compare A value
+					// Setup counter mode
+					EPwm1Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN; // Count up
+					EPwm1Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;       // Clock ratio to SYSCLKOUT
+					EPwm1Regs.TBCTL.bit.CLKDIV = TB_DIV1;
+					// Setup shadowing
+					EPwm1Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;
+					EPwm1Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;  // Load on Zero
+					// Set actions
+					EPwm1Regs.AQCTLA.bit.CAU = AQ_SET;             // Set PWM1A on event A, up count
+					EPwm1Regs.AQCTLA.bit.CAD = AQ_CLEAR;           // Clear PWM1A on event A, down count
+
+					EALLOW;
+					   SysCtrlRegs.PCLKCR0.bit.TBCLKSYNC = 1;
+
+
+
+
 
 
 /* Fill the buffer with dummy data */
 
-	for(k=0; k<1024; k++) { ping_buffer[k] = 0xDEADDEAD; }
-	for(k=0; k<1024; k++) { pong_buffer[k] = 0xDEADDEAD; }
+	for(k=0; k<1024; k++) { ping_buffer[k] = 0x0; }
+	for(k=0; k<1024; k++) { pong_buffer[k] = 0x0; }
 
 
 // Step 3. Clear all interrupts and initialize PIE vector table:
@@ -199,18 +229,19 @@ void main(void)
 
 	init_dma();				// Initialize the DMA before McBSP, so that DMA is ready to transfer the McBSP data
    	init_mcbspa();      	// Initalize McBSP-A
+
     delay_loop();
 
     EALLOW;
     DmaRegs.CH1.CONTROL.bit.RUN = 1; // Start rx on Channel 1
 
-/* Reassign ISRS */
+/* Reassign ISRS*/
 
 
 	PieVectTable.DINTCH1 = &local_D_INTCH1_ISR;
     PieVectTable.DINTCH2 = &local_D_INTCH2_ISR;
 
-/* Configure PIE interrupts */
+/* Configure PIE interrupts*/
 
 	PieCtrlRegs.PIECTRL.bit.ENPIE = 1;  // Enable vector fetching from PIE block
 	PieCtrlRegs.PIEACK.all = 0xFFFF;    // Enables PIE to drive a pulse into the CPU
@@ -221,7 +252,7 @@ void main(void)
 	PieCtrlRegs.PIEIER7.bit.INTx1 = 1;	// Enable INTx.1 of INT7 (DMA CH1)
     PieCtrlRegs.PIEIER7.bit.INTx2 = 1;  // Enable INTx.2 of INT7 (DMA CH2)
 
-/* Configure system interrupts */
+/* Configure system interrupts*/
 
 	IER |= 0x0040;					    // Enable  INT7
     EINT;      					        // Global enable of interrupts
