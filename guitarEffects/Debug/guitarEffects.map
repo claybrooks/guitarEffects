@@ -1,10 +1,10 @@
 ******************************************************************************
              TMS320C2000 Linker PC v6.2.7                      
 ******************************************************************************
->> Linked Mon Oct 27 14:24:56 2014
+>> Linked Tue Oct 28 00:20:50 2014
 
 OUTPUT FILE NAME:   <guitarEffects.out>
-ENTRY POINT SYMBOL: "_c_int00"  address: 00009ec0
+ENTRY POINT SYMBOL: "_c_int00"  address: 0000a625
 
 
 MEMORY CONFIGURATION
@@ -14,10 +14,10 @@ MEMORY CONFIGURATION
 PAGE 0:
   BEGIN                 00000000   00000002  00000002  00000000  RWIX
   BOOT_RSVD             00000002   0000004e  00000000  0000004e  RWIX
-  RAMM0                 00000050   000003b0  000000c3  000002ed  RWIX
+  RAMM0                 00000050   000003b0  000000bc  000002f4  RWIX
   RAML0                 00008000   00001000  00000004  00000ffc  RWIX
-  RAML1                 00009000   00001000  00000ff9  00000007  RWIX
-  RAML2                 0000a000   00001000  00000000  00001000  RWIX
+  RAML1                 00009000   00001000  00001000  00000000  RWIX
+  RAML2                 0000a000   00001000  000007bc  00000844  RWIX
   RAML3                 0000b000   00001000  00000000  00001000  RWIX
   ZONE7A                00200000   0000fc00  00000000  0000fc00  RWIX
   CSM_RSVD              0033ff80   00000076  00000000  00000076  RWIX
@@ -79,7 +79,7 @@ PAGE 1:
   SCIB                  00007750   00000010  00000010  00000000  RWIX
   SCIC                  00007770   00000010  00000010  00000000  RWIX
   I2CA                  00007900   00000040  00000022  0000001e  RWIX
-  RAML4                 0000c000   00001000  00000900  00000700  RWIX
+  RAML4                 0000c000   00001000  00000cbc  00000344  RWIX
   RAML5                 0000d000   00001000  00000100  00000f00  RWIX
   RAML6                 0000e000   00001000  00000000  00001000  RWIX
   RAML7                 0000f000   00001000  00000000  00001000  RWIX
@@ -97,44 +97,63 @@ codestart
 *          0    00000000    00000002     
                   00000000    00000002     DSP2833x_CodeStartBranch.obj (codestart)
 
-.cinit     0    00000050    000000c3     
-                  00000050    00000096     main.obj (.cinit)
-                  000000e6    00000017     effect.obj (.cinit)
-                  000000fd    0000000a     rts2800_fpu32.lib : _lock.obj (.cinit)
-                  00000107    0000000a                       : exit.obj (.cinit)
-                  00000111    00000002     --HOLE-- [fill = 0]
+.cinit     0    00000050    000000bc     
+                  00000050    00000070     main.obj (.cinit)
+                  000000c0    00000017     effect.obj (.cinit)
+                  000000d7    00000017     lowpass.obj (.cinit)
+                  000000ee    0000000a     rts2800_fpu32.lib : _lock.obj (.cinit)
+                  000000f8    0000000a                       : exit.obj (.cinit)
+                  00000102    00000004                       : errno.obj (.cinit)
+                  00000106    00000004                       : memory.obj (.cinit)
+                  0000010a    00000002     --HOLE-- [fill = 0]
 
 ramfuncs   0    00008000    00000004     
                   00008000    00000004     DSP2833x_usDelay.obj (ramfuncs)
 
-.text      0    00009000    00000ff9     
+.text.1    0    00009000    00001000     
                   00009000    00000345     DSP2833x_DefaultIsr.obj (.text:retain)
-                  00009345    000002e7     main.obj (.text:retain)
-                  0000962c    000001b2     effect.obj (.text)
-                  000097de    0000015a     DSP2833x_Mcbsp.obj (.text)
-                  00009938    00000138     C28x_FPU_Lib.lib : RFFT_adc_f32.obj (.text)
-                  00009a70    000000f7     DSP2833x_SysCtrl.obj (.text)
-                  00009b67    00000001     --HOLE-- [fill = 0]
-                  00009b68    0000009e     RFFT_adc_f32u.obj (.text)
-                  00009c06    00000088     rts2800_fpu32.lib : fs_div.obj (.text)
-                  00009c8e    0000007d     sys.obj (.text)
-                  00009d0b    00000078     eeprom.obj (.text)
-                  00009d83    00000075     spi.obj (.text)
-                  00009df8    00000074     DSP2833x_CpuTimers.obj (.text)
-                  00009e6c    00000054     main.obj (.text)
-                  00009ec0    00000046     rts2800_fpu32.lib : boot.obj (.text)
-                  00009f06    00000032     adc.obj (.text)
-                  00009f38    00000028     DSP2833x_PieCtrl.obj (.text)
-                  00009f60    00000028     DSP2833x_Spi.obj (.text)
-                  00009f88    00000019     rts2800_fpu32.lib : args_main.obj (.text)
-                  00009fa1    00000019                       : exit.obj (.text)
-                  00009fba    00000017     DSP2833x_I2C.obj (.text)
-                  00009fd1    00000014     DSP2833x_Adc.obj (.text)
-                  00009fe5    00000009     rts2800_fpu32.lib : _lock.obj (.text)
-                  00009fee    00000008     DSP2833x_CodeStartBranch.obj (.text)
-                  00009ff6    00000003     DSP2833x_DBGIER.obj (.text)
+                  00009345    000002e2     main.obj (.text:retain)
+                  00009627    000001d7     rts2800_fpu32.lib : memory.obj (.text)
+                  000097fe    000001d1     effect.obj (.text)
+                  000099cf    0000015a     DSP2833x_Mcbsp.obj (.text)
+                  00009b29    00000150     bp_iir.obj (.text)
+                  00009c79    00000001     --HOLE-- [fill = 0]
+                  00009c7a    00000138     C28x_FPU_Lib.lib : RFFT_adc_f32.obj (.text)
+                  00009db2    00000115     autoWah.obj (.text)
+                  00009ec7    000000f7     DSP2833x_SysCtrl.obj (.text)
+                  00009fbe    00000031     rts2800_fpu32.lib : ldexp.obj (.text)
+                  00009fef    00000009                       : _lock.obj (.text)
+                  00009ff8    00000008     DSP2833x_CodeStartBranch.obj (.text)
 
 .data      0    0000a000    00000000     UNINITIALIZED
+
+.text.2    0    0000a000    000007bc     
+                  0000a000    000000da     lowpass.obj (.text)
+                  0000a0da    0000009e     RFFT_adc_f32u.obj (.text)
+                  0000a178    0000008c     spi.obj (.text)
+                  0000a204    00000088     rts2800_fpu32.lib : fs_div.obj (.text)
+                  0000a28c    0000007d     sys.obj (.text)
+                  0000a309    00000078     eeprom.obj (.text)
+                  0000a381    00000074     DSP2833x_CpuTimers.obj (.text)
+                  0000a3f5    00000068     rts2800_fpu32.lib : exp.obj (.text)
+                  0000a45d    00000061                       : cos.obj (.text)
+                  0000a4be    00000061                       : tan.obj (.text)
+                  0000a51f    0000005c     main.obj (.text)
+                  0000a57b    0000005a     rts2800_fpu32.lib : pow.obj (.text)
+                  0000a5d5    00000050                       : _log.obj (.text)
+                  0000a625    00000046                       : boot.obj (.text)
+                  0000a66b    0000002d     adc.obj (.text)
+                  0000a698    00000028     DSP2833x_PieCtrl.obj (.text)
+                  0000a6c0    00000023     rts2800_fpu32.lib : sqrt.obj (.text)
+                  0000a6e3    00000022                       : i_div.obj (.text)
+                  0000a705    00000021                       : memcpy_ff.obj (.text)
+                  0000a726    00000020     DSP2833x_Spi.obj (.text)
+                  0000a746    00000019     rts2800_fpu32.lib : args_main.obj (.text)
+                  0000a75f    00000019                       : exit.obj (.text)
+                  0000a778    00000017     DSP2833x_I2C.obj (.text)
+                  0000a78f    00000016     rts2800_fpu32.lib : frexp.obj (.text)
+                  0000a7a5    00000014     DSP2833x_Adc.obj (.text)
+                  0000a7b9    00000003     DSP2833x_DBGIER.obj (.text)
 
 .bss       0    0000b000    00000000     UNINITIALIZED
 
@@ -344,13 +363,23 @@ I2caRegsFile
 *          1    00007900    00000022     UNINITIALIZED
                   00007900    00000022     DSP2833x_GlobalVariableDefs.obj (I2caRegsFile)
 
-.ebss      1    0000c000    00000900     UNINITIALIZED
-                  0000c000    00000688     effect.obj (.ebss)
-                  0000c688    00000018     DSP2833x_CpuTimers.obj (.ebss)
-                  0000c6a0    00000004     rts2800_fpu32.lib : _lock.obj (.ebss)
-                  0000c6a4    00000004                       : exit.obj (.ebss)
-                  0000c6a8    00000018     --HOLE--
-                  0000c6c0    00000240     main.obj (.ebss)
+.ebss      1    0000c000    000008bc     UNINITIALIZED
+                  0000c000    000004b0     bp_iir.obj (.ebss)
+                  0000c4b0    00000008     rts2800_fpu32.lib : memory.obj (.ebss)
+                  0000c4b8    00000004                       : _lock.obj (.ebss)
+                  0000c4bc    00000004                       : exit.obj (.ebss)
+                  0000c4c0    00000366     effect.obj (.ebss)
+                  0000c826    00000018     DSP2833x_CpuTimers.obj (.ebss)
+                  0000c83e    00000001     rts2800_fpu32.lib : errno.obj (.ebss)
+                  0000c83f    00000001     --HOLE--
+                  0000c840    00000036     autoWah.obj (.ebss)
+                  0000c876    0000000a     --HOLE--
+                  0000c880    00000028     main.obj (.ebss)
+                  0000c8a8    00000014     lowpass.obj (.ebss)
+
+.sysmem    1    0000c8bc    00000400     UNINITIALIZED
+                  0000c8bc    00000001     rts2800_fpu32.lib : memory.obj (.sysmem)
+                  0000c8bd    000003ff     --HOLE--
 
 .econst    1    0000d000    00000100     
                   0000d000    00000100     DSP2833x_PieVect.obj (.econst)
@@ -456,63 +485,59 @@ address     data page           name
 
 00007900     1e4 (00007900)     _I2caRegs
 
-0000c000     300 (0000c000)     _numQueued
-0000c001     300 (0000c000)     _location
-0000c00b     300 (0000c000)     _on_off
-0000c016     300 (0000c000)     _pipeline
-0000c02a     300 (0000c000)     _list
+0000c4b8     312 (0000c480)     __unlock
+0000c4ba     312 (0000c480)     __lock
+0000c4bc     312 (0000c480)     ___TI_cleanup_ptr
+0000c4be     312 (0000c480)     ___TI_dtors_ptr
 
-0000c688     31a (0000c680)     _CpuTimer1
-0000c690     31a (0000c680)     _CpuTimer2
-0000c698     31a (0000c680)     _CpuTimer0
-0000c6a0     31a (0000c680)     __unlock
-0000c6a2     31a (0000c680)     __lock
-0000c6a4     31a (0000c680)     ___TI_cleanup_ptr
-0000c6a6     31a (0000c680)     ___TI_dtors_ptr
+0000c4c0     313 (0000c4c0)     _numQueued
+0000c4c2     313 (0000c4c0)     _lowpass
+0000c4c4     313 (0000c4c0)     _on_off
+0000c4ce     313 (0000c4c0)     _location
+0000c4d8     313 (0000c4c0)     _list
+0000c4ec     313 (0000c4c0)     _pipeline
 
-0000c6c0     31b (0000c6c0)     _midChange
-0000c6c1     31b (0000c6c0)     _trebleChange
-0000c6c2     31b (0000c6c0)     _delayChange
-0000c6c3     31b (0000c6c0)     _chorusChange
-0000c6c4     31b (0000c6c0)     _volumeChange
-0000c6c5     31b (0000c6c0)     _chorusLevel
-0000c6c6     31b (0000c6c0)     _delayLevel
-0000c6c7     31b (0000c6c0)     _tremoloLevel
-0000c6c8     31b (0000c6c0)     _bassChange
-0000c6c9     31b (0000c6c0)     _flangeLevel
-0000c6ca     31b (0000c6c0)     _newLevel
-0000c6cb     31b (0000c6c0)     _updateChange
-0000c6cc     31b (0000c6c0)     _first_interrupt
-0000c6cd     31b (0000c6c0)     _updateVolume
-0000c6ce     31b (0000c6c0)     _oldLevel
-0000c6cf     31b (0000c6c0)     _reverbChange
-0000c6d0     31b (0000c6c0)     _flangeChange
-0000c6d1     31b (0000c6c0)     _tremoloChange
-0000c6d2     31b (0000c6c0)     _updateCode
-0000c6d3     31b (0000c6c0)     _updateLcd
-0000c6d4     31b (0000c6c0)     _newVolumeLevel
-0000c6d5     31b (0000c6c0)     _tuner
-0000c6d6     31b (0000c6c0)     _toggled
-0000c6d7     31b (0000c6c0)     _currentChangeScreen
-0000c6d8     31b (0000c6c0)     _preset
-0000c6d9     31b (0000c6c0)     _trebleLevel
-0000c6da     31b (0000c6c0)     _reverbLevel
-0000c6db     31b (0000c6c0)     _midLevel
-0000c6dc     31b (0000c6c0)     _bassLevel
-0000c6dd     31b (0000c6c0)     _resetTimer
-0000c6de     31b (0000c6c0)     _volumeLevel
-0000c6df     31b (0000c6c0)     _sysStart
-0000c6e0     31b (0000c6c0)     _R_channel
-0000c6e2     31b (0000c6c0)     _L_channel
-0000c6e4     31b (0000c6c0)     _k
-0000c6e6     31b (0000c6c0)     _voltageLevel
-0000c6e8     31b (0000c6c0)     _ping_buff_offset
-0000c6ea     31b (0000c6c0)     _pong_buff_offset
-0000c6ec     31b (0000c6c0)     _adcVals
+0000c826     320 (0000c800)     _CpuTimer1
+0000c82e     320 (0000c800)     _CpuTimer2
+0000c836     320 (0000c800)     _CpuTimer0
+0000c83e     320 (0000c800)     _errno
 
-0000c700     31c (0000c700)     _pong_buffer
+0000c848     321 (0000c840)     _x
+0000c84e     321 (0000c840)     _y
 
-0000c800     320 (0000c800)     _ping_buffer
+0000c880     322 (0000c880)     _bassChange
+0000c881     322 (0000c880)     _volumeChange
+0000c882     322 (0000c880)     _flangeChange
+0000c883     322 (0000c880)     _delayChange
+0000c884     322 (0000c880)     _trebleChange
+0000c885     322 (0000c880)     _tremoloLevel
+0000c886     322 (0000c880)     _delayLevel
+0000c887     322 (0000c880)     _chorusLevel
+0000c888     322 (0000c880)     _flangeLevel
+0000c889     322 (0000c880)     _reverbLevel
+0000c88a     322 (0000c880)     _newVolumeLevel
+0000c88b     322 (0000c880)     _updateCode
+0000c88c     322 (0000c880)     _updateChange
+0000c88d     322 (0000c880)     _updateVolume
+0000c88e     322 (0000c880)     _newLevel
+0000c88f     322 (0000c880)     _chorusChange
+0000c890     322 (0000c880)     _midChange
+0000c891     322 (0000c880)     _reverbChange
+0000c892     322 (0000c880)     _updateLcd
+0000c893     322 (0000c880)     _tremoloChange
+0000c894     322 (0000c880)     _preset
+0000c895     322 (0000c880)     _tuner
+0000c896     322 (0000c880)     _trebleLevel
+0000c897     322 (0000c880)     _volumeLevel
+0000c898     322 (0000c880)     _midLevel
+0000c899     322 (0000c880)     _bassLevel
+0000c89a     322 (0000c880)     _resetTimer
+0000c89b     322 (0000c880)     _currentChangeScreen
+0000c89c     322 (0000c880)     _oldLevel
+0000c89d     322 (0000c880)     _sysStart
+0000c89e     322 (0000c880)     _adcVals
+0000c8a8     322 (0000c880)     _lowpass_coefficients
+0000c8bc     322 (0000c880)     __sys_memory
 
 0000d000     340 (0000d000)     _PieVectTableInit
 
@@ -528,22 +553,27 @@ address    name
 0000b000   .bss
 0000a000   .data
 ffffffff   .text
-00009fa1   C$$EXIT
-00009c06   FS$$DIV
+0000a75f   C$$EXIT
+0000a204   FS$$DIV
+0000a6e3   I$$DIV
+0000a6f4   I$$MOD
 000090e6   _ADCINT_ISR
 00380080   _ADC_cal
 00000b00   _AdcMirror
 00007100   _AdcRegs
-00009e31   _ConfigCpuTimer
-0000c698   _CpuTimer0
+00009db2   _AutoWah_init
+00009e34   _AutoWah_process
+00009e45   _AutoWah_sweep
+0000a3ba   _ConfigCpuTimer
+0000c836   _CpuTimer0
 00000c00   _CpuTimer0Regs
-0000c688   _CpuTimer1
+0000c826   _CpuTimer1
 00000c08   _CpuTimer1Regs
-0000c690   _CpuTimer2
+0000c82e   _CpuTimer2
 00000c10   _CpuTimer2Regs
 0033fff8   _CsmPwl
 00000ae0   _CsmRegs
-00009b36   _CsmUnlock
+00009f8d   _CsmUnlock
 00009014   _DATALOG_ISR
 00009237   _DINTCH1_ISR
 00009241   _DINTCH2_ISR
@@ -553,7 +583,7 @@ ffffffff   .text
 00009269   _DINTCH6_ISR
 00008000   _DSP28x_usDelay
 00000880   _DevEmuRegs
-00009a83   _DisableDog
+00009eda   _DisableDog
 00001000   _DmaRegs
 000092c3   _ECAN0INTA_ISR
 000092d7   _ECAN0INTB_ISR
@@ -604,52 +634,51 @@ ffffffff   .text
 000091c5   _EQEP2_INT_ISR
 00006b00   _EQep1Regs
 00006b40   _EQep2Regs
-00009f57   _EnableInterrupts
+0000a6b7   _EnableInterrupts
 00000a80   _FlashRegs
 00006f80   _GpioCtrlRegs
 00006fc0   _GpioDataRegs
 00006fe0   _GpioIntRegs
-00009d0b   _I2CA_Init
-00009d51   _I2CA_ReadData
-00009d1e   _I2CA_WriteData
+0000a309   _I2CA_Init
+0000a34f   _I2CA_ReadData
+0000a31c   _I2CA_WriteData
 00009273   _I2CINT1A_ISR
 0000927d   _I2CINT2A_ISR
 00007900   _I2caRegs
 0000903c   _ILLEGAL_ISR
 00009000   _INT13_ISR
 0000900a   _INT14_ISR
-00009fd1   _InitAdc
-00009df8   _InitCpuTimers
-00009fba   _InitI2C
-00009fbb   _InitI2CGpio
-000097de   _InitMcbsp
-000098b7   _InitMcbspGpio
-000097e3   _InitMcbspa
-00009842   _InitMcbspa12bit
-0000984d   _InitMcbspa16bit
-00009858   _InitMcbspa20bit
-00009863   _InitMcbspa24bit
-0000986e   _InitMcbspa32bit
-0000983b   _InitMcbspa8bit
-000098bc   _InitMcbspaGpio
-0000980f   _InitMcbspb
-00009880   _InitMcbspb12bit
-0000988b   _InitMcbspb16bit
-00009896   _InitMcbspb20bit
-000098a1   _InitMcbspb24bit
-000098ac   _InitMcbspb32bit
-00009879   _InitMcbspb8bit
-000098f6   _InitMcbspbGpio
-00009adb   _InitPeripheralClocks
-00009f38   _InitPieCtrl
-00009a8b   _InitPll
-00009f60   _InitSpi
-00009f61   _InitSpiGpio
-00009f64   _InitSpiaGpio
-00009a70   _InitSysCtrl
+0000a7a5   _InitAdc
+0000a381   _InitCpuTimers
+0000a778   _InitI2C
+0000a779   _InitI2CGpio
+000099cf   _InitMcbsp
+00009aa8   _InitMcbspGpio
+000099d4   _InitMcbspa
+00009a33   _InitMcbspa12bit
+00009a3e   _InitMcbspa16bit
+00009a49   _InitMcbspa20bit
+00009a54   _InitMcbspa24bit
+00009a5f   _InitMcbspa32bit
+00009a2c   _InitMcbspa8bit
+00009aad   _InitMcbspaGpio
+00009a00   _InitMcbspb
+00009a71   _InitMcbspb12bit
+00009a7c   _InitMcbspb16bit
+00009a87   _InitMcbspb20bit
+00009a92   _InitMcbspb24bit
+00009a9d   _InitMcbspb32bit
+00009a6a   _InitMcbspb8bit
+00009ae7   _InitMcbspbGpio
+00009f32   _InitPeripheralClocks
+0000a698   _InitPieCtrl
+00009ee2   _InitPll
+0000a726   _InitSpi
+0000a727   _InitSpiGpio
+0000a72a   _InitSpiaGpio
+00009ec7   _InitSysCtrl
 00009327   _LUF_ISR
 0000931d   _LVF_ISR
-0000c6e2   _L_channel
 0000920c   _MRINTA_ISR
 000091e3   _MRINTB_ISR
 0000921d   _MXINTA_ISR
@@ -662,10 +691,9 @@ ffffffff   .text
 00000ce0   _PieCtrlRegs
 00000d00   _PieVectTable
 0000d000   _PieVectTableInit
-00009938   _RFFT_adc_f32
-00009b68   _RFFT_adc_f32u
+00009c7a   _RFFT_adc_f32
+0000a0da   _RFFT_adc_f32u
 0000901e   _RTOSINT_ISR
-0000c6e0   _R_channel
 0000929b   _SCIRXINTA_ISR
 000092af   _SCIRXINTB_ISR
 00009287   _SCIRXINTC_ISR
@@ -679,8 +707,8 @@ ffffffff   .text
 00007050   _SciaRegs
 00007750   _ScibRegs
 00007770   _ScicRegs
-00009a79   _ServiceDog
-00009ff6   _SetDBGIER
+00009ed0   _ServiceDog
+0000a7b9   _SetDBGIER
 00007040   _SpiaRegs
 00007010   _SysCtrlRegs
 000090f0   _TINT0_ISR
@@ -708,9 +736,10 @@ ffffffff   .text
 00000b20   _XintfRegs
 00000700   __STACK_END
 00000300   __STACK_SIZE
+00000400   __SYSMEM_SIZE
 00000001   __TI_args_main
-0000c6a4   ___TI_cleanup_ptr
-0000c6a6   ___TI_dtors_ptr
+0000c4bc   ___TI_cleanup_ptr
+0000c4be   ___TI_dtors_ptr
 ffffffff   ___binit__
 0000b000   ___bss__
 ffffffff   ___c_args__
@@ -719,96 +748,120 @@ ffffffff   ___c_args__
 0000a000   ___edata__
 0000b000   ___end__
 ffffffff   ___etext__
+0000a705   ___memcpy_ff
 ffffffff   ___pinit__
 ffffffff   ___text__
-00009f88   __args_main
-0000c6a2   __lock
-00009fed   __nop
-00009fe9   __register_lock
-00009fe5   __register_unlock
+0000a746   __args_main
+0000c4ba   __lock
+0000a5d5   __log
+00009ff7   __nop
+00009ff3   __register_lock
+00009fef   __register_unlock
 00000400   __stack
-0000c6a0   __unlock
-00009fa1   _abort
-0000c6ec   _adcVals
-000093a6   _adc_isr
-0000c6c8   _bassChange
-0000c6dc   _bassLevel
-00009ec0   _c_int00
-0000c6c3   _chorusChange
-0000c6c5   _chorusLevel
-0000967a   _clearPipeline
-00009922   _clkg_delay_loop
+0000c8bc   __sys_memory
+0000c4b8   __unlock
+0000a75f   _abort
+0000c89e   _adcVals
+000093a3   _adc_isr
+0000c880   _bassChange
+0000c899   _bassLevel
+00009c19   _bp_iir_filter
+00009b29   _bp_iir_init
+00009be6   _bp_iir_setup
+0000a625   _c_int00
+000097e6   _calloc
+000097e4   _chkheap
+0000c88f   _chorusChange
+0000c887   _chorusLevel
+00009864   _clearPipeline
+00009b13   _clkg_delay_loop
+0000a45d   _cos
 00009345   _cpu_timer0_isr
-00009380   _cpu_timer1_isr
-0000c6d7   _currentChangeScreen
-0000c6c2   _delayChange
-0000c6c6   _delayLevel
-0000990c   _delay_loop
-00009fa3   _exit
-0000c6cc   _first_interrupt
-0000c6d0   _flangeChange
-0000c6c9   _flangeLevel
-00009f33   _getAdc
-00009e9b   _indexLookup
-00009f06   _initAdc
-0000962c   _initEffects
-00009c8e   _initINTS
-00009d98   _initSPI
-00009db2   _init_mcbsp_spi
-0000c6e4   _k
-0000c02a   _list
-0000c001   _location
-00009e6c   _main
-00009dee   _mcbsp_xmit
-0000c6c0   _midChange
-0000c6db   _midLevel
-0000c6ca   _newLevel
-0000c6d4   _newVolumeLevel
-0000c000   _numQueued
-0000c6ce   _oldLevel
-0000c00b   _on_off
-0000c6e8   _ping_buff_offset
-0000c800   _ping_buffer
-0000c016   _pipeline
-0000c6ea   _pong_buff_offset
-0000c700   _pong_buffer
-0000c6d8   _preset
-00009696   _process
-000097d2   _processChorus
-000096cd   _processCrunch
-000096bb   _processDelay
-000096c1   _processDistortion
-0000973c   _processFlange
-00009736   _processPhaser
-000097d8   _processPitchShift
-00009742   _processReverb
-000096d3   _processTremolo
-00009730   _processWah
-00009656   _queueEffect
-00009d92   _readSPI
-0000c6dd   _resetTimer
-0000c6cf   _reverbChange
-0000c6da   _reverbLevel
-000099c8   _rfft_adc_f32_Stages4andUp
+0000937d   _cpu_timer1_isr
+0000c89b   _currentChangeScreen
+0000c883   _delayChange
+0000c886   _delayLevel
+00009afd   _delay_loop
+0000c83e   _errno
+0000a761   _exit
+0000a3f5   _exp
+0000c882   _flangeChange
+0000c888   _flangeLevel
+00009627   _free
+000097c6   _free_memory
+0000a78f   _frexp
+0000a693   _getAdc
+0000a556   _indexLookup
+0000a66b   _initAdc
+000097fe   _initEffects
+0000a28c   _initINTS
+0000a19a   _init_adc_spi
+0000a1b2   _init_mcbsp_spi
+00009fbe   _ldexp
+0000c4d8   _list
+0000c4ce   _location
+0000c4c2   _lowpass
+0000c8a8   _lowpass_coefficients
+0000a000   _lowpass_create
+0000a00b   _lowpass_destroy
+0000a045   _lowpass_filterBiquad
+0000a025   _lowpass_filterBlock
+0000a012   _lowpass_init
+0000a019   _lowpass_reset
+0000a51f   _main
+00009690   _malloc
+000097a4   _max_free
+0000a1ef   _mcbsp_xmit
+0000c890   _midChange
+0000c898   _midLevel
+0000966a   _minit
+0000c88e   _newLevel
+0000c88a   _newVolumeLevel
+0000c4c0   _numQueued
+0000c89c   _oldLevel
+0000c4c4   _on_off
+0000c4ec   _pipeline
+0000a57b   _pow
+0000c894   _preset
+00009880   _process
+000099c5   _processChorus
+000098be   _processCrunch
+000098a5   _processDelay
+000098aa   _processDistortion
+00009939   _processFlange
+00009934   _processPhaser
+000099ca   _processPitchShift
+0000993e   _processReverb
+000098d2   _processTremolo
+0000992b   _processWah
+00009840   _queueEffect
+0000a187   _read_adc
+000096ef   _realloc
+0000c89a   _resetTimer
+0000c891   _reverbChange
+0000c889   _reverbLevel
+00009d0a   _rfft_adc_f32_Stages4andUp
 0000933b   _rsvd_ISR
-0000c6df   _sysStart
-0000963a   _toggleOn_Off
-0000c6d6   _toggled
-0000c6c1   _trebleChange
-0000c6d9   _trebleLevel
-0000c6d1   _tremoloChange
-0000c6c7   _tremoloLevel
-0000c6d5   _tuner
-0000c6cb   _updateChange
-0000c6d2   _updateCode
-0000c6d3   _updateLcd
-00009cfa   _updateTimer0
-0000c6cd   _updateVolume
-0000c6e6   _voltageLevel
-0000c6c4   _volumeChange
-0000c6de   _volumeLevel
-00009d83   _write_dac
-0000956f   _xint1_isr
+0000a6c0   _sqrt
+0000c89d   _sysStart
+0000a4be   _tan
+00009824   _toggleOn_Off
+0000c884   _trebleChange
+0000c896   _trebleLevel
+0000c893   _tremoloChange
+0000c885   _tremoloLevel
+0000c895   _tuner
+0000c88c   _updateChange
+0000c88b   _updateCode
+0000c892   _updateLcd
+0000a2f8   _updateTimer0
+0000c88d   _updateVolume
+0000c881   _volumeChange
+0000c897   _volumeLevel
+0000a178   _write_dac
+0000c848   _x
+0000956c   _xint1_isr
+0000c84e   _y
 ffffffff   binit
 00000050   cinit
 00000000   code_start
@@ -827,6 +880,7 @@ address    name
 00000050   ___cinit__
 00000050   cinit
 00000300   __STACK_SIZE
+00000400   __SYSMEM_SIZE
 00000400   __stack
 00000700   __STACK_END
 00000880   _DevEmuRegs
@@ -958,148 +1012,175 @@ address    name
 00009331   _PIE_RESERVED
 0000933b   _rsvd_ISR
 00009345   _cpu_timer0_isr
-00009380   _cpu_timer1_isr
-000093a6   _adc_isr
-0000956f   _xint1_isr
-0000962c   _initEffects
-0000963a   _toggleOn_Off
-00009656   _queueEffect
-0000967a   _clearPipeline
-00009696   _process
-000096bb   _processDelay
-000096c1   _processDistortion
-000096cd   _processCrunch
-000096d3   _processTremolo
-00009730   _processWah
-00009736   _processPhaser
-0000973c   _processFlange
-00009742   _processReverb
-000097d2   _processChorus
-000097d8   _processPitchShift
-000097de   _InitMcbsp
-000097e3   _InitMcbspa
-0000980f   _InitMcbspb
-0000983b   _InitMcbspa8bit
-00009842   _InitMcbspa12bit
-0000984d   _InitMcbspa16bit
-00009858   _InitMcbspa20bit
-00009863   _InitMcbspa24bit
-0000986e   _InitMcbspa32bit
-00009879   _InitMcbspb8bit
-00009880   _InitMcbspb12bit
-0000988b   _InitMcbspb16bit
-00009896   _InitMcbspb20bit
-000098a1   _InitMcbspb24bit
-000098ac   _InitMcbspb32bit
-000098b7   _InitMcbspGpio
-000098bc   _InitMcbspaGpio
-000098f6   _InitMcbspbGpio
-0000990c   _delay_loop
-00009922   _clkg_delay_loop
-00009938   _RFFT_adc_f32
-000099c8   _rfft_adc_f32_Stages4andUp
-00009a70   _InitSysCtrl
-00009a79   _ServiceDog
-00009a83   _DisableDog
-00009a8b   _InitPll
-00009adb   _InitPeripheralClocks
-00009b36   _CsmUnlock
-00009b68   _RFFT_adc_f32u
-00009c06   FS$$DIV
-00009c8e   _initINTS
-00009cfa   _updateTimer0
-00009d0b   _I2CA_Init
-00009d1e   _I2CA_WriteData
-00009d51   _I2CA_ReadData
-00009d83   _write_dac
-00009d92   _readSPI
-00009d98   _initSPI
-00009db2   _init_mcbsp_spi
-00009dee   _mcbsp_xmit
-00009df8   _InitCpuTimers
-00009e31   _ConfigCpuTimer
-00009e6c   _main
-00009e9b   _indexLookup
-00009ec0   _c_int00
-00009f06   _initAdc
-00009f33   _getAdc
-00009f38   _InitPieCtrl
-00009f57   _EnableInterrupts
-00009f60   _InitSpi
-00009f61   _InitSpiGpio
-00009f64   _InitSpiaGpio
-00009f88   __args_main
-00009fa1   C$$EXIT
-00009fa1   _abort
-00009fa3   _exit
-00009fba   _InitI2C
-00009fbb   _InitI2CGpio
-00009fd1   _InitAdc
-00009fe5   __register_unlock
-00009fe9   __register_lock
-00009fed   __nop
-00009ff6   _SetDBGIER
+0000937d   _cpu_timer1_isr
+000093a3   _adc_isr
+0000956c   _xint1_isr
+00009627   _free
+0000966a   _minit
+00009690   _malloc
+000096ef   _realloc
+000097a4   _max_free
+000097c6   _free_memory
+000097e4   _chkheap
+000097e6   _calloc
+000097fe   _initEffects
+00009824   _toggleOn_Off
+00009840   _queueEffect
+00009864   _clearPipeline
+00009880   _process
+000098a5   _processDelay
+000098aa   _processDistortion
+000098be   _processCrunch
+000098d2   _processTremolo
+0000992b   _processWah
+00009934   _processPhaser
+00009939   _processFlange
+0000993e   _processReverb
+000099c5   _processChorus
+000099ca   _processPitchShift
+000099cf   _InitMcbsp
+000099d4   _InitMcbspa
+00009a00   _InitMcbspb
+00009a2c   _InitMcbspa8bit
+00009a33   _InitMcbspa12bit
+00009a3e   _InitMcbspa16bit
+00009a49   _InitMcbspa20bit
+00009a54   _InitMcbspa24bit
+00009a5f   _InitMcbspa32bit
+00009a6a   _InitMcbspb8bit
+00009a71   _InitMcbspb12bit
+00009a7c   _InitMcbspb16bit
+00009a87   _InitMcbspb20bit
+00009a92   _InitMcbspb24bit
+00009a9d   _InitMcbspb32bit
+00009aa8   _InitMcbspGpio
+00009aad   _InitMcbspaGpio
+00009ae7   _InitMcbspbGpio
+00009afd   _delay_loop
+00009b13   _clkg_delay_loop
+00009b29   _bp_iir_init
+00009be6   _bp_iir_setup
+00009c19   _bp_iir_filter
+00009c7a   _RFFT_adc_f32
+00009d0a   _rfft_adc_f32_Stages4andUp
+00009db2   _AutoWah_init
+00009e34   _AutoWah_process
+00009e45   _AutoWah_sweep
+00009ec7   _InitSysCtrl
+00009ed0   _ServiceDog
+00009eda   _DisableDog
+00009ee2   _InitPll
+00009f32   _InitPeripheralClocks
+00009f8d   _CsmUnlock
+00009fbe   _ldexp
+00009fef   __register_unlock
+00009ff3   __register_lock
+00009ff7   __nop
 0000a000   .data
 0000a000   ___data__
 0000a000   ___edata__
+0000a000   _lowpass_create
 0000a000   edata
+0000a00b   _lowpass_destroy
+0000a012   _lowpass_init
+0000a019   _lowpass_reset
+0000a025   _lowpass_filterBlock
+0000a045   _lowpass_filterBiquad
+0000a0da   _RFFT_adc_f32u
+0000a178   _write_dac
+0000a187   _read_adc
+0000a19a   _init_adc_spi
+0000a1b2   _init_mcbsp_spi
+0000a1ef   _mcbsp_xmit
+0000a204   FS$$DIV
+0000a28c   _initINTS
+0000a2f8   _updateTimer0
+0000a309   _I2CA_Init
+0000a31c   _I2CA_WriteData
+0000a34f   _I2CA_ReadData
+0000a381   _InitCpuTimers
+0000a3ba   _ConfigCpuTimer
+0000a3f5   _exp
+0000a45d   _cos
+0000a4be   _tan
+0000a51f   _main
+0000a556   _indexLookup
+0000a57b   _pow
+0000a5d5   __log
+0000a625   _c_int00
+0000a66b   _initAdc
+0000a693   _getAdc
+0000a698   _InitPieCtrl
+0000a6b7   _EnableInterrupts
+0000a6c0   _sqrt
+0000a6e3   I$$DIV
+0000a6f4   I$$MOD
+0000a705   ___memcpy_ff
+0000a726   _InitSpi
+0000a727   _InitSpiGpio
+0000a72a   _InitSpiaGpio
+0000a746   __args_main
+0000a75f   C$$EXIT
+0000a75f   _abort
+0000a761   _exit
+0000a778   _InitI2C
+0000a779   _InitI2CGpio
+0000a78f   _frexp
+0000a7a5   _InitAdc
+0000a7b9   _SetDBGIER
 0000b000   .bss
 0000b000   ___bss__
 0000b000   ___end__
 0000b000   end
-0000c000   _numQueued
-0000c001   _location
-0000c00b   _on_off
-0000c016   _pipeline
-0000c02a   _list
-0000c688   _CpuTimer1
-0000c690   _CpuTimer2
-0000c698   _CpuTimer0
-0000c6a0   __unlock
-0000c6a2   __lock
-0000c6a4   ___TI_cleanup_ptr
-0000c6a6   ___TI_dtors_ptr
-0000c6c0   _midChange
-0000c6c1   _trebleChange
-0000c6c2   _delayChange
-0000c6c3   _chorusChange
-0000c6c4   _volumeChange
-0000c6c5   _chorusLevel
-0000c6c6   _delayLevel
-0000c6c7   _tremoloLevel
-0000c6c8   _bassChange
-0000c6c9   _flangeLevel
-0000c6ca   _newLevel
-0000c6cb   _updateChange
-0000c6cc   _first_interrupt
-0000c6cd   _updateVolume
-0000c6ce   _oldLevel
-0000c6cf   _reverbChange
-0000c6d0   _flangeChange
-0000c6d1   _tremoloChange
-0000c6d2   _updateCode
-0000c6d3   _updateLcd
-0000c6d4   _newVolumeLevel
-0000c6d5   _tuner
-0000c6d6   _toggled
-0000c6d7   _currentChangeScreen
-0000c6d8   _preset
-0000c6d9   _trebleLevel
-0000c6da   _reverbLevel
-0000c6db   _midLevel
-0000c6dc   _bassLevel
-0000c6dd   _resetTimer
-0000c6de   _volumeLevel
-0000c6df   _sysStart
-0000c6e0   _R_channel
-0000c6e2   _L_channel
-0000c6e4   _k
-0000c6e6   _voltageLevel
-0000c6e8   _ping_buff_offset
-0000c6ea   _pong_buff_offset
-0000c6ec   _adcVals
-0000c700   _pong_buffer
-0000c800   _ping_buffer
+0000c4b8   __unlock
+0000c4ba   __lock
+0000c4bc   ___TI_cleanup_ptr
+0000c4be   ___TI_dtors_ptr
+0000c4c0   _numQueued
+0000c4c2   _lowpass
+0000c4c4   _on_off
+0000c4ce   _location
+0000c4d8   _list
+0000c4ec   _pipeline
+0000c826   _CpuTimer1
+0000c82e   _CpuTimer2
+0000c836   _CpuTimer0
+0000c83e   _errno
+0000c848   _x
+0000c84e   _y
+0000c880   _bassChange
+0000c881   _volumeChange
+0000c882   _flangeChange
+0000c883   _delayChange
+0000c884   _trebleChange
+0000c885   _tremoloLevel
+0000c886   _delayLevel
+0000c887   _chorusLevel
+0000c888   _flangeLevel
+0000c889   _reverbLevel
+0000c88a   _newVolumeLevel
+0000c88b   _updateCode
+0000c88c   _updateChange
+0000c88d   _updateVolume
+0000c88e   _newLevel
+0000c88f   _chorusChange
+0000c890   _midChange
+0000c891   _reverbChange
+0000c892   _updateLcd
+0000c893   _tremoloChange
+0000c894   _preset
+0000c895   _tuner
+0000c896   _trebleLevel
+0000c897   _volumeLevel
+0000c898   _midLevel
+0000c899   _bassLevel
+0000c89a   _resetTimer
+0000c89b   _currentChangeScreen
+0000c89c   _oldLevel
+0000c89d   _sysStart
+0000c89e   _adcVals
+0000c8a8   _lowpass_coefficients
+0000c8bc   __sys_memory
 0000d000   _PieVectTableInit
 0033fff8   _CsmPwl
 00380080   _ADC_cal
@@ -1114,4 +1195,4 @@ ffffffff   binit
 ffffffff   etext
 ffffffff   pinit
 
-[291 symbols]
+[319 symbols]

@@ -7,15 +7,7 @@
 #include "sys.h"
 #include "PWM.h"
 #include "eeprom.h"
-//#include "AIC23.h"
 #include "DSP2833x_Mcbsp.h"
-
-#define MIC 0      // 0 = line input, 1 = microphone input
-#define I2S_SEL 1  // 0 = normal DSP McBSP dig. interface, 1 = I2S interface
-
-double voltageLevel = 0;
-
-int toggled = 0;
 
 int indexLookup(int);
 
@@ -25,17 +17,6 @@ int bassChange = 0, volumeChange = 0, trebleChange = 0, midChange = 0, flangeCha
 int updateLcd = 0, updateCode = 0, updateChange, newLevel = 0, oldLevel = 0;
 int updateVolume = 0, newVolumeLevel = 0;
 int adcVals[10];
-
-
-Uint32 ping_buffer[128];  	// Note that Uint32 is used, not Uint16
-Uint32 pong_buffer[128];
-Uint32 * L_channel = &ping_buffer[0];	// This pointer points to the beginning of the L-C data in either of the buffers
-Uint32 * R_channel = &ping_buffer[64];	// This pointer points to the beginning of the R-C data in either of the buffers
-Uint32 ping_buff_offset = (Uint32) &ping_buffer[0];
-Uint32 pong_buff_offset = (Uint32) &pong_buffer[0];
-
-Uint16 first_interrupt = 1;   // 1 indicates first interrupt
-Uint32 k = 0;
 
 int main(){
 	InitSysCtrl();
@@ -53,7 +34,6 @@ int main(){
 
 
 	// For this example, enable the GPIO PINS for McBSP operation.
-		//InitMcbspaGpio();
 		InitMcbspbGpio();
 
 	    EALLOW;
@@ -62,9 +42,11 @@ int main(){
 		//Initialize I2C
 			InitI2CGpio();
 			I2CA_Init();
-		//Initialize MCBSP
-	    	init_mcbsp_spi();
-	    	mcbsp_xmit(0x38000000);//Initialize dac command to internal voltage ref
+		//Initialize ADC/DAC
+			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
+			init_adc_spi();
+			init_mcbsp_spi();
+			mcbsp_xmit(0x38000100);
 		//Initialize ADC
 			initAdc();
 		//Initialize Effects
@@ -77,9 +59,8 @@ int main(){
 			initINTS();
 	    EINT;      					        // Global enable of interrupts
 	    EDIS;
-
-
 	while(1){
+
 		//Wait for interrupts
 		if(updateLcd){
 			//updateLCD(updateCode);
@@ -89,15 +70,14 @@ int main(){
 		//	updateLevel(newLevel, oldLevel);
 			updateChange = 0;
 		}
-
 	}
 }
 
-interrupt void cpu_timer0_isr(void)
-{
-	Uint16 sample = process(AdcRegs.ADCRESULT3 >> 4);
-	write_dac(sample);
-	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+interrupt void cpu_timer0_isr(void){
+	int sample = read_adc();	//Get sample from ADC
+	sample = process(sample);	//Process sample
+	write_dac(sample);			//write sample to DAC
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;	//Clear flag to accept more interrupts
 }
 
 //Timeout counter for Preset selection
@@ -250,7 +230,7 @@ interrupt void xint1_isr(void){
 	int input = (GpioDataRegs.GPADAT.all & 0x000001E) >> 1;
 
 	//Scroll up through presets
-	if(GpioDataRegs.GPADAT.bit.GPIO19){
+	if(GpioDataRegs.GPADAT.bit.GPIO5){
 		//If initial entry into preset, set up timer and flag
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
@@ -261,7 +241,7 @@ interrupt void xint1_isr(void){
 		updateCode = PRESETUP;
 	}
 	//Scroll down through presets
-	else if(GpioDataRegs.GPADAT.bit.GPIO18){
+	else if(GpioDataRegs.GPADAT.bit.GPIO21){
 		//If initial entry into preset, set up timer and flag
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
@@ -272,7 +252,7 @@ interrupt void xint1_isr(void){
 		updateCode = PRESETDOWN;
 	}
 	//Load preset
-	else if(GpioDataRegs.GPADAT.bit.GPIO17){
+	else if(GpioDataRegs.GPADAT.bit.GPIO20){
 		//Stop timer and reset flag
 		CpuTimer1Regs.TCR.bit.TSS = 1;
 		preset = 0;
@@ -311,7 +291,6 @@ interrupt void xint1_isr(void){
 		if(!toggleOn_Off(effect)) queueEffect(effect);		//queue the effect
 		updateLcd = 1;
 		updateCode = effect;
-		toggled = 1;
 	}
 
 	//Acknowledge Interrupt

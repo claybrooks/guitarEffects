@@ -1,15 +1,18 @@
 #include "../include/effect.h"
 #include "math.h"
 #include "DSP28x_Project.h"
+#include "spi.h"
+#include "autoWah.h"
+#include "lowpass.h"
 
 //Type definition for process*Effect* method prototypes
-typedef Uint32 FUNC(Uint32, struct params*);
+typedef int FUNC(int, struct params*);
 
 //Create FUNC variables
 FUNC processTremolo,processDistortion,processCrunch,processDelay,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[10] = {processTremolo,processReverb,processDistortion,processCrunch,processDelay,processWah,processPhaser,processFlange,processChorus,processPitchShift};
+FUNC *list[10] = {processTremolo,processReverb,processDistortion,processCrunch,processDelay,processReverb,processPhaser,processFlange,processChorus,processPitchShift};
 
 /*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
@@ -20,6 +23,8 @@ int location[10];
 
 //Array of FUNC's, this is the queue set by the user.
 FUNC *pipeline[10];
+lowpassType* lowpass;
+
 
 //State of each queued effect, this allows user to stomp effects on/off without losing location in queue
 //Indices of this array map direclty to indices of pipeline
@@ -32,6 +37,11 @@ int numQueued;
 static struct params params;
 
 void initEffects(){
+	//Lowpass Filter
+	lowpass = lowpass_create();
+
+	//Autowah
+	AutoWah_init(2000,  /*Effect rate 2000*/16000, /*Sampling Frequency*/1000,  /*Maximum frequency*/500,   /*Minimum frequency*/ 4,     /*Q*/0.707, /*Gain factor*/10     /*Frequency increment*/);
 	//Clear the queue
 	clearPipeline();
 	//Tremolo
@@ -41,6 +51,7 @@ void initEffects(){
 			params.tremoloLimit = 0;
 			params.reverbCount = 0;
 			params.reverbStart = 0;
+
 }
 
 int toggleOn_Off(int effect){
@@ -72,7 +83,7 @@ void clearPipeline(){
 	numQueued = 0;
 }
 
-Uint32 process(Uint32 sample){
+int process(int sample){
 	int index;
 	//Loop through the entire queue, if its on -> process, else skip
 	for(index = 0; index < numQueued; index++){
@@ -84,22 +95,30 @@ Uint32 process(Uint32 sample){
 /*
  * Processing functions
  */
-Uint32 processDelay(Uint32 sample, struct params* p){
+int processDelay(int sample, struct params* p){
 	return sample;
 }
-Uint32 processDistortion(Uint32 sample, struct params* p){
-	if(sample > 0xF20) return 0xF20;
-	//else if (sample < 0xC000) return 0xC000;
-	else return sample;
+int processDistortion(int sample, struct params* p){
+	//Spit out sample to analog Distortion circuit on DAC B.  Will need a GPIO to select where the signal goes from the analog switch
+	long temp = sample;
+	Uint32 command = 0x19000000 | (temp<<8);
+	mcbsp_xmit(command);
+	DELAY_US(3);
+	return (sample);
 }
-Uint32 processCrunch(Uint32 sample, struct params* p){
-	return sample;
+int processCrunch(int sample, struct params* p){
+	//Spit out sample to analog Distortion circuit on DAC B.  Will need a GPIO to select where the signal goes from the analog switch
+	long temp = sample;
+	Uint32 command = 0x19000000 | (temp<<8);
+	mcbsp_xmit(command);
+	DELAY_US(3);
+	return (sample);
 }
-Uint32 processTremolo(Uint32 sample, struct params* p){
+int processTremolo(int sample, struct params* p){
 	//Sets rate at which the effect runs
-		double max = 0x0666;
+		double max = 0x0FFF;
 		double pedal = AdcRegs.ADCRESULT1>>4;
-		p->tremoloLimit = (double)4000*(pedal/max)+ 3000;
+		p->tremoloLimit = (double)1000*(pedal/max)+ 1000;
 
 		//Count up or down, if it hits upper limit then count up else count down
 		if(p->tremoloCounter >= p->tremoloLimit) p->tremoloCount = -1;
@@ -111,16 +130,16 @@ Uint32 processTremolo(Uint32 sample, struct params* p){
 
 		return (int)(temp*(double)sample);
 }
-Uint32 processWah(Uint32 sample, struct params* p){
+int processWah(int sample, struct params* p){
+	return AutoWah_process(sample);
+}
+int processPhaser(int sample, struct params* p){
 	return sample;
 }
-Uint32 processPhaser(Uint32 sample, struct params* p){
+int processFlange(int sample, struct params* p){
 	return sample;
 }
-Uint32 processFlange(Uint32 sample, struct params* p){
-	return sample;
-}
-Uint32 processReverb(Uint32 sample, struct params* p){
+int processReverb(int sample, struct params* p){
 	//Reinitialize the reverb array on every start
 
 	if(p->reverbCount == 800){
@@ -128,11 +147,10 @@ Uint32 processReverb(Uint32 sample, struct params* p){
 			p->reverbCount = 0;
 		}
 		double decay = AdcRegs.ADCRESULT3 >> 4;
-		decay = ((double)decay / (double)0xFFF)*.3 + .15;
+		decay = ((double)decay / (double)0xFFF)*.5 + .15;
 		//Once reinitialized, start to process reverb
 		if(p->reverbStart){
-
-			Uint32 temp = p->reverbDelay[p->reverbCount];
+			int temp = p->reverbDelay[p->reverbCount];
 			sample += p->reverbDelay[p->reverbCount];
 			p->reverbDelay[p->reverbCount] = (double)sample*decay + (double)temp*(decay-.08);
 		}
@@ -141,9 +159,9 @@ Uint32 processReverb(Uint32 sample, struct params* p){
 		p->reverbCount++;
 		return sample;
 }
-Uint32 processChorus(Uint32 sample, struct params* p){
+int processChorus(int sample, struct params* p){
 	return sample;
 }
-Uint32 processPitchShift(Uint32 sample, struct params* p){
+int processPitchShift(int sample, struct params* p){
 	return sample;
 }
