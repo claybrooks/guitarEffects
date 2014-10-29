@@ -38,6 +38,9 @@ InitSysCtrl();
 
 	    EALLOW;
 
+	    //GPIO for muxing
+	    //GpioCtrlRegs.GPAMUX1.bit.GPIO0 = 0;
+	    //GpioCtrlRegs.GPADIR.bit.GPIO0 = 1;
 
 		//Initialize I2C
 			//InitI2CGpio();
@@ -75,6 +78,7 @@ InitSysCtrl();
 }
 
 interrupt void cpu_timer0_isr(void){
+	//GpioDataRegs.GPADAT.bit.GPIO1 = 1;
 	int sample = read_adc();	//Get sample from ADC
 	sample = process(sample);	//Process sample
 	write_dac(sample);			//write sample to DAC
@@ -83,7 +87,7 @@ interrupt void cpu_timer0_isr(void){
 
 //Timeout counter for Preset selection
 interrupt void cpu_timer1_isr(void){
-
+	GpioDataRegs.GPADAT.bit.GPIO1 = 1;
 	CpuTimer1Regs.TCR.bit.TSS = 1;
 
 	//Return to homescreen

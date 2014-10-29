@@ -34,7 +34,7 @@ void init_adc_spi(){
 	SpiaRegs.SPICTL.bit.MASTER_SLAVE = 1;   // Slave mode enabled
 	SpiaRegs.SPICTL.bit.TALK = 1; 			// Transmit capability enabled
 	SpiaRegs.SPISTS.all=0x0000;
-	SpiaRegs.SPIBRR = 0;           	// Baud rate ~  16.6666MHz
+	SpiaRegs.SPIBRR = 4;           	// Baud rate ~  16.6666MHz
 	SpiaRegs.SPICCR.bit.CLKPOLARITY = 0;  	// Rising edge with delay
 	SpiaRegs.SPICTL.bit.CLK_PHASE = 1;
 
