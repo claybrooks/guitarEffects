@@ -13,26 +13,28 @@ void write_dac(int sample){
 	mcbsp_xmit(command);
 }
 int read_adc(){
-	//Toggle CONVST high
-	GpioDataRegs.GPADAT.bit.GPIO19 = 1;	//CONVST, ~CS
-	DELAY_US(2);	//Delay min of 500ns, max of 8800ns.
-
-	while(SpiaRegs.SPIFFRX.bit.RXFFST !=1) { }
+	GpioDataRegs.GPADAT.bit.GPIO19 = 1;
+	//while(SpiaRegs.SPISTS.bit.INT_FLAG !=1) { }
+	DELAY_US(3);
+	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
+	//DELAY_US(.2);
+	SpiaRegs.SPITXBUF = 0xFFFF;
 	int sample = SpiaRegs.SPIRXBUF;
 	return sample;
 }
 
 void init_adc_spi(){
-	InitSpiaGpio();
 	EALLOW;
+	InitSpiaGpio();
+
 	SpiaRegs.SPICCR.bit.SPISWRESET=0; 		// Reset SPI
 
 	SpiaRegs.SPICCR.bit.SPICHAR =  0xF;		//16-bit character
 
-	SpiaRegs.SPICTL.bit.MASTER_SLAVE = 0;   // Slave mode enabled
+	SpiaRegs.SPICTL.bit.MASTER_SLAVE = 1;   // Slave mode enabled
 	SpiaRegs.SPICTL.bit.TALK = 1; 			// Transmit capability enabled
 	SpiaRegs.SPISTS.all=0x0000;
-	SpiaRegs.SPIBRR = 30;           	// Baud rate ~  16.6666MHz
+	SpiaRegs.SPIBRR = 0;           	// Baud rate ~  16.6666MHz
 	SpiaRegs.SPICCR.bit.CLKPOLARITY = 0;  	// Rising edge with delay
 	SpiaRegs.SPICTL.bit.CLK_PHASE = 1;
 
@@ -65,7 +67,6 @@ void init_mcbsp_spi()
 	McbspbRegs.SPCR2.bit.XRST=1;         // Release TX from Reset
 	McbspbRegs.SPCR1.bit.RRST=1;         // Release RX from Reset
     McbspbRegs.SPCR2.bit.FRST=1;         // Frame Sync Generator reset
-    EDIS;
 }
 
 void mcbsp_xmit(Uint32 a)

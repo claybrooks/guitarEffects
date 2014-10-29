@@ -9,7 +9,7 @@
 typedef int FUNC(int, struct params*);
 
 //Create FUNC variables
-FUNC processTremolo,processDistortion,processCrunch,processDelay,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift;
+FUNC processTremolo,processReverb,processCrunch,processDelay,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift;
 
 //Static list of available effects, GPIO must match this
 FUNC *list[10] = {processTremolo,processReverb,processDistortion,processCrunch,processDelay,processReverb,processPhaser,processFlange,processChorus,processPitchShift};

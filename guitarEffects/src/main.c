@@ -19,7 +19,7 @@ int updateVolume = 0, newVolumeLevel = 0;
 int adcVals[10];
 
 int main(){
-	InitSysCtrl();
+InitSysCtrl();
 	EALLOW;
 	adcVals[0] = 0;
 	adcVals[1] = 0;
@@ -40,13 +40,14 @@ int main(){
 
 
 		//Initialize I2C
-			InitI2CGpio();
-			I2CA_Init();
+			//InitI2CGpio();
+			//I2CA_Init();
 		//Initialize ADC/DAC
-			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
-			init_adc_spi();
 			init_mcbsp_spi();
 			mcbsp_xmit(0x38000100);
+			GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;
+			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
+			init_adc_spi();
 		//Initialize ADC
 			initAdc();
 		//Initialize Effects
@@ -57,10 +58,9 @@ int main(){
 			//initLCD();
 		//Initialize Interrupts
 			initINTS();
-	    EINT;      					        // Global enable of interrupts
-	    EDIS;
+	    //EINT;      					        // Global enable of interrupts
 	while(1){
-
+		EALLOW;
 		//Wait for interrupts
 		if(updateLcd){
 			//updateLCD(updateCode);
@@ -70,6 +70,7 @@ int main(){
 		//	updateLevel(newLevel, oldLevel);
 			updateChange = 0;
 		}
+		//Toggle CONVST high
 	}
 }
 
