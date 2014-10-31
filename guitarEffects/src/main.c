@@ -78,7 +78,6 @@ memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFu
 			updateLevel(newLevel, oldLevel);
 			updateChange = 0;
 		}
-		//Toggle CONVST high
 	}
 }
 

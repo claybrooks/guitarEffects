@@ -14,12 +14,12 @@ void initINTS(){
 	//InitPieVectTable();
 	EALLOW;
 	//Timer0
-			ConfigCpuTimer(&CpuTimer0, 150, 22.4);
+			ConfigCpuTimer(&CpuTimer0, 75, 21.4);
 			PieVectTable.TINT0 = &cpu_timer0_isr;
 			CpuTimer0Regs.TCR.all = 0x4001;
 			PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 	//Timer1
-		ConfigCpuTimer(&CpuTimer1, 150, 1500000);
+		ConfigCpuTimer(&CpuTimer1, 75, 1500000);
 		PieVectTable.XINT13 = &cpu_timer1_isr;
 		//CpuTimer1Regs.TCR.all = 0x4001;
 		PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
