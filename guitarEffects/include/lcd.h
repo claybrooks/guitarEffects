@@ -10,7 +10,7 @@
 
 #define TREMOLO			0
 #define REVERB	 		1
-/*#define CRUNCH 			2
+#define CRUNCH 		2
 #define DELAY	 		3
 #define WAH 			4
 #define DISTORTION		5
@@ -18,7 +18,7 @@
 #define PHASER 			7
 #define CHORUS 			8
 #define PITCHSHIFT 		9
-#define SUSTAIN			10*/
+#define SUSTAIN			10
 #define MAIN 			11
 #define CLEAR 			14
 #define TUNER 			15

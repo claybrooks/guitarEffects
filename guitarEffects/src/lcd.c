@@ -45,7 +45,7 @@ void printReverb(){
 	printLCD(B+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
-/*
+
 void printDelay(){
 	controlLCD(CL);
 	controlLCD(SECOND);
@@ -77,7 +77,7 @@ void printChorus(){
 	printLCD(U+lc);
 	printLCD(S+lc);
 	controlLCD(HOME); //Return cursor to home;
-}*/
+}
 void updateLevel(int level, int oldLevel){
 	//controlLCD(0x01);
 	controlLCD(HOME);//return home
@@ -205,8 +205,8 @@ void updateLCD(int update){
 		}
 	}
 	else if(update == SAVEPRESET && presetScreen){
-		//Save presets.  Method of calling needs to be moved to main
-		/*savePreset(currentPreset);
+		/*//Save presets.  Method of calling needs to be moved to main
+		savePreset(currentPreset);
 		int start = (currentPreset-1)*42;
 		int i;
 		for(i = 21; i < 31; i++){
@@ -235,7 +235,7 @@ void updateLCD(int update){
 	}
 	else if(update == CHANGEREVERB){
 		printReverb();
-	}/*
+	}
 	else if(update == CHANGECHORUS){
 		printChorus();
 	}
@@ -244,7 +244,7 @@ void updateLCD(int update){
 	}
 	else if(update == CHANGEFLANGE){
 		printFlange();
-	}*/
+	}
 }
 
 void goToMain(){
@@ -280,7 +280,7 @@ void addToLCD(int effect){
 		printLCD(T);
 		printLCD(R);
 	}
-	/*
+
 	else if(effect == DISTORTION){
 		printLCD(D);
 		printLCD(I);
@@ -296,31 +296,31 @@ void addToLCD(int effect){
 	else if(effect == WAH){
 		printLCD(W);
 		printLCD(A);
-	}*/
+	}
 	else if(effect == REVERB){
 		printLCD(R);
 		printLCD(E);
-	}/*
+	}
 	else if(effect == SUSTAIN){
 			printLCD(S);
 			printLCD(U);
 	}
 	else if(effect == FLANGE){
-	 	printLCD(0xF);
-		printLCD(0xL);
+	 	printLCD(F);
+		printLCD(L);
 	}
 	else if(effect == PHASER){
-		printLCD(0xP);
-		printLCD(0xH);
+		printLCD(P);
+		printLCD(H);
 	}
 	else if(effect == CHORUS){
-		printLCD(0xC);
-		printLCD(0xH);
+		printLCD(C);
+		printLCD(H);
 	}
 	else if(effect == PITCHSHIFT){
-		printLCD(0xP);
-		printLCD(0xI);
-	}*/
+		printLCD(P);
+		printLCD(I);
+	}
 }
 
 void toggleLCD(int effect, int index, int on){

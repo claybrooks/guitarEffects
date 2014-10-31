@@ -16,6 +16,7 @@ PAGE 0:    /* Program Memory */
    CSM_RSVD       (R) : origin = 0x33FF80, length = 0x000076     /* Part of FLASH Sector A.  Reserved when CSM is in use. */
    BEGIN_FLASH    (R) : origin = 0x33FFF6, length = 0x000002     /* Part of FLASH Sector A.  Used for "Jump to flash" bootloader mode. */
    PASSWORDS      (R) : origin = 0x33FFF8, length = 0x000008     /* Part of FLASH Sector A.  CSM password locations. */
+   ADC_CAL    		  : origin = 0x380080, length = 0x000009
    OTP            (R) : origin = 0x380400, length = 0x000400     /* OTP */
    IQTABLES       (R) : origin = 0x3FE000, length = 0x000B50     /* Part of Boot ROM */
    IQTABLES2      (R) : origin = 0x3FEB50, length = 0x00008C     /* Part of Boot ROM */
@@ -46,11 +47,12 @@ SECTIONS
 
   /* Data Memory (PAGE 1) sections */
    .bss              : > L4SARAM,               PAGE = 1
-   .ebss             : > L4SARAM,               PAGE = 1
+   .ebss             : >> L4SARAM | L5SARAM | L6SARAM | L7SARAM    PAGE = 1
    .cio              : > L4SARAM,               PAGE = 1
    .stack            : > M1SARAM,               PAGE = 1
    .sysmem           : > L4SARAM,               PAGE = 1
    .esysmem          : > L4SARAM,               PAGE = 1
+    DMARAML5         : > L5SARAM,     			PAGE = 1
 
 /*** User Defined Sections ***/
    codestart         : > BEGIN_FLASH,           PAGE = 0                /* Used by file CodeStartBranch.asm */
@@ -62,6 +64,8 @@ SECTIONS
                          LOAD_START(_secureRamFuncs_loadstart),
                          LOAD_SIZE(_secureRamFuncs_loadsize),
                          RUN_START(_secureRamFuncs_runstart)
+/* Allocate ADC_cal function (pre-programmed by factory into TI reserved memory) */
+	.adc_cal         : load = ADC_CAL,   		PAGE = 0, TYPE = NOLOAD
 
 }
 

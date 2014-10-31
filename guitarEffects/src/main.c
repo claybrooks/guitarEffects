@@ -8,6 +8,7 @@
 #include "PWM.h"
 #include "eeprom.h"
 #include "DSP2833x_Mcbsp.h"
+#include "F28335_example.h"
 
 int indexLookup(int);
 
@@ -20,6 +21,10 @@ int adcVals[10];
 
 int main(){
 InitSysCtrl();
+
+memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
+	InitFlash();
+
 	EALLOW;
 	adcVals[0] = 0;
 	adcVals[1] = 0;
@@ -43,8 +48,8 @@ InitSysCtrl();
 	    //GpioCtrlRegs.GPADIR.bit.GPIO0 = 1;
 
 		//Initialize I2C
-			//InitI2CGpio();
-			//I2CA_Init();
+			InitI2CGpio();
+			I2CA_Init();
 		//Initialize ADC/DAC
 			init_mcbsp_spi();
 			mcbsp_xmit(0x38000100);
@@ -58,7 +63,7 @@ InitSysCtrl();
 		//Initialize FFT
 			//initFFT();
 		//Initialize LCD
-			//initLCD();
+			initLCD();
 		//Initialize Interrupts
 			initINTS();
 	    //EINT;      					        // Global enable of interrupts
@@ -66,11 +71,11 @@ InitSysCtrl();
 		EALLOW;
 		//Wait for interrupts
 		if(updateLcd){
-			//updateLCD(updateCode);
+			updateLCD(updateCode);
 			updateLcd = 0;
 		}
 		if(updateChange){
-		//	updateLevel(newLevel, oldLevel);
+			updateLevel(newLevel, oldLevel);
 			updateChange = 0;
 		}
 		//Toggle CONVST high

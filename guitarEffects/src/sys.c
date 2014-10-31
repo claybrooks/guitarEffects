@@ -13,20 +13,6 @@ void initINTS(){
 	InitCpuTimers();
 	//InitPieVectTable();
 	EALLOW;
-	/*
-		//DMA
-		DmaRegs.CH1.CONTROL.bit.RUN = 1; // Start rx on Channel 1
-		// Reassign ISRS
-		PieVectTable.DINTCH1 = &local_D_INTCH1_ISR;
-		PieVectTable.DINTCH2 = &local_D_INTCH2_ISR;
-		// Configure PIE interrupts
-		PieCtrlRegs.PIECTRL.bit.ENPIE = 1;  // Enable vector fetching from PIE block
-		PieCtrlRegs.PIEACK.all = 0xFFFF;    // Enables PIE to drive a pulse into the CPU
-		// The interrupt can be asserted in the following interrupt lines
-		PieCtrlRegs.PIEIER7.bit.INTx1 = 1;	// Enable INTx.1 of INT7 (DMA CH1)
-		PieCtrlRegs.PIEIER7.bit.INTx2 = 1;  // Enable INTx.2 of INT7 (DMA CH2)
-		//Configure system interrupts*/
-
 	//Timer0
 			ConfigCpuTimer(&CpuTimer0, 150, 22.4);
 			PieVectTable.TINT0 = &cpu_timer0_isr;

@@ -4,6 +4,23 @@
 #include "spi.h"
 #include "autoWah.h"
 #include "lowpass.h"
+#include "eeprom.h"
+
+
+//For eeprom reading/writing
+int readDone, writeDone = 0;
+unsigned int adcVal[5];
+#define EEPROMREADDELAY 5000
+#define EEPROMWRITEDELAY 5000
+struct I2CMSG *CurrentMsgPtr;	// Used in interrupts
+struct I2CMSG messageOut;
+struct I2CMSG messageIn;
+#define I2C_SLAVE_ADDR        0x50
+#define I2C_NUMBYTES          5
+Uint16 Error;
+void eepromWrite();
+void eepromRead();
+
 
 //Type definition for process*Effect* method prototypes
 typedef int FUNC(int, struct params*);
@@ -164,4 +181,228 @@ int processChorus(int sample, struct params* p){
 }
 int processPitchShift(int sample, struct params* p){
 	return sample;
+}
+
+
+
+
+
+
+
+
+void savePreset(int presetNum){
+	//Calculate addresses based on presetNum
+	int i = 0;
+	int locationMessage1 = (presetNum-1)*32;
+	int locationMessage2 = locationMessage1 + 5;
+	int on_offMessage1 = locationMessage2 + 5;
+	int on_offMessage2 = on_offMessage1 + 5;
+	int adcMessage1 = on_offMessage2 + 5;
+	int adcMessage2 = adcMessage1 + 6;
+
+	//write first half of location array
+	messageOut.MemoryLowAddr = locationMessage1 & 0x00FF;
+	messageOut.MemoryHighAddr = (locationMessage1 & 0xFF00)>>8;
+	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
+	messageOut.SlaveAddress = 0x50;
+	messageOut.NumOfBytes = 5;
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = location[i];
+	eepromWrite();
+	DELAY_US(EEPROMWRITEDELAY);
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+
+	//write second half of location array
+	messageOut.MemoryLowAddr = locationMessage2 & 0x00FF;
+	messageOut.MemoryHighAddr = (locationMessage2 & 0xFF00)>>8;
+	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
+	messageOut.SlaveAddress = 0x50;
+	messageOut.NumOfBytes = 5;
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = location[i+5];
+	eepromWrite();
+	DELAY_US(EEPROMWRITEDELAY);
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+
+
+	//write first half of on_off array
+	messageOut.MemoryLowAddr = on_offMessage1 & 0x00FF;
+	messageOut.MemoryHighAddr = (on_offMessage1 & 0xFF00)>>8;
+	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
+	messageOut.SlaveAddress = 0x50;
+	messageOut.NumOfBytes = 5;
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = on_off[i];
+	eepromWrite();
+	DELAY_US(EEPROMWRITEDELAY);
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+
+	//write second half of on_off array
+	messageOut.MemoryLowAddr = on_offMessage2 & 0x00FF;
+	messageOut.MemoryHighAddr = (on_offMessage2 & 0xFF00)>>8;
+	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
+	messageOut.SlaveAddress = 0x50;
+	messageOut.NumOfBytes = 5;
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = on_off[i+5];
+	eepromWrite();
+	DELAY_US(EEPROMWRITEDELAY);
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+
+	//write out first half of adc values
+	messageOut.MemoryLowAddr = adcMessage1 & 0x00FF;
+	messageOut.MemoryHighAddr = (adcMessage1 & 0xFF00)>>8;
+	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
+	messageOut.SlaveAddress = 0x50;
+	messageOut.NumOfBytes = 6;
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = adcVal[i];
+	eepromWrite();
+	DELAY_US(EEPROMWRITEDELAY);
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+
+	//write out second half of adc values
+	messageOut.MemoryLowAddr = adcMessage2 & 0x00FF;
+	messageOut.MemoryHighAddr = (adcMessage2 & 0xFF00)>>8;
+	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
+	messageOut.SlaveAddress = 0x50;
+	messageOut.NumOfBytes = 6;
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = adcVal[i] >> 8;
+	eepromWrite();
+	DELAY_US(EEPROMWRITEDELAY);
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+}
+
+void loadPreset(int presetNum){
+	int i = 0;
+	//Calculate addresses based on presetNum
+	int locationMessage1 = (presetNum-1)*32;
+	int locationMessage2 = locationMessage1 + 5;
+	int on_offMessage1 = locationMessage2 + 5;
+	int on_offMessage2 = on_offMessage1 + 5;
+	int adcMessage1 = on_offMessage2 + 5;
+	int adcMessage2 = adcMessage1 + 6;
+
+	//Read in first half of location array
+	messageIn.MemoryLowAddr = locationMessage1 & 0x00FF;
+	messageIn.MemoryHighAddr = (locationMessage1 & 0xFF00)>>8;
+	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+	messageIn.SlaveAddress = 0x50;
+	messageIn.NumOfBytes = 5;
+	eepromRead();
+	DELAY_US(EEPROMREADDELAY);
+	for(i = 0; i < 5; i++)  location[i] = messageIn.MsgBuffer[i];
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+
+	//Read in second half of location array
+	messageIn.MemoryLowAddr = locationMessage2 & 0x00FF;
+	messageIn.MemoryHighAddr = (locationMessage2 & 0xFF00)>>8;
+	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+	messageIn.SlaveAddress = 0x50;
+	messageIn.NumOfBytes = 5;
+	eepromRead();
+	DELAY_US(EEPROMREADDELAY);
+	for(i = 0; i < 5; i++)  location[i+5] = messageIn.MsgBuffer[i];
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+
+	//Read in second half of on_off array
+	messageIn.MemoryLowAddr = on_offMessage1 & 0x00FF;
+	messageIn.MemoryHighAddr = (on_offMessage1 & 0xFF00)>>8;
+	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+	messageIn.SlaveAddress = 0x50;
+	messageIn.NumOfBytes = 5;
+	eepromRead();
+	DELAY_US(EEPROMREADDELAY);
+	for(i = 0; i < 5; i++) on_off[i] = messageIn.MsgBuffer[i];
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+
+	//Read in second half of on_off array
+	messageIn.MemoryLowAddr = on_offMessage2 & 0x00FF;
+	messageIn.MemoryHighAddr = (on_offMessage2 & 0xFF00)>>8;
+	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+	messageIn.SlaveAddress = 0x50;
+	messageIn.NumOfBytes = 5;
+	eepromRead();
+	DELAY_US(EEPROMREADDELAY);
+	for(i = 0; i < 5; i++) on_off[i+5] = messageIn.MsgBuffer[i];
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+
+	//Read in first half of adc values
+	messageIn.MemoryLowAddr = adcMessage1 & 0x00FF;
+	messageIn.MemoryHighAddr = (adcMessage1 & 0xFF00)>>8;
+	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+	messageIn.SlaveAddress = 0x50;
+	messageIn.NumOfBytes = 5;
+	eepromRead();
+	DELAY_US(EEPROMREADDELAY);
+	for(i = 0; i < 5; i++) adcVal[i] = messageIn.MsgBuffer[i];
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+
+	//Read in second half of adc values
+	messageIn.MemoryLowAddr = adcMessage2 & 0x00FF;
+	messageIn.MemoryHighAddr = (adcMessage2 & 0xFF00)>>8;
+	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+	messageIn.SlaveAddress = 0x50;
+	messageIn.NumOfBytes = 5;
+	eepromRead();
+	DELAY_US(EEPROMREADDELAY);
+	for(i = 0; i < 5; i++){
+		unsigned int temp = messageIn.MsgBuffer[i] << 8;
+		adcVal[i] = temp | adcVal[i];
+	}
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+
+
+	numQueued = 0;
+	for(i = 0; i < 10; i++){
+		int temp = location[i];
+		if(temp != 0){
+			location[i] = temp;
+			pipeline[temp] = list[i];
+			numQueued++;
+		}
+	}
+}
+
+void eepromWrite(){
+	writeDone = 0;
+	while(!writeDone){
+		 if(messageOut.MsgStatus == I2C_MSGSTAT_SEND_WITHSTOP){
+			Error = I2CA_WriteData(&messageOut);
+			if (Error == I2C_SUCCESS){
+				writeDone = 1;
+				CurrentMsgPtr = &messageOut;
+				messageOut.MsgStatus = I2C_MSGSTAT_WRITE_BUSY;
+			}
+		}  // end of write section
+	}
+}
+
+void eepromRead(){
+	readDone = 0;
+	while(!readDone){
+	//Check outgoing message status. Bypass read section if status is not inactive.
+		  if (messageOut.MsgStatus == I2C_MSGSTAT_INACTIVE){
+			 // Check incoming message status.
+			 if(messageIn.MsgStatus == I2C_MSGSTAT_SEND_NOSTOP){
+				// EEPROM address setup portion
+				while(I2CA_ReadData(&messageIn) != I2C_SUCCESS){
+
+				}
+				// Update current message pointer and message status
+				CurrentMsgPtr = &messageIn;
+				messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP_BUSY;
+			 }
+
+			 // Once message has progressed past setting up the internal address
+			 // of the EEPROM, send a restart to read the data bytes from the
+			 // EEPROM. Complete the communique with a stop bit. MsgStatus is
+			 // updated in the interrupt service routine.
+			 else if(messageIn.MsgStatus == I2C_MSGSTAT_RESTART){
+				// Read data portion
+				while(I2CA_ReadData(&messageIn) != I2C_SUCCESS){
+				   // Maybe setup an attempt counter to break an infinite while
+				   // loop.
+				}
+				// Update current message pointer and message status
+				CurrentMsgPtr = &messageIn;
+				messageIn.MsgStatus = I2C_MSGSTAT_READ_BUSY;
+			 }
+		  }
+	}
 }
