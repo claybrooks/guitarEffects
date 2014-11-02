@@ -55,8 +55,8 @@ set_location_assignment PIN_5 -to GPIO_9
 set_location_assignment PIN_6 -to GPIO_10
 set_location_assignment PIN_8 -to GPIO_11
 set_location_assignment PIN_16 -to xintrup
-set_location_assignment PIN_24 -to clk_in
-set_location_assignment PIN_9 -to GPIO_12
-set_location_assignment PIN_11 -to GPIO_13
-set_location_assignment PIN_12 -to GPIO_14
-set_location_assignment PIN_14 -to GPIO_15
+set_location_assignment PIN_18 -to GPIO_12
+set_location_assignment PIN_19 -to GPIO_13
+set_location_assignment PIN_20 -to GPIO_14
+set_location_assignment PIN_21 -to GPIO_15
+set_global_assignment -name BDF_FILE guitarEffects_2.bdf

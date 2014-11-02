@@ -10,6 +10,9 @@
 #include "DSP2833x_Mcbsp.h"
 #include "F28335_example.h"
 
+
+#define DEBOUNCE 200000
+
 int indexLookup(int);
 
 int tuner = 0, preset = 0, currentChangeScreen = 0, resetTimer = 0, sysStart = 1;
@@ -18,12 +21,22 @@ int bassChange = 0, volumeChange = 0, trebleChange = 0, midChange = 0, flangeCha
 int updateLcd = 0, updateCode = 0, updateChange, newLevel = 0, oldLevel = 0;
 int updateVolume = 0, newVolumeLevel = 0;
 int adcVals[10];
+int load = 0, save = 0, presetNumber = 1;
+int toggleDisplay = 0, toToggle = 0;
+
+int intCounter = 0;
+
+//#pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
+///#pragma CODE_SECTION(cpu_timer1_isr, "secureRamFuncs")
+//#pragma CODE_SECTION(adc_isr, "secureRamFuncs")
+//#pragma CODE_SECTION(xint1_isr, "secureRamFuncs")
 
 int main(){
-InitSysCtrl();
 
-memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
-	InitFlash();
+	InitSysCtrl();
+
+//memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
+	//InitFlash();
 
 	EALLOW;
 	adcVals[0] = 0;
@@ -45,12 +58,12 @@ memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFu
 
 	    //GPIO for muxing
 	    //GpioCtrlRegs.GPAMUX1.bit.GPIO0 = 0;
-	    //GpioCtrlRegs.GPADIR.bit.GPIO0 = 1;
+	    //GpioCtrlRegs.GPADIR.bit.GPIO6 = 1;
 
 		//Initialize I2C
 			InitI2CGpio();
 			I2CA_Init();
-		//Initialize ADC/DAC
+		//I/nitialize ADC/DAC
 			init_mcbsp_spi();
 			mcbsp_xmit(0x38000100);
 			GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;
@@ -66,7 +79,6 @@ memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFu
 			initLCD();
 		//Initialize Interrupts
 			initINTS();
-	    //EINT;      					        // Global enable of interrupts
 	while(1){
 		EALLOW;
 		//Wait for interrupts
@@ -78,11 +90,21 @@ memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFu
 			updateLevel(newLevel, oldLevel);
 			updateChange = 0;
 		}
+		if(load){
+			loadPresetScreen(loadPreset(presetNumber));
+			load = 0;
+		}
+		if(save){
+			savePreset(presetNumber);
+			save = 0;
+		}
 	}
 }
 
 interrupt void cpu_timer0_isr(void){
-	//GpioDataRegs.GPADAT.bit.GPIO1 = 1;
+	EALLOW;
+	//if(GpioDataRegs.GPADAT.bit.GPIO6 == 1)GpioDataRegs.GPADAT.bit.GPIO6 = 0;
+	//else GpioDataRegs.GPADAT.bit.GPIO6 = 1;
 	int sample = read_adc();	//Get sample from ADC
 	sample = process(sample);	//Process sample
 	write_dac(sample);			//write sample to DAC
@@ -91,6 +113,7 @@ interrupt void cpu_timer0_isr(void){
 
 //Timeout counter for Preset selection
 interrupt void cpu_timer1_isr(void){
+
 	GpioDataRegs.GPADAT.bit.GPIO1 = 1;
 	CpuTimer1Regs.TCR.bit.TSS = 1;
 
@@ -123,190 +146,305 @@ interrupt void adc_isr(void){
 		 properly prints the screen on every iteration
 		-resetTimer resets the timer1 to start over counting down from 3 seconds.  This will cause a timeout signal
 		 to be sent to the LCD after 3 seconds of no change on any ADC channel.
-	*/
+
 	//TREMOLO
-	if(abs(adcVals[0] - (AdcRegs.ADCRESULT0 >> 4)) > 0x00F0){
-		adcVals[0] = AdcRegs.ADCRESULT0 >> 4;
-		if(!tremoloChange|| currentChangeScreen != 1){
-			currentChangeScreen = 1;
-			updateLcd = 1;
-			updateCode = CHANGETREMOLO;
-			tremoloChange = 1;
-		}
-		int temp = 16*((double)adcVals[0]/(double)0x0FFF);
-		newLevel = temp;
-		oldLevel = tremoloLevel;
-		updateChange = 1;
-		tremoloLevel = temp;
-		resetTimer = 1;
-	}
-	//REVERB
-	else if(abs(adcVals[1]- (AdcRegs.ADCRESULT1 >> 4)) > 0x00F0){
-		adcVals[1] = AdcRegs.ADCRESULT1 >> 4;
-		if(!reverbChange || currentChangeScreen != 2){
-			currentChangeScreen = 2;
-			updateLcd = 1;
-			updateCode = CHANGEREVERB;
-			reverbChange = 1;
-		}
-		int temp = 16*((double)adcVals[1]/(double)0x0FFF);
-		newLevel = temp;
-		oldLevel = reverbLevel;
-		updateChange = 1;
-		reverbLevel = temp;
-		resetTimer = 1;
-	}
-	//VOLUME
-	else if(abs(adcVals[2] - (AdcRegs.ADCRESULT2 >> 4)) > 0x00F0){
-		adcVals[2] = AdcRegs.ADCRESULT2 >> 4;
-		if(!volumeChange || currentChangeScreen != 3){
-			currentChangeScreen = 3;
-			updateLcd = 1;
-			updateCode = CHANGEVOLUME;
-			volumeChange = 1;
-		}
-		int temp = 16*((double)adcVals[2]/(double)0x0FFF);
-		newLevel = temp;
-		oldLevel = volumeLevel;
-		updateChange = 1;
-		newVolumeLevel = (((double)adcVals[2]/(double)0xFFF))*(0x1F);
-		resetTimer = 1;
-		updateVolume = 1;
-	}
-	//BASS
-	else if(abs(adcVals[3] - (AdcRegs.ADCRESULT3 >> 4)) > 0x00F0){
-		adcVals[3] = AdcRegs.ADCRESULT3 >> 4;
-		if(!bassChange || currentChangeScreen != 4){
-			currentChangeScreen = 4;
-			updateLcd = 1;
-			updateCode = CHANGEBASS;
-			bassChange = 1;
-		}
-		int temp = 16*((double)adcVals[3]/(double)0x0FFF);
-		newLevel = temp;
-		oldLevel = bassLevel;
-		updateChange = 1;
-		bassLevel = temp;
-		resetTimer = 1;
-	}
-	//MID
-	else if(abs(adcVals[4] - (AdcRegs.ADCRESULT4 >> 4)) > 0x00F0){
-			adcVals[4] = AdcRegs.ADCRESULT4 >> 4;
-			if(!midChange || currentChangeScreen != 5){
-				currentChangeScreen = 5;
+	if(!preset){
+		if(abs(adcVals[0] - (AdcRegs.ADCRESULT0 >> 4)) > 0x00F0){
+			adcVals[0] = AdcRegs.ADCRESULT0 >> 4;
+			if(!tremoloChange|| currentChangeScreen != 1){
+				currentChangeScreen = 1;
 				updateLcd = 1;
-				updateCode = CHANGEMID;
-				midChange = 1;
+				updateCode = CHANGETREMOLO;
+				tremoloChange = 1;
 			}
-			int temp = 16*((double)adcVals[4]/(double)0x0FFF);
+			int temp = 16*((double)adcVals[0]/(double)0x0FFF);
 			newLevel = temp;
-			oldLevel = midLevel;
+			oldLevel = tremoloLevel;
 			updateChange = 1;
-			midLevel = temp;
+			tremoloLevel = temp;
 			resetTimer = 1;
-	}
-	//TREBLE
-	else if(abs(adcVals[5] - (AdcRegs.ADCRESULT5 >> 4)) > 0x00F0){
-			adcVals[5] = AdcRegs.ADCRESULT5 >> 4;
-			if(!trebleChange || currentChangeScreen != 6){
-				currentChangeScreen = 6;
+		}
+		//REVERB
+		else if(abs(adcVals[1]- (AdcRegs.ADCRESULT1 >> 4)) > 0x00F0){
+			adcVals[1] = AdcRegs.ADCRESULT1 >> 4;
+			if(!reverbChange || currentChangeScreen != 2){
+				currentChangeScreen = 2;
 				updateLcd = 1;
-				updateCode = CHANGETREBLE;
-				trebleChange = 1;
+				updateCode = CHANGEREVERB;
+				reverbChange = 1;
 			}
-			int temp = 16*((double)adcVals[5]/(double)0x0FFF);
+			int temp = 16*((double)adcVals[1]/(double)0x0FFF);
 			newLevel = temp;
-			oldLevel = trebleLevel;
+			oldLevel = reverbLevel;
 			updateChange = 1;
-			trebleLevel = temp;
+			reverbLevel = temp;
 			resetTimer = 1;
-	}
+		}
+		//VOLUME
+		else if(abs(adcVals[2] - (AdcRegs.ADCRESULT2 >> 4)) > 0x00F0){
+			adcVals[2] = AdcRegs.ADCRESULT2 >> 4;
+			if(!volumeChange || currentChangeScreen != 3){
+				currentChangeScreen = 3;
+				updateLcd = 1;
+				updateCode = CHANGEVOLUME;
+				volumeChange = 1;
+			}
+			int temp = 16*((double)adcVals[2]/(double)0x0FFF);
+			newLevel = temp;
+			oldLevel = volumeLevel;
+			updateChange = 1;
+			newVolumeLevel = (((double)adcVals[2]/(double)0xFFF))*(0x1F);
+			resetTimer = 1;
+			updateVolume = 1;
+		}
+		//BASS
+		else if(abs(adcVals[3] - (AdcRegs.ADCRESULT3 >> 4)) > 0x00F0){
+			adcVals[3] = AdcRegs.ADCRESULT3 >> 4;
+			if(!bassChange || currentChangeScreen != 4){
+				currentChangeScreen = 4;
+				updateLcd = 1;
+				updateCode = CHANGEBASS;
+				bassChange = 1;
+			}
+			int temp = 16*((double)adcVals[3]/(double)0x0FFF);
+			newLevel = temp;
+			oldLevel = bassLevel;
+			updateChange = 1;
+			bassLevel = temp;
+			resetTimer = 1;
+		}
+		//MID
+		else if(abs(adcVals[4] - (AdcRegs.ADCRESULT4 >> 4)) > 0x00F0){
+				adcVals[4] = AdcRegs.ADCRESULT4 >> 4;
+				if(!midChange || currentChangeScreen != 5){
+					currentChangeScreen = 5;
+					updateLcd = 1;
+					updateCode = CHANGEMID;
+					midChange = 1;
+				}
+				int temp = 16*((double)adcVals[4]/(double)0x0FFF);
+				newLevel = temp;
+				oldLevel = midLevel;
+				updateChange = 1;
+				midLevel = temp;
+				resetTimer = 1;
+		}
+		//TREBLE
+		else if(abs(adcVals[5] - (AdcRegs.ADCRESULT5 >> 4)) > 0x00F0){
+				adcVals[5] = AdcRegs.ADCRESULT5 >> 4;
+				if(!trebleChange || currentChangeScreen != 6){
+					currentChangeScreen = 6;
+					updateLcd = 1;
+					updateCode = CHANGETREBLE;
+					trebleChange = 1;
+				}
+				int temp = 16*((double)adcVals[5]/(double)0x0FFF);
+				newLevel = temp;
+				oldLevel = trebleLevel;
+				updateChange = 1;
+				trebleLevel = temp;
+				resetTimer = 1;
+		}
 
 
-	if(resetTimer){
-		CpuTimer1Regs.TCR.all = 0x4001;
-		CpuTimer1Regs.TCR.bit.TRB = 1;
-		resetTimer = 0;
-	}
-
+		if(resetTimer){
+			CpuTimer1Regs.TCR.all = 0x4001;
+			CpuTimer1Regs.TCR.bit.TRB = 1;
+			resetTimer = 0;
+		}
+	}*/
 		//Clear Flags
 		AdcRegs.ADCST.bit.INT_SEQ1_CLR = 1;       // Clear INT SEQ1 bit
 		PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;   // Acknowledge interrupt to PIE
 }
 
+//Preset Up
 interrupt void xint1_isr(void){
-	//Get user input, shift for clearer comparisons
-	int input = (GpioDataRegs.GPADAT.all & 0x000001E) >> 1;
-
-	//Scroll up through presets
-	if(GpioDataRegs.GPADAT.bit.GPIO5){
-		//If initial entry into preset, set up timer and flag
+	DELAY_US(DEBOUNCE);
+	//If initial entry into preset, set up timer and flag
+	if(GpioDataRegs.GPADAT.bit.GPIO25){
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
 			preset = 1;
+		}
+		else{
+			presetNumber++;
+			if(presetNumber == 10) presetNumber= 1;
 		}
 		CpuTimer1Regs.TCR.bit.TRB = 1;
 		updateLcd = 1;
 		updateCode = PRESETUP;
 	}
-	//Scroll down through presets
-	else if(GpioDataRegs.GPADAT.bit.GPIO21){
-		//If initial entry into preset, set up timer and flag
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+}
+interrupt void xint2_isr(void){
+	//If initial entry into preset, set up timer and flag
+	DELAY_US(DEBOUNCE);
+	if(GpioDataRegs.GPADAT.bit.GPIO21){
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
 			preset = 1;
+		}
+		else{
+			presetNumber--;
+			if(presetNumber == 0) presetNumber= 9;
 		}
 		CpuTimer1Regs.TCR.bit.TRB = 1;
 		updateLcd = 1;
 		updateCode = PRESETDOWN;
 	}
-	//Load preset
-	else if(GpioDataRegs.GPADAT.bit.GPIO20){
-		//Stop timer and reset flag
-		CpuTimer1Regs.TCR.bit.TSS = 1;
-		preset = 0;
-		updateLcd = 1;
-		updateCode = LOADPRESET;
-	}
-	//Save Preset
-	else if(GpioDataRegs.GPADAT.bit.GPIO16){
-		//Stop timer and reset flag
-		CpuTimer1Regs.TCR.bit.TSS = 1;
-		preset = 0;
-		updateLcd = 1;
-		updateCode = SAVEPRESET;
-	}
-		//Clear pipeline of all effects/ clear screen
-	else if(input == 0x0008){
-		updateLcd = 1;
-		clearPipeline();
-		updateCode = CLEAR;
-	}
-
-	//Switch to tuning function
-	else if(input == 0x0040){
-		tuner ^= 1;			//signal for timer0 to not sample out to SPI
-		updateLcd = 1;
-		updateCode = TUNER;
-		if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
-		else updateTimer0(22.675f);		//FFT was toggled off, switch back to sample out to SPI
-	}
-
-	//Look to either queue effect or toggle state
-	else{
-		//Simple lookup vs mathematical computation gets the effect to be manipulated
-		int effect = indexLookup(input);
-		//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
-		if(!toggleOn_Off(effect)) queueEffect(effect);		//queue the effect
-		updateLcd = 1;
-		updateCode = effect;
-	}
-
-	//Acknowledge Interrupt
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
+interrupt void xint3_isr(void){
+	//Stop timer and reset flag
+	DELAY_US(DEBOUNCE);
+	if(GpioDataRegs.GPBDAT.bit.GPIO48){
+		CpuTimer1Regs.TCR.bit.TSS = 1;
+		preset = 0;
+		//updateLcd = 1;
+		//updateCode = LOADPRESET;
+		//load = 1;
+	}
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
+}
+interrupt void xint4_isr(void){
+	//Stop timer and reset flag
+	DELAY_US(DEBOUNCE);
+	if(GpioDataRegs.GPBDAT.bit.GPIO49){
+		CpuTimer1Regs.TCR.bit.TSS = 1;
+		preset = 0;
+		//updateLcd = 1;
+		//updateCode = SAVEPRESET;
+		//save = 1;
+	}
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
+}
+interrupt void xint5_isr(void){
+	DELAY_US(DEBOUNCE);
+	int input = (GpioDataRegs.GPADAT.all & 0x000001E) >> 1;
+	if(input){
+		if(input == 0x0008){
+			updateLcd = 1;
+			clearPipeline();
+			updateCode = CLEAR;
+		}
+		//Switch to tuning function
+		else if(input == 0x0040){
+			/*tuner ^= 1;			//signal for timer0 to not sample out to SPI
+			updateLcd = 1;
+			updateCode = TUNER;
+			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
+			else updateTimer0(22.675f);		//FFT was toggled off, switch back to sample out to SPI*/
+		}
 
+		//Look to either queue effect or toggle state
+		else{
+			//Simple lookup vs mathematical computation gets the effect to be manipulated
+			int effect = indexLookup(input);
+			//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
+			if(!toggleOn_Off(effect)){
+				queueEffect(effect);		//queue the effect
+				queueDisplay(effect);		//queue the display
+			}
+			toggleDisplayOn_Off(effect);
+			updateLcd = 1;
+			updateCode = effect;
+		}
+	}
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
+}
+/*
+interrupt void xint1_isr(void){
+
+	DELAY_US(DEBOUNCE);
+	int presetUp = GpioDataRegs.GPADAT.bit.GPIO5;
+	int presetDown = GpioDataRegs.GPADAT.bit.GPIO21;
+	int presetLoad = GpioDataRegs.GPADAT.bit.GPIO20;
+	int presetSave = GpioDataRegs.GPADAT.bit.GPIO16;
+	int input = (GpioDataRegs.GPADAT.all & 0x000001E) >> 1;
+
+	if(presetUp + presetDown + presetLoad + presetSave + input){
+		intCounter++;
+		//Get user input, shift for clearer comparisons
+		//Scroll up through presets
+		if(presetUp){
+			//If initial entry into preset, set up timer and flag
+			if(!preset){
+				CpuTimer1Regs.TCR.all = 0x4001;
+				preset = 1;
+			}
+			else{
+				presetNumber++;
+				if(presetNumber == 10) presetNumber= 1;
+			}
+			CpuTimer1Regs.TCR.bit.TRB = 1;
+			updateLcd = 1;
+			updateCode = PRESETUP;
+		}
+		//Scroll down through presets
+		else if(presetDown){
+			//If initial entry into preset, set up timer and flag
+			if(!preset){
+				CpuTimer1Regs.TCR.all = 0x4001;
+				preset = 1;
+			}
+			else{
+				presetNumber--;
+				if(presetNumber == 0) presetNumber= 9;
+			}
+			CpuTimer1Regs.TCR.bit.TRB = 1;
+			updateLcd = 1;
+			updateCode = PRESETDOWN;
+		}
+		//Load preset
+		else if(presetLoad){
+			//Stop timer and reset flag
+			CpuTimer1Regs.TCR.bit.TSS = 1;
+			preset = 0;
+			updateLcd = 1;
+			updateCode = LOADPRESET;
+			load = 1;
+		}
+		//Save Preset
+		else if(presetSave){
+			//Stop timer and reset flag
+			CpuTimer1Regs.TCR.bit.TSS = 1;
+			preset = 0;
+			updateLcd = 1;
+			updateCode = SAVEPRESET;
+			save = 1;
+		}
+			//Clear pipeline of all effects/ clear screen
+		else if(input == 0x0008){
+			updateLcd = 1;
+			clearPipeline();
+			updateCode = CLEAR;
+		}
+
+		//Switch to tuning function
+		else if(input == 0x0040){
+			/*tuner ^= 1;			//signal for timer0 to not sample out to SPI
+			updateLcd = 1;
+			updateCode = TUNER;
+			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
+			else updateTimer0(22.675f);		//FFT was toggled off, switch back to sample out to SPI
+		}
+
+		//Look to either queue effect or toggle state
+		else{
+			//Simple lookup vs mathematical computation gets the effect to be manipulated
+			int effect = indexLookup(input);
+			//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
+			if(!toggleOn_Off(effect)) queueEffect(effect);		//queue the effect
+			updateLcd = 1;
+			updateCode = effect;
+		}
+	}
+	//Acknowledge Interrupt
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+}*/
 //Eliminates need to call log(input)/log(2).  Simple lookup will be faster
+
 int indexLookup(int input){
 	if(input == 1) return 0;
 	else if(input == 2) return 1;

@@ -10,7 +10,7 @@
 
 #define TREMOLO			0
 #define REVERB	 		1
-#define CRUNCH 		2
+#define CRUNCH 			2
 #define DELAY	 		3
 #define WAH 			4
 #define DISTORTION		5
@@ -37,7 +37,9 @@
 #define CHANGEMID		28
 #define	CHANGETREBLE	29
 
-
+int 	toggleDisplayOn_Off(int);	//Toggles effect on/off once its in the queue
+void	queueDisplay(int);	//Sticks effect into queue
+void	toggleEffectDisplay(int);	//Sticks effect into queue
 
 void 	initLCD(void);
 void 	printLCD(int);
@@ -50,6 +52,7 @@ void	updateLCD(int);
 void 	printFreq(int);
 void 	presetUp(int);
 void 	presetDown(int);
+void 	loadPresetScreen(int*);
 
 void 	printTremolo();
 void 	printReverb();

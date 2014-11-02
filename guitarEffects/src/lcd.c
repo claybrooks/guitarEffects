@@ -18,9 +18,8 @@ int mainDisplay[10];
 int mainDisplay_show[10];
 int numInMainDisplay, tunerScreen, currentPreset, presetScreen;
 
-
-//#pragma DATA_SECTION(presets, "presets")
-
+//#pragma CODE_SECTION(controlLCD, "secureRamFuncs")
+//#pragma CODE_SECTION(printLCD, "secureRamFuncs")
 
 void printTremolo(){
 	controlLCD(CL);
@@ -92,6 +91,53 @@ void updateLevel(int level, int oldLevel){
 
 }
 
+void toggleEffectDisplay(int effect){
+	//Block input if tunerScreen
+
+	//Initialize Variables
+	int i = 0;//, inMainDisplay = 0;
+	//Loop through mainDisplay to see if the effect is already set to print to LCD
+	for(;i<numInMainDisplay;i++){
+		//If it is in main display, break
+		if(mainDisplay[i] == effect){
+			//inMainDisplay = 1;
+			break;
+		}
+	}
+	//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
+	//where update == tremolo through pitch shift values defined in lcd.h
+	mainDisplay_show[i] ^= 1;
+	toggleLCD(effect, i, mainDisplay_show[i]);
+
+
+}
+
+int toggleDisplayOn_Off(int effect){
+	int i = 0, inMainDisplay = 0;
+	//Loop through mainDisplay to see if the effect is already set to print to LCD
+	for(;i<numInMainDisplay;i++){
+		//If it is in main display, break
+		if(mainDisplay[i] == effect){
+			//inMainDisplay = 1;
+			break;
+		}
+	}
+	if(inMainDisplay){
+		mainDisplay_show[i] ^= 1;
+		return 1;
+	}
+	else return 0;
+}
+
+void queueDisplay(int effect){
+	//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
+	//where update == tremolo through pitch shift values defined in lcd.h
+		mainDisplay[numInMainDisplay] = effect;
+		mainDisplay_show[numInMainDisplay] = 0;
+		numInMainDisplay++;
+}
+
+
 //Eventually parses code and tells the printLCD() what to print
 void updateLCD(int update){
 	//Clear Screen, called by a reset on the queue. Block input if on tuner screen or preset screen
@@ -99,43 +145,31 @@ void updateLCD(int update){
 		numInMainDisplay = 0;
 		controlLCD(CL);
 	}
-	else if(update == PRESETTIMEOUT){
-		presetScreen = 0;
-		goToMain();
-
-	}
 	//Block input if tunerScreen
-	else if((update >= TREMOLO && update <= REVERB) && !tunerScreen && !presetScreen){
-		//Initialize Variables
-		int i = 0, inMainDisplay = 0;
-		//Loop through mainDisplay to see if the effect is already set to print to LCD
-		for(;i<numInMainDisplay;i++){
-			//If it is in main display, break
-			if(mainDisplay[i] == update){
-				inMainDisplay = 1;
-				break;
+		else if((update >= TREMOLO && update <= REVERB) && !tunerScreen && !presetScreen){
+			//Initialize Variables
+			int i = 0, inMainDisplay = 0;
+			//Loop through mainDisplay to see if the effect is already set to print to LCD
+			for(;i<numInMainDisplay;i++){
+				//If it is in main display, break
+				if(mainDisplay[i] == update){
+					break;
+				}
 			}
-		}
-		//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
-		//where update == tremolo through pitch shift values defined in lcd.h
-		if(!inMainDisplay){
-			mainDisplay[numInMainDisplay] = update;
-			mainDisplay_show[numInMainDisplay] = 1;
-			numInMainDisplay++;
+			//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
+			//where update == tremolo through pitch shift values defined in lcd.h
 
-			//Send toLCD(effect to be printed)
-			if(numInMainDisplay == 4) controlLCD(SECOND); //Second line;
-			printLCD(numInMainDisplay + 0x30);
-			printLCD(COLON);
-			addToLCD(update);
-			printLCD(SPACE);
-		}
-		else{
+
 			//If its already in main display, its already in the queue, so toggle the effect on/off, toggle
 			//the display on/off
 			mainDisplay_show[i] ^= 1;
 			toggleLCD(update, i, mainDisplay_show[i]);
+
 		}
+	else if(update == PRESETTIMEOUT){
+		presetScreen = 0;
+		goToMain();
+
 	}
 	else if(update == TUNER){
 		if(tunerScreen){
@@ -168,6 +202,7 @@ void updateLCD(int update){
 		else{
 			//Clear Screen
 			controlLCD(0x01);
+			controlLCD(HOME); //Return cursor to home;
 			presetScreen = 1;
 			printLCD(P);	//P
 			printLCD(R);	//R
@@ -213,8 +248,8 @@ void updateLCD(int update){
 			presets[start + i] = mainDisplay[i-21];
 			presets[start + i + 10] = mainDisplay_show[i-21];
 		}
-		presets[start + i + 10] = numInMainDisplay;
-		presetScreen = 0;*/
+		presets[start + i + 10] = numInMainDisplay;*/
+		presetScreen = 0;
 		goToMain();
 	}
 	else if(update == LOADPRESET && presetScreen){
@@ -226,8 +261,8 @@ void updateLCD(int update){
 			mainDisplay[i-21] = presets[start + i];
 			mainDisplay_show[i-21] = presets[start + i + 10];
 		}
-		numInMainDisplay = presets[start + i + 10];
-		presetScreen = 0;*/
+		numInMainDisplay = presets[start + i + 10];*/
+		presetScreen = 0;
 		goToMain();
 	}
 	else if(update == CHANGETREMOLO){
@@ -244,6 +279,25 @@ void updateLCD(int update){
 	}
 	else if(update == CHANGEFLANGE){
 		printFlange();
+	}
+}
+
+void loadPresetScreen(int* array){
+	//0-10 is location
+	int i;
+	/*Must loop over entire location array.  If the index value is not -1,
+	you know the effect is queued.  Here, the index 'i' corresponds to the queued
+	effect, defined in the #define section of lcd.h.  The value of array[i] in
+	are location values, '1,2,3' of the effect in the queue.  This corresponds to the
+	location in the mainDisplay array.  The on_off array(array offset by 10) is then used to determine
+	whether or not the queued effect is currently turned on.*/
+
+	for(i = 0; i < 10; i++){
+		if(array[i] != -1){
+			mainDisplay[array[i]] = i;
+			mainDisplay_show[array[i]] = array[i+10];
+			numInMainDisplay++;
+		}
 	}
 }
 
@@ -391,7 +445,7 @@ void initLCD(){
 	currentPreset = 1;
 	presetScreen = 0;
 	for(;i<10;i++){
-		mainDisplay[i] = 0;
+		mainDisplay[i] = -1;
 		mainDisplay_show[i] = 0;
 	}
 	numInMainDisplay = 0;
@@ -404,8 +458,8 @@ void initLCD(){
 	GpioCtrlRegs.GPADIR.bit.GPIO13 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO14 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO15 = 0x1;
-	GpioCtrlRegs.GPBDIR.bit.GPIO48 = 0x1;
-	GpioCtrlRegs.GPBDIR.bit.GPIO49 = 0x1;
+	GpioCtrlRegs.GPADIR.bit.GPIO25 = 0x1;
+	GpioCtrlRegs.GPADIR.bit.GPIO21 = 0x1;
 	//E = 48
 	//RS = 49
 	//8 Bit Mode
@@ -422,24 +476,20 @@ void initLCD(){
 }
 
 void controlLCD(int data){
-	GpioDataRegs.GPBDAT.bit.GPIO49 = 0;
-	data <<= 8;
-	GpioDataRegs.GPADAT.all = data;
-	DELAY_US(5);
-	GpioDataRegs.GPBDAT.bit.GPIO48 = 1;
-	DELAY_US(5);
-	GpioDataRegs.GPBDAT.bit.GPIO48 = 0;
+	GpioDataRegs.GPADAT.bit.GPIO21 = 0;
+	GpioDataRegs.GPADAT.all = data << 8;
+	GpioDataRegs.GPADAT.bit.GPIO25 = 1;
+	wait(DELAYLCD);
+	GpioDataRegs.GPADAT.bit.GPIO25 = 0;
 	wait(DELAYLCD);
 
 }
 
 void printLCD(int data){
-	GpioDataRegs.GPBDAT.bit.GPIO49 = 1;
-	data <<= 8;
-	GpioDataRegs.GPADAT.all = data;
-	DELAY_US(5);
-	GpioDataRegs.GPBDAT.bit.GPIO48 = 1;
-	DELAY_US(5);
-	GpioDataRegs.GPBDAT.bit.GPIO48 = 0;
+	GpioDataRegs.GPADAT.bit.GPIO21 = 1;
+	GpioDataRegs.GPADAT.all = data << 8;
+	GpioDataRegs.GPADAT.bit.GPIO25 = 1;
+	wait(DELAYLCD);
+	GpioDataRegs.GPADAT.bit.GPIO25 = 0;
 	wait(DELAYLCD);
 }

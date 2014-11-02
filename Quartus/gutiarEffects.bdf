@@ -86,22 +86,6 @@ applicable agreement for further details.
 )
 (pin
 	(input)
-	(rect 232 152 400 168)
-	(text "INPUT" (rect 133 0 161 10)(font "Arial" (font_size 6)))
-	(text "clk_in" (rect 5 0 33 12)(font "Arial" ))
-	(pt 168 8)
-	(drawing
-		(line (pt 92 12)(pt 117 12)(line_width 1))
-		(line (pt 92 4)(pt 117 4)(line_width 1))
-		(line (pt 121 8)(pt 168 8)(line_width 1))
-		(line (pt 92 12)(pt 92 4)(line_width 1))
-		(line (pt 117 4)(pt 121 8)(line_width 1))
-		(line (pt 117 12)(pt 121 8)(line_width 1))
-	)
-	(text "VCC" (rect 136 7 156 17)(font "Arial" (font_size 6)))
-)
-(pin
-	(input)
 	(rect 168 384 336 400)
 	(text "INPUT" (rect 133 0 161 10)(font "Arial" (font_size 6)))
 	(text "GPIO_12" (rect 5 0 49 12)(font "Arial" ))
@@ -181,69 +165,6 @@ applicable agreement for further details.
 	)
 )
 (symbol
-	(rect 608 248 720 344)
-	(text "debounce" (rect 5 0 52 12)(font "Arial" ))
-	(text "inst9" (rect 8 80 31 92)(font "Arial" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "clk" (rect 0 0 14 12)(font "Arial" ))
-		(text "clk" (rect 21 27 35 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32)(line_width 1))
-	)
-	(port
-		(pt 0 48)
-		(input)
-		(text "button" (rect 0 0 30 12)(font "Arial" ))
-		(text "button" (rect 21 43 51 55)(font "Arial" ))
-		(line (pt 0 48)(pt 16 48)(line_width 1))
-	)
-	(port
-		(pt 112 32)
-		(output)
-		(text "result" (rect 0 0 27 12)(font "Arial" ))
-		(text "result" (rect 64 27 91 39)(font "Arial" ))
-		(line (pt 112 32)(pt 96 32)(line_width 1))
-	)
-	(parameter
-		"counter_size"
-		"15"
-		""
-		(type "PARAMETER_SIGNED_DEC")	)
-	(drawing
-		(rectangle (rect 16 16 96 80)(line_width 1))
-	)
-	(annotation_block (parameter)(rect 608 216 784 248))
-)
-(symbol
-	(rect 400 128 520 224)
-	(text "clk_div" (rect 5 0 40 12)(font "Arial" ))
-	(text "inst" (rect 8 80 25 92)(font "Arial" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "clk_in" (rect 0 0 28 12)(font "Arial" ))
-		(text "clk_in" (rect 21 27 49 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32)(line_width 1))
-	)
-	(port
-		(pt 120 32)
-		(output)
-		(text "clk_out" (rect 0 0 35 12)(font "Arial" ))
-		(text "clk_out" (rect 64 27 99 39)(font "Arial" ))
-		(line (pt 120 32)(pt 104 32)(line_width 1))
-	)
-	(parameter
-		"divider"
-		"70"
-		""
-		(type "PARAMETER_SIGNED_DEC")	)
-	(drawing
-		(rectangle (rect 16 16 104 80)(line_width 1))
-	)
-	(annotation_block (parameter)(rect 400 88 568 120))
-)
-(symbol
 	(rect 384 304 488 464)
 	(text "XOR8" (rect 34 -1 71 15)(font "Courier New" (font_size 10)(bold)))
 	(text "inst11" (rect 3 149 32 161)(font "Arial" ))
@@ -318,18 +239,6 @@ applicable agreement for further details.
 	)
 )
 (connector
-	(pt 608 296)
-	(pt 512 296)
-)
-(connector
-	(pt 520 160)
-	(pt 520 280)
-)
-(connector
-	(pt 520 280)
-	(pt 608 280)
-)
-(connector
 	(pt 336 328)
 	(pt 384 328)
 )
@@ -362,10 +271,14 @@ applicable agreement for further details.
 	(pt 384 440)
 )
 (connector
-	(pt 512 296)
+	(pt 512 392)
+	(pt 488 392)
+)
+(connector
+	(pt 512 280)
 	(pt 512 392)
 )
 (connector
-	(pt 512 392)
-	(pt 488 392)
+	(pt 512 280)
+	(pt 720 280)
 )

@@ -21,6 +21,8 @@ Uint16 Error;
 void eepromWrite();
 void eepromRead();
 
+int returnArray[26];
+
 
 //Type definition for process*Effect* method prototypes
 typedef int FUNC(int, struct params*);
@@ -134,7 +136,7 @@ int processCrunch(int sample, struct params* p){
 int processTremolo(int sample, struct params* p){
 	//Sets rate at which the effect runs
 		double max = 0x0FFF;
-		double pedal = AdcRegs.ADCRESULT1>>4;
+		double pedal = AdcRegs.ADCRESULT0>>4;
 		p->tremoloLimit = (double)1000*(pedal/max)+ 1000;
 
 		//Count up or down, if it hits upper limit then count up else count down
@@ -163,7 +165,7 @@ int processReverb(int sample, struct params* p){
 			p->reverbStart = 1;
 			p->reverbCount = 0;
 		}
-		double decay = AdcRegs.ADCRESULT3 >> 4;
+		double decay = AdcRegs.ADCRESULT1 >> 4;
 		decay = ((double)decay / (double)0xFFF)*.5 + .15;
 		//Once reinitialized, start to process reverb
 		if(p->reverbStart){
@@ -191,6 +193,7 @@ int processPitchShift(int sample, struct params* p){
 
 
 void savePreset(int presetNum){
+	/*
 	//Calculate addresses based on presetNum
 	int i = 0;
 	int locationMessage1 = (presetNum-1)*32;
@@ -199,6 +202,12 @@ void savePreset(int presetNum){
 	int on_offMessage2 = on_offMessage1 + 5;
 	int adcMessage1 = on_offMessage2 + 5;
 	int adcMessage2 = adcMessage1 + 6;
+
+	//Inc location array by 1 because I don't want to save -1 in eeprom
+	for(i = 0; i < 10; i++){
+		int temp = location[i];
+		location[i] = ++temp;
+	}
 
 	//write first half of location array
 	messageOut.MemoryLowAddr = locationMessage1 & 0x00FF;
@@ -265,10 +274,11 @@ void savePreset(int presetNum){
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = adcVal[i] >> 8;
 	eepromWrite();
 	DELAY_US(EEPROMWRITEDELAY);
-	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};*/
 }
 
-void loadPreset(int presetNum){
+int* loadPreset(int presetNum){
+	/*
 	int i = 0;
 	//Calculate addresses based on presetNum
 	int locationMessage1 = (presetNum-1)*32;
@@ -286,8 +296,11 @@ void loadPreset(int presetNum){
 	messageIn.NumOfBytes = 5;
 	eepromRead();
 	DELAY_US(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++)  location[i] = messageIn.MsgBuffer[i];
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	for(i = 0; i < 5; i++) {
+		location[i] = messageIn.MsgBuffer[i];
+		returnArray[i] = location[i];
+	}
+	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in second half of location array
 	messageIn.MemoryLowAddr = locationMessage2 & 0x00FF;
@@ -297,8 +310,11 @@ void loadPreset(int presetNum){
 	messageIn.NumOfBytes = 5;
 	eepromRead();
 	DELAY_US(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++)  location[i+5] = messageIn.MsgBuffer[i];
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	for(i = 0; i < 5; i++) {
+		location[i+5] = messageIn.MsgBuffer[i];
+		returnArray[i+5] = location[i+5];
+	}
+	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in second half of on_off array
 	messageIn.MemoryLowAddr = on_offMessage1 & 0x00FF;
@@ -308,8 +324,11 @@ void loadPreset(int presetNum){
 	messageIn.NumOfBytes = 5;
 	eepromRead();
 	DELAY_US(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++) on_off[i] = messageIn.MsgBuffer[i];
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	for(i = 0; i < 5; i++){
+		on_off[i] = messageIn.MsgBuffer[i];
+		returnArray[i+10] = on_off[i];
+	}
+	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in second half of on_off array
 	messageIn.MemoryLowAddr = on_offMessage2 & 0x00FF;
@@ -319,8 +338,11 @@ void loadPreset(int presetNum){
 	messageIn.NumOfBytes = 5;
 	eepromRead();
 	DELAY_US(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++) on_off[i+5] = messageIn.MsgBuffer[i];
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	for(i = 0; i < 5; i++){
+		on_off[i+5] = messageIn.MsgBuffer[i];
+		returnArray[i+15] = on_off[i+5];
+	}
+	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in first half of adc values
 	messageIn.MemoryLowAddr = adcMessage1 & 0x00FF;
@@ -330,8 +352,10 @@ void loadPreset(int presetNum){
 	messageIn.NumOfBytes = 5;
 	eepromRead();
 	DELAY_US(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++) adcVal[i] = messageIn.MsgBuffer[i];
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	for(i = 0; i < 5; i++){
+		adcVal[i] = messageIn.MsgBuffer[i];
+	}
+	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in second half of adc values
 	messageIn.MemoryLowAddr = adcMessage2 & 0x00FF;
@@ -344,9 +368,14 @@ void loadPreset(int presetNum){
 	for(i = 0; i < 5; i++){
 		unsigned int temp = messageIn.MsgBuffer[i] << 8;
 		adcVal[i] = temp | adcVal[i];
+		returnArray[i+20] = adcVal[i];
 	}
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
+	//Dec location array by 1 because I don't want to save -1 in eeprom
+	for(i = 0; i < 10; i++){
+		location[i] = location[i]--;
+	}
 
 	numQueued = 0;
 	for(i = 0; i < 10; i++){
@@ -357,6 +386,64 @@ void loadPreset(int presetNum){
 			numQueued++;
 		}
 	}
+	returnArray[25] = numQueued;
+	return returnArray;*/
+}
+
+interrupt void i2c_int1a_isr(void){
+   Uint16 IntSource, i;
+   // Read interrupt source
+   IntSource = I2caRegs.I2CISRC.all;
+   // Interrupt source = stop condition detected
+   if(IntSource == I2C_SCD_ISRC){
+      // If completed message was writing data, reset msg to inactive state
+      if (CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_WRITE_BUSY){
+         CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_INACTIVE;
+      }
+      else{
+         // If a message receives a NACK during the address setup portion of the
+         // EEPROM read, the code further below included in the register access ready
+         // interrupt source code will generate a stop condition. After the stop
+         // condition is received (here), set the message status to try again.
+         // User may want to limit the number of retries before generating an error.
+         if(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_SEND_NOSTOP_BUSY){
+            CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+         }
+         // If completed message was reading EEPROM data, reset msg to inactive state
+         // and read data from FIFO.
+         else if (CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_READ_BUSY){
+            CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_INACTIVE;
+            for(i=0; i < I2C_NUMBYTES; i++){
+              CurrentMsgPtr->MsgBuffer[i] = I2caRegs.I2CDRR;
+              readDone = 1;
+            }
+         }
+      }
+   }  // end of stop condition detected
+
+   // Interrupt source = Register Access Ready
+   // This interrupt is used to determine when the EEPROM address setup portion of the
+   // read data communication is complete. Since no stop bit is commanded, this flag
+   // tells us when the message has been sent instead of the SCD flag. If a NACK is
+   // received, clear the NACK bit and command a stop. Otherwise, move on to the read
+   // data portion of the communication.
+   else if(IntSource == I2C_ARDY_ISRC){
+      if(I2caRegs.I2CSTR.bit.NACK == 1){
+         I2caRegs.I2CMDR.bit.STP = 1;
+         I2caRegs.I2CSTR.all = I2C_CLR_NACK_BIT;
+      }
+      else if(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_SEND_NOSTOP_BUSY){
+         CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_RESTART;
+      }
+   }  // end of register access ready
+
+   else{
+      // Generate some error due to invalid interrupt source
+      asm("   ESTOP0");
+   }
+
+   // Enable future I2C (PIE Group 8) interrupts
+   PieCtrlRegs.PIEACK.all = PIEACK_GROUP8;
 }
 
 void eepromWrite(){

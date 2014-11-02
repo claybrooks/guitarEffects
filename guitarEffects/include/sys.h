@@ -10,12 +10,17 @@
 
 interrupt void cpu_timer0_isr(void);
 interrupt void xint1_isr(void);
+interrupt void xint2_isr(void);
+interrupt void xint3_isr(void);
+interrupt void xint4_isr(void);
+interrupt void xint5_isr(void);
+/*interrupt void xint6_isr(void);
+interrupt void xint7_isr(void);
+interrupt void xint8_isr(void);*/
+
 interrupt void adc_isr(void);
 interrupt void cpu_timer1_isr(void);
-interrupt void epwm5_isr(void);
-//interrupt void i2c_int1a_isr(void);
-interrupt void local_D_INTCH1_ISR(void); // Channel 1 Rx ISR
-interrupt void local_D_INTCH2_ISR(void); // Channel 2 Tx ISR
+interrupt void i2c_int1a_isr(void);
 
 void initINTS();
 void initXINT1();

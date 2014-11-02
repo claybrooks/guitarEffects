@@ -13,7 +13,6 @@ struct params{
 	int tremoloCounter, tremoloRate, tremoloCount, tremoloLimit;
 		int reverbDelay[800], reverbCount, reverbStart; //15 ms delay length at 44.1 kHz
 };
-
 int processDelay(int,struct params*);
 int processDistortion(int, struct params*);
 int processCrunch(int, struct params*);
@@ -26,6 +25,8 @@ int processChorus(int, struct params*);
 int processDelay(int, struct params*);
 int processPitchShift(int, struct params*);
 
+void savePreset(int presetNum);
+int* loadPreset(int presetNum);
 void	queueEffect(int);	//Sticks effect into queue
 void 	clearPipeline();	//Clears the queue
 int 	process(int);		//Process the effects in the queue, FIFO

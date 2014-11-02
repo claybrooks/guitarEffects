@@ -70,7 +70,8 @@ void init_mcbsp_spi()
 }
 
 void mcbsp_xmit(Uint32 a)
-{   while (McbspbRegs.SPCR2.bit.XRDY == 0){}
+{
+	//while (McbspbRegs.SPCR2.bit.XRDY == 0){}
 	Uint16 lowerHalf = a>>8;
 	Uint16 upperHalf = (a >> 24);
 	McbspbRegs.DXR1.all = lowerHalf;

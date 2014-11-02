@@ -72,22 +72,22 @@ GPIO_9                       : 5         : input  : 3.3-V LVTTL       :         
 GPIO_10                      : 6         : input  : 3.3-V LVTTL       :         :           : Y              
 TDI                          : 7         : input  : 3.3-V LVTTL       :         :           : N              
 GPIO_11                      : 8         : input  : 3.3-V LVTTL       :         :           : Y              
-GPIO_12                      : 9         : input  : 3.3-V LVTTL       :         :           : Y              
+RESERVED                     : 9         :        :                   :         :           :                
 GND                          : 10        : gnd    :                   :         :           :                
-GPIO_13                      : 11        : input  : 3.3-V LVTTL       :         :           : Y              
-GPIO_14                      : 12        : input  : 3.3-V LVTTL       :         :           : Y              
+RESERVED                     : 11        :        :                   :         :           :                
+RESERVED                     : 12        :        :                   :         :           :                
 TMS                          : 13        : input  : 3.3-V LVTTL       :         :           : N              
-GPIO_15                      : 14        : input  : 3.3-V LVTTL       :         :           : Y              
+RESERVED                     : 14        :        :                   :         :           :                
 VCCIO                        : 15        : power  :                   : 3.3V    :           :                
 xintrup                      : 16        : output : 3.3-V LVTTL       :         :           : Y              
 GND                          : 17        : gnd    :                   :         :           :                
-RESERVED                     : 18        :        :                   :         :           :                
-RESERVED                     : 19        :        :                   :         :           :                
-RESERVED                     : 20        :        :                   :         :           :                
-RESERVED                     : 21        :        :                   :         :           :                
+GPIO_12                      : 18        : input  : 3.3-V LVTTL       :         :           : Y              
+GPIO_13                      : 19        : input  : 3.3-V LVTTL       :         :           : Y              
+GPIO_14                      : 20        : input  : 3.3-V LVTTL       :         :           : Y              
+GPIO_15                      : 21        : input  : 3.3-V LVTTL       :         :           : Y              
 GND                          : 22        : gnd    :                   :         :           :                
 VCCINT                       : 23        : power  :                   : 3.3V    :           :                
-clk_in                       : 24        : input  : 3.3-V LVTTL       :         :           : Y              
+RESERVED                     : 24        :        :                   :         :           :                
 RESERVED                     : 25        :        :                   :         :           :                
 RESERVED                     : 26        :        :                   :         :           :                
 RESERVED                     : 27        :        :                   :         :           :                
