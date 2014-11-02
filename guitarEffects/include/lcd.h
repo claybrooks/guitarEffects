@@ -37,22 +37,20 @@
 #define CHANGEMID		28
 #define	CHANGETREBLE	29
 
-int 	toggleDisplayOn_Off(int);	//Toggles effect on/off once its in the queue
-void	queueDisplay(int);	//Sticks effect into queue
-void	toggleEffectDisplay(int);	//Sticks effect into queue
+
 
 void 	initLCD(void);
 void 	printLCD(int);
 void 	addToLCD(int);
-void 	goToMain();
+void 	goToMain(int* mainDisplay, int* on_off);
 void  	shiftCursor(int);
-void 	toggleLCD(int,int,int);
+void 	toggleLCD(int,int,int,int);
 void 	controlLCD(int);
-void	updateLCD(int);
+void	updateLCD(int* update, int* mainDisplay, int* on_off, int* presetNumber);
 void 	printFreq(int);
 void 	presetUp(int);
 void 	presetDown(int);
-void 	loadPresetScreen(int*);
+void 	loadPresetScreen(int*, int*, int*);
 
 void 	printTremolo();
 void 	printReverb();

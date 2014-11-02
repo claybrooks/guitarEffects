@@ -10,21 +10,73 @@
 #include "DSP2833x_Mcbsp.h"
 #include "F28335_example.h"
 
-
-#define DEBOUNCE 200000
-
+/*********************************************************************************************************************************************************************
+ * Effect variables/functions
+ */
+int toggleOn_Off(int effect);
+void queueEffect(int effect);
+void clearPipeline();
 int indexLookup(int);
+//typedef int FUNC(int, struct params*);
+//Struct for all the parameters available to effects, passed into the process functions
+static struct params params;
 
+//Create FUNC variables
+FUNC processTremolo,processReverb,processCrunch,processDelay,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift;
+
+//Static list of available effects, GPIO must match this
+FUNC *list[10] = {processTremolo,processReverb,processDistortion,processCrunch,processDelay,processReverb,processPhaser,processFlange,processChorus,processPitchShift};
+
+/*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
+ * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
+ * where that effect is located in the pipeline array. Increase in mem usage for speed gain, don't have to iterate through *list to find
+ * the right effect.*/
+int location[10];
+//Array of FUNC's, this is the queue set by the user.
+FUNC *pipeline[10];
+//lowpassType* lowpass;
+
+/*********************************************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************************************
+ * LCD controller variables/functions
+ */
+int 	toggleDisplayOn_Off(int);	//Toggles effect on/off once its in the queue
+void	queueDisplay(int);	//Sticks effect into queue
+int	toggleEffectOnDisplay(int);	//Sticks effect into queue
+//LCD Display Queue
+int mainDisplay[10];
+int toggle = 0, effectToToggle = 0, indexToToggle = 0;
 int tuner = 0, preset = 0, currentChangeScreen = 0, resetTimer = 0, sysStart = 1;
+int updateLcd = 0, updateCode = 0, updateChange, newLevel = 0, oldLevel = 0;
+/********************************************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************************************
+ * Shared Variables between LCD controller and effects
+ */
+//State of each queued effect, this allows user to stomp effects on/off without losing location in queue
+//Indices of this array map direclty to indices of pipeline.  LCD will use this to know what to display
+int on_off[10];
+//Number of queued effects
+int numQueued;
+/********************************************************************************************************************************************************************/
+
+/********************************************************************************************************************************************************************
+ * ADC ISR variables
+ */
 int volumeLevel = 0, bassLevel = 0, midLevel = 0, trebleLevel = 0, reverbLevel = 0, tremoloLevel = 0, delayLevel = 0, chorusLevel = 0,flangeLevel;
 int bassChange = 0, volumeChange = 0, trebleChange = 0, midChange = 0, flangeChange = 0,delayChange = 0, chorusChange = 0, reverbChange = 0, tremoloChange = 0;
-int updateLcd = 0, updateCode = 0, updateChange, newLevel = 0, oldLevel = 0;
 int updateVolume = 0, newVolumeLevel = 0;
 int adcVals[10];
-int load = 0, save = 0, presetNumber = 1;
-int toggleDisplay = 0, toToggle = 0;
+/********************************************************************************************************************************************************************/
 
-int intCounter = 0;
+/**********************************************************************************************************************************************************************
+ * Preset Variables
+ */
+int load = 0, save = 0, presetNumber = 1;
+/********************************************************************************************************************************************************************/
+
+#define DEBOUNCE 50000
 
 //#pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
 ///#pragma CODE_SECTION(cpu_timer1_isr, "secureRamFuncs")
@@ -35,21 +87,10 @@ int main(){
 
 	InitSysCtrl();
 
-//memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
+	//memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
 	//InitFlash();
 
 	EALLOW;
-	adcVals[0] = 0;
-	adcVals[1] = 0;
-	adcVals[2] = 0;
-	adcVals[3] = 0;
-	adcVals[4] = 0;
-	adcVals[5] = 0;
-	adcVals[6] = 0;
-	adcVals[7] = 0;
-	adcVals[8] = 0;
-	adcVals[9] = 0;
-
 
 	// For this example, enable the GPIO PINS for McBSP operation.
 		InitMcbspbGpio();
@@ -72,28 +113,42 @@ int main(){
 		//Initialize ADC
 			initAdc();
 		//Initialize Effects
-			initEffects();
+			initEffects(&params);
 		//Initialize FFT
 			//initFFT();
 		//Initialize LCD
 			initLCD();
 		//Initialize Interrupts
 			initINTS();
+			int i = 0;
+			for(;i < 10; i++){
+				adcVals[i] = 0;
+				mainDisplay[i] = -1;
+			}
 	while(1){
 		EALLOW;
-		//Wait for interrupts
+		//Wait for signals
+		//Toggle LCD screen
+		if(toggle){
+			toggleLCD(effectToToggle,indexToToggle,on_off[indexToToggle], numQueued);
+			toggle = 0;
+		}
+		//Print lcd screen with signals generated from ISR
 		if(updateLcd){
-			updateLCD(updateCode);
+			updateLCD(&updateCode, mainDisplay, on_off, &presetNumber);
 			updateLcd = 0;
 		}
+		//Print level of change from pot input
 		if(updateChange){
 			updateLevel(newLevel, oldLevel);
 			updateChange = 0;
 		}
+		//Load preset in effect and lcd controller
 		if(load){
-			loadPresetScreen(loadPreset(presetNumber));
+			loadPresetScreen(loadPreset(presetNumber),mainDisplay, on_off);
 			load = 0;
 		}
+		//Save preset in effect controller
 		if(save){
 			savePreset(presetNumber);
 			save = 0;
@@ -106,7 +161,7 @@ interrupt void cpu_timer0_isr(void){
 	//if(GpioDataRegs.GPADAT.bit.GPIO6 == 1)GpioDataRegs.GPADAT.bit.GPIO6 = 0;
 	//else GpioDataRegs.GPADAT.bit.GPIO6 = 1;
 	int sample = read_adc();	//Get sample from ADC
-	sample = process(sample);	//Process sample
+	sample = process(sample,numQueued, on_off,&pipeline[0],&params);	//Process sample
 	write_dac(sample);			//write sample to DAC
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;	//Clear flag to accept more interrupts
 }
@@ -146,7 +201,7 @@ interrupt void adc_isr(void){
 		 properly prints the screen on every iteration
 		-resetTimer resets the timer1 to start over counting down from 3 seconds.  This will cause a timeout signal
 		 to be sent to the LCD after 3 seconds of no change on any ADC channel.
-
+*/
 	//TREMOLO
 	if(!preset){
 		if(abs(adcVals[0] - (AdcRegs.ADCRESULT0 >> 4)) > 0x00F0){
@@ -252,7 +307,7 @@ interrupt void adc_isr(void){
 			CpuTimer1Regs.TCR.bit.TRB = 1;
 			resetTimer = 0;
 		}
-	}*/
+	}
 		//Clear Flags
 		AdcRegs.ADCST.bit.INT_SEQ1_CLR = 1;       // Clear INT SEQ1 bit
 		PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;   // Acknowledge interrupt to PIE
@@ -261,8 +316,9 @@ interrupt void adc_isr(void){
 //Preset Up
 interrupt void xint1_isr(void){
 	DELAY_US(DEBOUNCE);
+	DELAY_US(DEBOUNCE);
 	//If initial entry into preset, set up timer and flag
-	if(GpioDataRegs.GPADAT.bit.GPIO25){
+	if(GpioDataRegs.GPADAT.bit.GPIO5){
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
 			preset = 1;
@@ -280,7 +336,8 @@ interrupt void xint1_isr(void){
 interrupt void xint2_isr(void){
 	//If initial entry into preset, set up timer and flag
 	DELAY_US(DEBOUNCE);
-	if(GpioDataRegs.GPADAT.bit.GPIO21){
+	DELAY_US(DEBOUNCE);
+	if(GpioDataRegs.GPADAT.bit.GPIO6){
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
 			preset = 1;
@@ -339,19 +396,66 @@ interrupt void xint5_isr(void){
 
 		//Look to either queue effect or toggle state
 		else{
+			toggle = 1;
 			//Simple lookup vs mathematical computation gets the effect to be manipulated
 			int effect = indexLookup(input);
 			//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
 			if(!toggleOn_Off(effect)){
-				queueEffect(effect);		//queue the effect
-				queueDisplay(effect);		//queue the display
+				queueEffect(effect);					//queue the effect
+				mainDisplay[numQueued-1] = effect;		//queue the display
 			}
-			toggleDisplayOn_Off(effect);
-			updateLcd = 1;
-			updateCode = effect;
+			//Initialize Variables
+			int i = 0;//, inMainDisplay = 0;
+			//Loop through mainDisplay to see if the effect is already set to print to LCD
+			for(;i<10;i++){
+				//If it is in main display, break
+				if(mainDisplay[i] == effect){
+					indexToToggle = i;
+					break;
+				}
+			}
+			effectToToggle = effect;
 		}
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
+}
+int toggleOn_Off(int effect){
+	//If location[] == 0, then the effect is not in the queue so return 0 to signal
+	//that this effect needs to be queued up.  Else just toggle the state.
+	if(location[effect] != -1){
+		on_off[location[effect]] ^= 1;
+		return 1;
+	}
+	else return 0;
+}
+void queueEffect(int effect){
+	location[effect] = numQueued;			//Set location of the effect in the location array, corresponds to the index in the queue, -1 because we inc numQueued first
+	pipeline[numQueued] = list[effect];	//queue function pointer into the pipeline, -1 because we inc numQueued first
+	on_off[numQueued] = 1;					//Turn effect on, makes sense for the user
+	numQueued++;
+}
+
+void clearPipeline(){
+	//Clear location/on_off arrays
+	int i;
+	for(i=0; i < 10; i++){
+		location[i] = -1;
+		on_off[i] = 0;
+		mainDisplay[i] = 0;
+	}
+	numQueued = 0;
+}
+int toggleEffectOnDisplay(int effect){
+	//Block input if tunerScreen
+
+	//Initialize Variables
+	int i = 0;//, inMainDisplay = 0;
+	//Loop through mainDisplay to see if the effect is already set to print to LCD
+	for(;i<10;i++){
+		//If it is in main display, break
+		if(mainDisplay[i] == effect)break;
+	}
+	return i;
 }
 /*
 interrupt void xint1_isr(void){

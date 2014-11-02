@@ -14,8 +14,6 @@
 
 //Similar to queue system.  mainDisplay contains what could possibly be printed to screen.
 //mainDisplay_show holds whether or not it is printed to screen (on_off[]);
-int mainDisplay[10];
-int mainDisplay_show[10];
 int numInMainDisplay, tunerScreen, currentPreset, presetScreen;
 
 //#pragma CODE_SECTION(controlLCD, "secureRamFuncs")
@@ -91,90 +89,23 @@ void updateLevel(int level, int oldLevel){
 
 }
 
-void toggleEffectDisplay(int effect){
-	//Block input if tunerScreen
-
-	//Initialize Variables
-	int i = 0;//, inMainDisplay = 0;
-	//Loop through mainDisplay to see if the effect is already set to print to LCD
-	for(;i<numInMainDisplay;i++){
-		//If it is in main display, break
-		if(mainDisplay[i] == effect){
-			//inMainDisplay = 1;
-			break;
-		}
-	}
-	//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
-	//where update == tremolo through pitch shift values defined in lcd.h
-	mainDisplay_show[i] ^= 1;
-	toggleLCD(effect, i, mainDisplay_show[i]);
-
-
-}
-
-int toggleDisplayOn_Off(int effect){
-	int i = 0, inMainDisplay = 0;
-	//Loop through mainDisplay to see if the effect is already set to print to LCD
-	for(;i<numInMainDisplay;i++){
-		//If it is in main display, break
-		if(mainDisplay[i] == effect){
-			//inMainDisplay = 1;
-			break;
-		}
-	}
-	if(inMainDisplay){
-		mainDisplay_show[i] ^= 1;
-		return 1;
-	}
-	else return 0;
-}
-
-void queueDisplay(int effect){
-	//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
-	//where update == tremolo through pitch shift values defined in lcd.h
-		mainDisplay[numInMainDisplay] = effect;
-		mainDisplay_show[numInMainDisplay] = 0;
-		numInMainDisplay++;
-}
-
-
 //Eventually parses code and tells the printLCD() what to print
-void updateLCD(int update){
+void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset){
 	//Clear Screen, called by a reset on the queue. Block input if on tuner screen or preset screen
-	if(update == CLEAR && !tunerScreen && !presetScreen){
+	if(*update == CLEAR && !tunerScreen && !presetScreen){
 		numInMainDisplay = 0;
 		controlLCD(CL);
 	}
 	//Block input if tunerScreen
-		else if((update >= TREMOLO && update <= REVERB) && !tunerScreen && !presetScreen){
-			//Initialize Variables
-			int i = 0, inMainDisplay = 0;
-			//Loop through mainDisplay to see if the effect is already set to print to LCD
-			for(;i<numInMainDisplay;i++){
-				//If it is in main display, break
-				if(mainDisplay[i] == update){
-					break;
-				}
-			}
-			//If not inMainDisplay, put in mainDisplay array in the correct location, turn on to print to screen
-			//where update == tremolo through pitch shift values defined in lcd.h
-
-
-			//If its already in main display, its already in the queue, so toggle the effect on/off, toggle
-			//the display on/off
-			mainDisplay_show[i] ^= 1;
-			toggleLCD(update, i, mainDisplay_show[i]);
-
-		}
-	else if(update == PRESETTIMEOUT){
+	else if(*update == PRESETTIMEOUT){
 		presetScreen = 0;
-		goToMain();
+		goToMain(mainDisplay, on_off);
 
 	}
-	else if(update == TUNER){
+	else if(*update == TUNER){
 		if(tunerScreen){
 			tunerScreen = 0;
-			goToMain();
+			goToMain(mainDisplay, on_off);
 		}
 		else{
 			tunerScreen = 1;
@@ -188,16 +119,14 @@ void updateLCD(int update){
 		}
 	}
 	else if(tunerScreen == 1){
-		printFreq(update);
+		printFreq(*update);
 	}
-	else if(update == PRESETUP){
+	else if(*update == PRESETUP){
 		if(presetScreen){
 			controlLCD(HOME); //Return cursor to home;
 			//Shift Cursor over to correct position
 			shiftCursor(8);
-			currentPreset++;
-			if(currentPreset == 10)currentPreset = 1;
-			printLCD(currentPreset+0x30);
+			printLCD(*currentPreset+0x30);
 		}
 		else{
 			//Clear Screen
@@ -212,17 +141,15 @@ void updateLCD(int update){
 			printLCD(T);	//T
 			printLCD(COLON);	//:
 			printLCD(SPACE); //_
-			printLCD(currentPreset + 0x30);
+			printLCD(*currentPreset + 0x30);
 		}
 	}
-	else if(update == PRESETDOWN){
+	else if(*update == PRESETDOWN){
 		if(presetScreen){
 			controlLCD(HOME); //Return cursor to home;
 			//Shift Cursor over to correct position
 			shiftCursor(8);
-			currentPreset--;
-			if(currentPreset == 0)currentPreset = 9;
-			printLCD(currentPreset+0x30);
+			printLCD(*currentPreset+0x30);
 		}
 		else{
 			//Clear Screen
@@ -236,10 +163,10 @@ void updateLCD(int update){
 			printLCD(T);	//T
 			printLCD(COLON);	//:
 			printLCD(SPACE); //_
-			printLCD(currentPreset + 0x30);
+			printLCD(*currentPreset + 0x30);
 		}
 	}
-	else if(update == SAVEPRESET && presetScreen){
+	else if(*update == SAVEPRESET && presetScreen){
 		/*//Save presets.  Method of calling needs to be moved to main
 		savePreset(currentPreset);
 		int start = (currentPreset-1)*42;
@@ -250,9 +177,9 @@ void updateLCD(int update){
 		}
 		presets[start + i + 10] = numInMainDisplay;*/
 		presetScreen = 0;
-		goToMain();
+		goToMain(mainDisplay, on_off);
 	}
-	else if(update == LOADPRESET && presetScreen){
+	else if(*update == LOADPRESET && presetScreen){
 		//Load presets.  Method of calling needs to be moved to main
 		/*loadPreset(currentPreset);
 		int start = (currentPreset-1)*42;
@@ -263,26 +190,26 @@ void updateLCD(int update){
 		}
 		numInMainDisplay = presets[start + i + 10];*/
 		presetScreen = 0;
-		goToMain();
+		goToMain(mainDisplay, on_off);
 	}
-	else if(update == CHANGETREMOLO){
+	else if(*update == CHANGETREMOLO){
 		printTremolo();
 	}
-	else if(update == CHANGEREVERB){
+	else if(*update == CHANGEREVERB){
 		printReverb();
 	}
-	else if(update == CHANGECHORUS){
+	else if(*update == CHANGECHORUS){
 		printChorus();
 	}
-	else if(update == CHANGEDELAY){
+	else if(*update == CHANGEDELAY){
 		printDelay();
 	}
-	else if(update == CHANGEFLANGE){
+	else if(*update == CHANGEFLANGE){
 		printFlange();
 	}
 }
 
-void loadPresetScreen(int* array){
+void loadPresetScreen(int* array, int* mainDisplay, int* on_off){
 	//0-10 is location
 	int i;
 	/*Must loop over entire location array.  If the index value is not -1,
@@ -295,19 +222,19 @@ void loadPresetScreen(int* array){
 	for(i = 0; i < 10; i++){
 		if(array[i] != -1){
 			mainDisplay[array[i]] = i;
-			mainDisplay_show[array[i]] = array[i+10];
+			on_off[array[i]] = array[i+10];
 			numInMainDisplay++;
 		}
 	}
 }
 
-void goToMain(){
+void goToMain(int* mainDisplay, int* on_off){
 	//Reprint main screen.  Usually called after a load/save preset or presettimeout or tuner screen toggle
 	controlLCD(0x01);
 	int i;
 	for(i = 0; i < numInMainDisplay; i++){
 		if(i == 3) controlLCD(0xB8); //Second line;
-		if(mainDisplay_show[i]){
+		if(on_off[i]){
 			printLCD(i+1 + 0x30);
 			printLCD(0x3A);
 			addToLCD(mainDisplay[i]);
@@ -377,7 +304,7 @@ void addToLCD(int effect){
 	}
 }
 
-void toggleLCD(int effect, int index, int on){
+void toggleLCD(int effect, int index, int on, int numQueued){
 	controlLCD(0x02); //Return cursor to home;
 	//Shift to beggining of section that needs to be changed
 	int i;
@@ -400,7 +327,7 @@ void toggleLCD(int effect, int index, int on){
 	}
 
 	controlLCD(0x02); //Return cursor to home;
-	for(i = 0;i<numInMainDisplay*5;i++){
+	for(i = 0;i<numQueued*5;i++){
 			controlLCD(0x14);
 	}
 }
@@ -444,11 +371,6 @@ void initLCD(){
 	tunerScreen = 0;
 	currentPreset = 1;
 	presetScreen = 0;
-	for(;i<10;i++){
-		mainDisplay[i] = -1;
-		mainDisplay_show[i] = 0;
-	}
-	numInMainDisplay = 0;
 	EALLOW;
 	GpioCtrlRegs.GPADIR.bit.GPIO8 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO9 = 0x1;

@@ -9,10 +9,15 @@
 #include "DSP28x_Project.h"
 #define PI 3.1415926
 
+//Type definition for process*Effect* method prototypes
+
+
 struct params{
 	int tremoloCounter, tremoloRate, tremoloCount, tremoloLimit;
 		int reverbDelay[800], reverbCount, reverbStart; //15 ms delay length at 44.1 kHz
 };
+
+typedef int FUNC(int, struct params*);
 int processDelay(int,struct params*);
 int processDistortion(int, struct params*);
 int processCrunch(int, struct params*);
@@ -29,8 +34,8 @@ void savePreset(int presetNum);
 int* loadPreset(int presetNum);
 void	queueEffect(int);	//Sticks effect into queue
 void 	clearPipeline();	//Clears the queue
-int 	process(int);		//Process the effects in the queue, FIFO
-void 	initEffects();		//Initialize registers
+int 	process(int, int,int*, FUNC**, struct params*);		//Process the effects in the queue, FIFO
+void 	initEffects(struct params*);		//Initialize registers
 int 	indexLookup(int);	//Maps GPIO input to an effect
 int 	toggleOn_Off(int);	//Toggles effect on/off once its in the queue
 
