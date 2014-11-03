@@ -1,4 +1,5 @@
 #include "../include/effect.h"
+#include "F28335_example.h"
 #include "math.h"
 #include "DSP28x_Project.h"
 #include "spi.h"
@@ -67,7 +68,7 @@ int processDistortion(int sample, struct params* p){
 	long temp = sample;
 	Uint32 command = 0x19000000 | (temp<<8);
 	mcbsp_xmit(command);
-	DELAY_US(3);
+	DelayUs(3);
 	return (sample);
 }
 int processCrunch(int sample, struct params* p){
@@ -75,7 +76,7 @@ int processCrunch(int sample, struct params* p){
 	long temp = sample;
 	Uint32 command = 0x19000000 | (temp<<8);
 	mcbsp_xmit(command);
-	DELAY_US(3);
+	DelayUs(3);
 	return (sample);
 }
 int processTremolo(int sample, struct params* p){
@@ -161,7 +162,7 @@ void savePreset(int presetNum, int* location, int* on_off){
 	messageOut.NumOfBytes = 5;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = tLocation[i];
 	eepromWrite();
-	DELAY_US(EEPROMWRITEDELAY);
+	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 
 	//write second half of location array
@@ -172,7 +173,7 @@ void savePreset(int presetNum, int* location, int* on_off){
 	messageOut.NumOfBytes = 5;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = tLocation[i+5];
 	eepromWrite();
-	DELAY_US(EEPROMWRITEDELAY);
+	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 
 
@@ -184,7 +185,7 @@ void savePreset(int presetNum, int* location, int* on_off){
 	messageOut.NumOfBytes = 5;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = on_off[i];
 	eepromWrite();
-	DELAY_US(EEPROMWRITEDELAY);
+	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 
 	//write second half of on_off array
@@ -195,7 +196,7 @@ void savePreset(int presetNum, int* location, int* on_off){
 	messageOut.NumOfBytes = 5;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = on_off[i+5];
 	eepromWrite();
-	DELAY_US(EEPROMWRITEDELAY);
+	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 
 	//write out first half of adc values
@@ -206,7 +207,7 @@ void savePreset(int presetNum, int* location, int* on_off){
 	messageOut.NumOfBytes = 6;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = adcVal[i];
 	eepromWrite();
-	DELAY_US(EEPROMWRITEDELAY);
+	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 
 	//write out second half of adc values
@@ -217,7 +218,7 @@ void savePreset(int presetNum, int* location, int* on_off){
 	messageOut.NumOfBytes = 6;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = adcVal[i] >> 8;
 	eepromWrite();
-	DELAY_US(EEPROMWRITEDELAY);
+	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 }
 
@@ -238,7 +239,7 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	messageIn.SlaveAddress = 0x50;
 	messageIn.NumOfBytes = 5;
 	eepromRead();
-	DELAY_US(EEPROMREADDELAY);
+	DelayUs(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++) {
 		location[i] = messageIn.MsgBuffer[i];
 		returnArray[i] = location[i];
@@ -252,7 +253,7 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	messageIn.SlaveAddress = 0x50;
 	messageIn.NumOfBytes = 5;
 	eepromRead();
-	DELAY_US(EEPROMREADDELAY);
+	DelayUs(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++) {
 		location[i+5] = messageIn.MsgBuffer[i];
 	}
@@ -265,7 +266,7 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	messageIn.SlaveAddress = 0x50;
 	messageIn.NumOfBytes = 5;
 	eepromRead();
-	DELAY_US(EEPROMREADDELAY);
+	DelayUs(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++){
 		on_off[i] = messageIn.MsgBuffer[i];
 	}
@@ -278,7 +279,7 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	messageIn.SlaveAddress = 0x50;
 	messageIn.NumOfBytes = 5;
 	eepromRead();
-	DELAY_US(EEPROMREADDELAY);
+	DelayUs(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++){
 		on_off[i+5] = messageIn.MsgBuffer[i];
 	}
@@ -291,7 +292,7 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	messageIn.SlaveAddress = 0x50;
 	messageIn.NumOfBytes = 5;
 	eepromRead();
-	DELAY_US(EEPROMREADDELAY);
+	DelayUs(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++){
 		adcVal[i] = messageIn.MsgBuffer[i];
 	}
@@ -304,7 +305,7 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	messageIn.SlaveAddress = 0x50;
 	messageIn.NumOfBytes = 5;
 	eepromRead();
-	DELAY_US(EEPROMREADDELAY);
+	DelayUs(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++){
 		unsigned int temp = messageIn.MsgBuffer[i] << 8;
 		adcVal[i] = temp | adcVal[i];

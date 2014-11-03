@@ -6,6 +6,7 @@
  */
 #include "../include/spi.h"
 #include "DSP28x_Project.h"
+#include "F28335_example.h"
 
 void write_dac(int sample){
 	long temp = sample;
@@ -15,7 +16,7 @@ void write_dac(int sample){
 int read_adc(){
 	GpioDataRegs.GPADAT.bit.GPIO19 = 1;
 	//while(SpiaRegs.SPISTS.bit.INT_FLAG !=1) { }
-	DELAY_US(3);
+	DelayUs(3);
 	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
 	//DELAY_US(.2);
 	SpiaRegs.SPITXBUF = 0xFFFF;

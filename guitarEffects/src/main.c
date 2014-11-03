@@ -383,7 +383,7 @@ interrupt void save_preset(void){
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
 interrupt void effects(void){
-	DELAY_US(DEBOUNCE);
+	DelayUs(DEBOUNCE);
 	int input = (GpioDataRegs.GPADAT.all & 0x000001E) >> 1;
 	if(input){
 		if(input == 0x0008){

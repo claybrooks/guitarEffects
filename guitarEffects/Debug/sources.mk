@@ -104,6 +104,7 @@ S64_DEPS__QUOTED :=
 SUBDIRS := \
 src \
 cmd \
-DSP2833x/src \
-DSP2833x/cmd \
+DSP2833x_headers/src \
+DSP2833x_headers/include \
+DSP2833x_headers/cmd \
 
