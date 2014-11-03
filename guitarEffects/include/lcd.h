@@ -42,11 +42,11 @@
 void 	initLCD(void);
 void 	printLCD(int);
 void 	addToLCD(int);
-void 	goToMain(int* mainDisplay, int* on_off);
+void 	goToMain(int* mainDisplay, int* on_off, int* numQueued);
 void  	shiftCursor(int);
 void 	toggleLCD(int,int,int,int);
 void 	controlLCD(int);
-void	updateLCD(int* update, int* mainDisplay, int* on_off, int* presetNumber);
+void	updateLCD(int* update, int* mainDisplay, int* on_off, int* presetNumber, int* numQueued);
 void 	printFreq(int);
 void 	presetUp(int);
 void 	presetDown(int);

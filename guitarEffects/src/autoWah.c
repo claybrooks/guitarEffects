@@ -1,14 +1,14 @@
 #include "bp_iir.h"
 #include "AutoWah.h"
 #include "math.h"
-static short center_freq;
-static short samp_freq;
+//static short center_freq;
+//static short samp_freq;
 static short counter;
 static short counter_limit;
-static short control;
+//static short control;
 static short max_freq;
 static short min_freq;
-static short f_step;
+//static short f_step;
 static struct bp_filter H;
 static double a[3];
 static double b[3];
@@ -18,10 +18,10 @@ void AutoWah_init(short effect_rate,short sampling,short maxf,short minf,short Q
         double C;
 
         //Process variables
-        center_freq = 0;
-        samp_freq = sampling;
+       // center_freq = 0;
+       // samp_freq = sampling;
         counter = effect_rate;
-        control = 0;
+        //control = 0;
 
         //User Parametters
         counter_limit = effect_rate;
@@ -31,7 +31,7 @@ void AutoWah_init(short effect_rate,short sampling,short maxf,short minf,short Q
         max_freq = (maxf - minf)/freq_step;
 
     bp_iir_init(sampling,gainfactor,Q,freq_step,minf, &H);
-        f_step = freq_step;
+       // f_step = freq_step;
 
         //Lowpass filter parameters
         /*
@@ -60,7 +60,7 @@ Uint16 AutoWah_process(double xin) {
 
 void AutoWah_sweep(double xin) {
         unsigned int filter_index;
-        double yout;
+        //double yout;
         double detect;
 
         /*The input is 16 bit unsigned so it

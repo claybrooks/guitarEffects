@@ -23,7 +23,7 @@
 // a different section.  This section will then be mapped to a load and
 // run address using the linker cmd file.
 
-#pragma CODE_SECTION(InitFlash, "ramfuncs");
+#pragma CODE_SECTION(InitFlash, "ramFuncs");
 
 //---------------------------------------------------------------------------
 // InitSysCtrl:

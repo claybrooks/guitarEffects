@@ -10,8 +10,6 @@
 #define PI 3.1415926
 
 //Type definition for process*Effect* method prototypes
-
-
 struct params{
 	int tremoloCounter, tremoloRate, tremoloCount, tremoloLimit;
 		int reverbDelay[800], reverbCount, reverbStart; //15 ms delay length at 44.1 kHz
@@ -30,8 +28,8 @@ int processChorus(int, struct params*);
 int processDelay(int, struct params*);
 int processPitchShift(int, struct params*);
 
-void savePreset(int presetNum);
-int* loadPreset(int presetNum);
+void savePreset(int presetNum, int* location, int* on_off);
+void loadPreset(int presetNum, FUNC**pipeline,FUNC**list, int* location, int* on_off, int* numQueued);
 void	queueEffect(int);	//Sticks effect into queue
 void 	clearPipeline();	//Clears the queue
 int 	process(int, int,int*, FUNC**, struct params*);		//Process the effects in the queue, FIFO

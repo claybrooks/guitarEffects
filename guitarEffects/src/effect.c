@@ -8,6 +8,11 @@
 #include "effect.h"
 
 
+/*
+#pragma CODE_SECTION(loadPreset, "secureRamFuncs")
+#pragma CODE_SECTION(savePreset, "secureRamFuncs")
+*/
+
 //For eeprom reading/writing
 int readDone, writeDone = 0;
 unsigned int adcVal[5];
@@ -27,7 +32,7 @@ int returnArray[26];
 void initEffects(struct params* params){
 	//Lowpass Filter
 	//lowpass = lowpass_create();
-
+	messageOut.MsgStatus = I2C_MSGSTAT_INACTIVE;
 	//Autowah
 	AutoWah_init(2000,  /*Effect rate 2000*/16000, /*Sampling Frequency*/1000,  /*Maximum frequency*/500,   /*Minimum frequency*/ 4,     /*Q*/0.707, /*Gain factor*/10     /*Frequency increment*/);
 	//Clear the queue
@@ -132,8 +137,7 @@ int processPitchShift(int sample, struct params* p){
 
 
 
-void savePreset(int presetNum){
-	/*
+void savePreset(int presetNum, int* location, int* on_off){
 	//Calculate addresses based on presetNum
 	int i = 0;
 	int locationMessage1 = (presetNum-1)*32;
@@ -142,11 +146,11 @@ void savePreset(int presetNum){
 	int on_offMessage2 = on_offMessage1 + 5;
 	int adcMessage1 = on_offMessage2 + 5;
 	int adcMessage2 = adcMessage1 + 6;
-
+	int tLocation[10];
 	//Inc location array by 1 because I don't want to save -1 in eeprom
 	for(i = 0; i < 10; i++){
 		int temp = location[i];
-		location[i] = ++temp;
+		tLocation[i] = ++temp;
 	}
 
 	//write first half of location array
@@ -155,7 +159,7 @@ void savePreset(int presetNum){
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
 	messageOut.SlaveAddress = 0x50;
 	messageOut.NumOfBytes = 5;
-	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = location[i];
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = tLocation[i];
 	eepromWrite();
 	DELAY_US(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
@@ -166,7 +170,7 @@ void savePreset(int presetNum){
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
 	messageOut.SlaveAddress = 0x50;
 	messageOut.NumOfBytes = 5;
-	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = location[i+5];
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = tLocation[i+5];
 	eepromWrite();
 	DELAY_US(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
@@ -214,11 +218,10 @@ void savePreset(int presetNum){
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = adcVal[i] >> 8;
 	eepromWrite();
 	DELAY_US(EEPROMWRITEDELAY);
-	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};*/
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 }
 
-int* loadPreset(int presetNum){
-	/*
+void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* on_off, int* numQueued){
 	int i = 0;
 	//Calculate addresses based on presetNum
 	int locationMessage1 = (presetNum-1)*32;
@@ -240,7 +243,7 @@ int* loadPreset(int presetNum){
 		location[i] = messageIn.MsgBuffer[i];
 		returnArray[i] = location[i];
 	}
-	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in second half of location array
 	messageIn.MemoryLowAddr = locationMessage2 & 0x00FF;
@@ -252,9 +255,8 @@ int* loadPreset(int presetNum){
 	DELAY_US(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++) {
 		location[i+5] = messageIn.MsgBuffer[i];
-		returnArray[i+5] = location[i+5];
 	}
-	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in second half of on_off array
 	messageIn.MemoryLowAddr = on_offMessage1 & 0x00FF;
@@ -266,9 +268,8 @@ int* loadPreset(int presetNum){
 	DELAY_US(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++){
 		on_off[i] = messageIn.MsgBuffer[i];
-		returnArray[i+10] = on_off[i];
 	}
-	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in second half of on_off array
 	messageIn.MemoryLowAddr = on_offMessage2 & 0x00FF;
@@ -280,9 +281,8 @@ int* loadPreset(int presetNum){
 	DELAY_US(EEPROMREADDELAY);
 	for(i = 0; i < 5; i++){
 		on_off[i+5] = messageIn.MsgBuffer[i];
-		returnArray[i+15] = on_off[i+5];
 	}
-	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in first half of adc values
 	messageIn.MemoryLowAddr = adcMessage1 & 0x00FF;
@@ -295,7 +295,7 @@ int* loadPreset(int presetNum){
 	for(i = 0; i < 5; i++){
 		adcVal[i] = messageIn.MsgBuffer[i];
 	}
-	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Read in second half of adc values
 	messageIn.MemoryLowAddr = adcMessage2 & 0x00FF;
@@ -308,26 +308,25 @@ int* loadPreset(int presetNum){
 	for(i = 0; i < 5; i++){
 		unsigned int temp = messageIn.MsgBuffer[i] << 8;
 		adcVal[i] = temp | adcVal[i];
-		returnArray[i+20] = adcVal[i];
 	}
-	//while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Dec location array by 1 because I don't want to save -1 in eeprom
 	for(i = 0; i < 10; i++){
-		location[i] = location[i]--;
+		int temp = location[i];
+		temp = temp - 1;
+		location[i] = temp;
 	}
 
-	numQueued = 0;
+	*numQueued = 0;
 	for(i = 0; i < 10; i++){
 		int temp = location[i];
-		if(temp != 0){
+		if(temp != -1){
 			location[i] = temp;
 			pipeline[temp] = list[i];
-			numQueued++;
+			*numQueued = *numQueued + 1;
 		}
 	}
-	returnArray[25] = numQueued;
-	return returnArray;*/
 }
 
 interrupt void i2c_int1a_isr(void){

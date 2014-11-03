@@ -9,11 +9,11 @@
 #define SYS_H_
 
 interrupt void cpu_timer0_isr(void);
-interrupt void xint1_isr(void);
-interrupt void xint2_isr(void);
-interrupt void xint3_isr(void);
-interrupt void xint4_isr(void);
-interrupt void xint5_isr(void);
+interrupt void preset_up(void);
+interrupt void preset_down(void);
+interrupt void load_preset(void);
+interrupt void save_preset(void);
+interrupt void effects(void);
 /*interrupt void xint6_isr(void);
 interrupt void xint7_isr(void);
 interrupt void xint8_isr(void);*/

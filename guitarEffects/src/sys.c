@@ -30,11 +30,11 @@ void initINTS(){
 
 	//External Interrupts
 			//Set up isr functions
-			PieVectTable.XINT1 = &xint1_isr;
-			PieVectTable.XINT2 = &xint2_isr;
-			PieVectTable.XINT3 = &xint3_isr;
-			PieVectTable.XINT4 = &xint4_isr;
-			PieVectTable.XINT5 = &xint5_isr;
+			PieVectTable.XINT1 = &preset_up;
+			PieVectTable.XINT2 = &preset_down;
+			PieVectTable.XINT3 = &load_preset;
+			PieVectTable.XINT4 = &save_preset;
+			PieVectTable.XINT5 = &effects;
 
 			//preset up
 			PieCtrlRegs.PIEIER1.bit.INTx4 = 1;          //Enable PIE Gropu 1 INT4

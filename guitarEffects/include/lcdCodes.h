@@ -33,7 +33,7 @@
 #define	W		0x57
 #define	X		0x58
 #define Y		0x59
-#define Z		0x58
+#define Z		0x5A
 
 #define lc		0x20
 

@@ -48,6 +48,9 @@
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DISPLAY_ERROR_NUMBER.1305988835" name="Emit diagnostic identifier numbers (--display_error_number, -pden)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DISPLAY_ERROR_NUMBER" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DIAG_WRAP.1868896234" name="Wrap diagnostic messages (--diag_wrap)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DIAG_WRAP" value="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DIAG_WRAP.off" valueType="enumerated"/>
+								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DEFINE.270034040" name="Pre-define NAME (--define, -D)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.DEFINE" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="FLASH"/>
+								</option>
 								<inputType id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compiler.inputType__C_SRCS.245957328" name="C Sources" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compiler.inputType__C_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compiler.inputType__CPP_SRCS.1769060497" name="C++ Sources" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compiler.inputType__CPP_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compiler.inputType__ASM_SRCS.1678584664" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compiler.inputType__ASM_SRCS"/>
@@ -77,7 +80,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="cmd/F28335_nonBIOS_flash.cmd|src/initialize.c|DSP2833x_Audio_App|DSP2833x_Audio_App/AIC23_project|DSP2833x_Audio_App/DSP2833x_headers|DSP2833x_Audio_App/DSP2833x_headers/cmd|DSP2833x_Audio_App/DSP2833x_common/cmd|src/fft.c|src/wah.c|Effects.c|F28335.cmd|src/butterworth_bp.c|DSP2833x_Headers_nonBIOS.cmd|F28335_nonBIOS_ram.cmd|KG_RAM_Link1.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="cmd/KG_RAM_Link1.cmd|src/initialize.c|DSP2833x_Audio_App|DSP2833x_Audio_App/AIC23_project|DSP2833x_Audio_App/DSP2833x_headers|DSP2833x_Audio_App/DSP2833x_headers/cmd|DSP2833x_Audio_App/DSP2833x_common/cmd|src/fft.c|src/wah.c|Effects.c|F28335.cmd|src/butterworth_bp.c|DSP2833x_Headers_nonBIOS.cmd|F28335_nonBIOS_ram.cmd|KG_RAM_Link1.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -77,18 +77,21 @@ int load = 0, save = 0, presetNumber = 1;
 /********************************************************************************************************************************************************************/
 
 #define DEBOUNCE 50000
-
-//#pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
-///#pragma CODE_SECTION(cpu_timer1_isr, "secureRamFuncs")
-//#pragma CODE_SECTION(adc_isr, "secureRamFuncs")
-//#pragma CODE_SECTION(xint1_isr, "secureRamFuncs")
-
-int main(){
-
+/*
+#pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
+#pragma CODE_SECTION(cpu_timer1_isr, "secureRamFuncs")
+#pragma CODE_SECTION(adc_isr, "secureRamFuncs")
+#pragma CODE_SECTION(preset_up, "secureRamFuncs")
+#pragma CODE_SECTION(preset_down, "secureRamFuncs")
+#pragma CODE_SECTION(load_preset, "secureRamFuncs")
+#pragma CODE_SECTION(save_preset, "secureRamFuncs")
+#pragma CODE_SECTION(effects, "secureRamFuncs")
+*/
+ int main(){
 	InitSysCtrl();
 
-	//memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
-	//InitFlash();
+	memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
+	InitFlash();
 
 	EALLOW;
 
@@ -135,7 +138,7 @@ int main(){
 		}
 		//Print lcd screen with signals generated from ISR
 		if(updateLcd){
-			updateLCD(&updateCode, mainDisplay, on_off, &presetNumber);
+			updateLCD(&updateCode, mainDisplay, on_off, &presetNumber, &numQueued);
 			updateLcd = 0;
 		}
 		//Print level of change from pot input
@@ -145,12 +148,15 @@ int main(){
 		}
 		//Load preset in effect and lcd controller
 		if(load){
-			loadPresetScreen(loadPreset(presetNumber),mainDisplay, on_off);
+			loadPreset(presetNumber, pipeline, list, location, on_off, &numQueued);
+			loadPresetScreen(location,mainDisplay, &numQueued);
+			updateCode = MAIN;
+			updateLcd = 1;
 			load = 0;
 		}
 		//Save preset in effect controller
 		if(save){
-			savePreset(presetNumber);
+			savePreset(presetNumber, location, on_off);
 			save = 0;
 		}
 	}
@@ -204,7 +210,7 @@ interrupt void adc_isr(void){
 */
 	//TREMOLO
 	if(!preset){
-		if(abs(adcVals[0] - (AdcRegs.ADCRESULT0 >> 4)) > 0x00F0){
+		if(abs(adcVals[0] - (AdcRegs.ADCRESULT0 >> 4)) > 0x00FF){
 			adcVals[0] = AdcRegs.ADCRESULT0 >> 4;
 			if(!tremoloChange|| currentChangeScreen != 1){
 				currentChangeScreen = 1;
@@ -220,7 +226,7 @@ interrupt void adc_isr(void){
 			resetTimer = 1;
 		}
 		//REVERB
-		else if(abs(adcVals[1]- (AdcRegs.ADCRESULT1 >> 4)) > 0x00F0){
+		else if(abs(adcVals[1]- (AdcRegs.ADCRESULT1 >> 4)) > 0x00FF){
 			adcVals[1] = AdcRegs.ADCRESULT1 >> 4;
 			if(!reverbChange || currentChangeScreen != 2){
 				currentChangeScreen = 2;
@@ -236,7 +242,7 @@ interrupt void adc_isr(void){
 			resetTimer = 1;
 		}
 		//VOLUME
-		else if(abs(adcVals[2] - (AdcRegs.ADCRESULT2 >> 4)) > 0x00F0){
+		else if(abs(adcVals[2] - (AdcRegs.ADCRESULT2 >> 4)) > 0x00FF){
 			adcVals[2] = AdcRegs.ADCRESULT2 >> 4;
 			if(!volumeChange || currentChangeScreen != 3){
 				currentChangeScreen = 3;
@@ -253,7 +259,7 @@ interrupt void adc_isr(void){
 			updateVolume = 1;
 		}
 		//BASS
-		else if(abs(adcVals[3] - (AdcRegs.ADCRESULT3 >> 4)) > 0x00F0){
+		else if(abs(adcVals[3] - (AdcRegs.ADCRESULT3 >> 4)) > 0x00FF){
 			adcVals[3] = AdcRegs.ADCRESULT3 >> 4;
 			if(!bassChange || currentChangeScreen != 4){
 				currentChangeScreen = 4;
@@ -269,7 +275,7 @@ interrupt void adc_isr(void){
 			resetTimer = 1;
 		}
 		//MID
-		else if(abs(adcVals[4] - (AdcRegs.ADCRESULT4 >> 4)) > 0x00F0){
+		else if(abs(adcVals[4] - (AdcRegs.ADCRESULT4 >> 4)) > 0x00FF){
 				adcVals[4] = AdcRegs.ADCRESULT4 >> 4;
 				if(!midChange || currentChangeScreen != 5){
 					currentChangeScreen = 5;
@@ -285,7 +291,7 @@ interrupt void adc_isr(void){
 				resetTimer = 1;
 		}
 		//TREBLE
-		else if(abs(adcVals[5] - (AdcRegs.ADCRESULT5 >> 4)) > 0x00F0){
+		else if(abs(adcVals[5] - (AdcRegs.ADCRESULT5 >> 4)) > 0x00FF){
 				adcVals[5] = AdcRegs.ADCRESULT5 >> 4;
 				if(!trebleChange || currentChangeScreen != 6){
 					currentChangeScreen = 6;
@@ -314,9 +320,7 @@ interrupt void adc_isr(void){
 }
 
 //Preset Up
-interrupt void xint1_isr(void){
-	DELAY_US(DEBOUNCE);
-	DELAY_US(DEBOUNCE);
+interrupt void preset_up(void){
 	//If initial entry into preset, set up timer and flag
 	if(GpioDataRegs.GPADAT.bit.GPIO5){
 		if(!preset){
@@ -331,12 +335,12 @@ interrupt void xint1_isr(void){
 		updateLcd = 1;
 		updateCode = PRESETUP;
 	}
+
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
-interrupt void xint2_isr(void){
+//Preset Down
+interrupt void preset_down(void){
 	//If initial entry into preset, set up timer and flag
-	DELAY_US(DEBOUNCE);
-	DELAY_US(DEBOUNCE);
 	if(GpioDataRegs.GPADAT.bit.GPIO6){
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
@@ -350,33 +354,35 @@ interrupt void xint2_isr(void){
 		updateLcd = 1;
 		updateCode = PRESETDOWN;
 	}
+
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
-interrupt void xint3_isr(void){
+//Load Preset
+interrupt void load_preset(void){
 	//Stop timer and reset flag
-	DELAY_US(DEBOUNCE);
 	if(GpioDataRegs.GPBDAT.bit.GPIO48){
 		CpuTimer1Regs.TCR.bit.TSS = 1;
 		preset = 0;
-		//updateLcd = 1;
-		//updateCode = LOADPRESET;
-		//load = 1;
+		load = 1;
+		updateLcd = 1;
+		updateCode = LOADPRESET;
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
-interrupt void xint4_isr(void){
+//Save Preset
+interrupt void save_preset(void){
 	//Stop timer and reset flag
-	DELAY_US(DEBOUNCE);
 	if(GpioDataRegs.GPBDAT.bit.GPIO49){
 		CpuTimer1Regs.TCR.bit.TSS = 1;
 		preset = 0;
-		//updateLcd = 1;
-		//updateCode = SAVEPRESET;
-		//save = 1;
+		updateLcd = 1;
+		updateCode = SAVEPRESET;
+		save = 1;
 	}
+
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
-interrupt void xint5_isr(void){
+interrupt void effects(void){
 	DELAY_US(DEBOUNCE);
 	int input = (GpioDataRegs.GPADAT.all & 0x000001E) >> 1;
 	if(input){
@@ -441,7 +447,7 @@ void clearPipeline(){
 	for(i=0; i < 10; i++){
 		location[i] = -1;
 		on_off[i] = 0;
-		mainDisplay[i] = 0;
+		mainDisplay[i] = -1;
 	}
 	numQueued = 0;
 }
@@ -527,7 +533,7 @@ interrupt void xint1_isr(void){
 
 		//Switch to tuning function
 		else if(input == 0x0040){
-			/*tuner ^= 1;			//signal for timer0 to not sample out to SPI
+			tuner ^= 1;			//signal for timer0 to not sample out to SPI
 			updateLcd = 1;
 			updateCode = TUNER;
 			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution

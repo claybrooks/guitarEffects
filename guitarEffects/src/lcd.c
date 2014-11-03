@@ -15,10 +15,10 @@
 //Similar to queue system.  mainDisplay contains what could possibly be printed to screen.
 //mainDisplay_show holds whether or not it is printed to screen (on_off[]);
 int numInMainDisplay, tunerScreen, currentPreset, presetScreen;
-
-//#pragma CODE_SECTION(controlLCD, "secureRamFuncs")
-//#pragma CODE_SECTION(printLCD, "secureRamFuncs")
-
+/*
+#pragma CODE_SECTION(controlLCD, "secureRamFuncs")
+#pragma CODE_SECTION(printLCD, "secureRamFuncs")
+*/
 void printTremolo(){
 	controlLCD(CL);
 	controlLCD(SECOND);
@@ -90,22 +90,22 @@ void updateLevel(int level, int oldLevel){
 }
 
 //Eventually parses code and tells the printLCD() what to print
-void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset){
+void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, int* numQueued){
 	//Clear Screen, called by a reset on the queue. Block input if on tuner screen or preset screen
 	if(*update == CLEAR && !tunerScreen && !presetScreen){
-		numInMainDisplay = 0;
+		*numQueued = 0;
 		controlLCD(CL);
 	}
 	//Block input if tunerScreen
-	else if(*update == PRESETTIMEOUT){
+	else if(*update == PRESETTIMEOUT || *update == MAIN){
 		presetScreen = 0;
-		goToMain(mainDisplay, on_off);
+		goToMain(mainDisplay, on_off, numQueued);
 
 	}
 	else if(*update == TUNER){
 		if(tunerScreen){
 			tunerScreen = 0;
-			goToMain(mainDisplay, on_off);
+			goToMain(mainDisplay, on_off, numQueued);
 		}
 		else{
 			tunerScreen = 1;
@@ -130,7 +130,7 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset){
 		}
 		else{
 			//Clear Screen
-			controlLCD(0x01);
+			controlLCD(CL);
 			controlLCD(HOME); //Return cursor to home;
 			presetScreen = 1;
 			printLCD(P);	//P
@@ -153,7 +153,8 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset){
 		}
 		else{
 			//Clear Screen
-			controlLCD(CLEAR);
+			controlLCD(CL);
+			controlLCD(HOME); //Return cursor to home;
 			presetScreen = 1;
 			printLCD(P);	//P
 			printLCD(R);	//R
@@ -167,30 +168,14 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset){
 		}
 	}
 	else if(*update == SAVEPRESET && presetScreen){
-		/*//Save presets.  Method of calling needs to be moved to main
-		savePreset(currentPreset);
-		int start = (currentPreset-1)*42;
-		int i;
-		for(i = 21; i < 31; i++){
-			presets[start + i] = mainDisplay[i-21];
-			presets[start + i + 10] = mainDisplay_show[i-21];
-		}
-		presets[start + i + 10] = numInMainDisplay;*/
+		//Save presets.  Method of calling needs to be moved to main
 		presetScreen = 0;
-		goToMain(mainDisplay, on_off);
+		goToMain(mainDisplay, on_off, numQueued);
 	}
 	else if(*update == LOADPRESET && presetScreen){
 		//Load presets.  Method of calling needs to be moved to main
-		/*loadPreset(currentPreset);
-		int start = (currentPreset-1)*42;
-		int i;
-		for(i = 21; i < 31; i++){
-			mainDisplay[i-21] = presets[start + i];
-			mainDisplay_show[i-21] = presets[start + i + 10];
-		}
-		numInMainDisplay = presets[start + i + 10];*/
 		presetScreen = 0;
-		goToMain(mainDisplay, on_off);
+		goToMain(mainDisplay, on_off, numQueued);
 	}
 	else if(*update == CHANGETREMOLO){
 		printTremolo();
@@ -209,30 +194,27 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset){
 	}
 }
 
-void loadPresetScreen(int* array, int* mainDisplay, int* on_off){
+void loadPresetScreen(int* location, int* mainDisplay, int* numQueued){
 	//0-10 is location
 	int i;
 	/*Must loop over entire location array.  If the index value is not -1,
 	you know the effect is queued.  Here, the index 'i' corresponds to the queued
-	effect, defined in the #define section of lcd.h.  The value of array[i] in
+	effect, defined in the #define section of lcd.h.  The value of location[i] in
 	are location values, '1,2,3' of the effect in the queue.  This corresponds to the
 	location in the mainDisplay array.  The on_off array(array offset by 10) is then used to determine
 	whether or not the queued effect is currently turned on.*/
 
-	for(i = 0; i < 10; i++){
-		if(array[i] != -1){
-			mainDisplay[array[i]] = i;
-			on_off[array[i]] = array[i+10];
-			numInMainDisplay++;
-		}
+	for(i = 0; i < *numQueued; i++){
+			mainDisplay[i] = location[i];
 	}
 }
 
-void goToMain(int* mainDisplay, int* on_off){
+void goToMain(int* mainDisplay, int* on_off, int* numQueued){
 	//Reprint main screen.  Usually called after a load/save preset or presettimeout or tuner screen toggle
-	controlLCD(0x01);
+	controlLCD(CL);
+	controlLCD(HOME);
 	int i;
-	for(i = 0; i < numInMainDisplay; i++){
+	for(i = 0; i < *numQueued; i++){
 		if(i == 3) controlLCD(0xB8); //Second line;
 		if(on_off[i]){
 			printLCD(i+1 + 0x30);
@@ -367,7 +349,6 @@ void wait(int temp){
 }
 
 void initLCD(){
-	int i = 0;
 	tunerScreen = 0;
 	currentPreset = 1;
 	presetScreen = 0;
