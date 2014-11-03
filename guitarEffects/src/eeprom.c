@@ -6,6 +6,11 @@
  */
 #include "../include/eeprom.h"
 #include "DSP28x_Project.h"     // Device Headerfile and Examples Include File
+
+#pragma CODE_SECTION(I2CA_Init, "secureRamFuncs")
+#pragma CODE_SECTION(I2CA_WriteData, "secureRamFuncs")
+#pragma CODE_SECTION(I2CA_ReadData, "secureRamFuncs")
+
 void I2CA_Init(void)
 {
    // Initialize I2C

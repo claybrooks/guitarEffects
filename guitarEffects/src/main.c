@@ -77,7 +77,7 @@ int load = 0, save = 0, presetNumber = 1;
 /********************************************************************************************************************************************************************/
 
 #define DEBOUNCE 50000
-/*
+
 #pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
 #pragma CODE_SECTION(cpu_timer1_isr, "secureRamFuncs")
 #pragma CODE_SECTION(adc_isr, "secureRamFuncs")
@@ -86,7 +86,7 @@ int load = 0, save = 0, presetNumber = 1;
 #pragma CODE_SECTION(load_preset, "secureRamFuncs")
 #pragma CODE_SECTION(save_preset, "secureRamFuncs")
 #pragma CODE_SECTION(effects, "secureRamFuncs")
-*/
+
  int main(){
 	InitSysCtrl();
 
@@ -392,7 +392,7 @@ interrupt void effects(void){
 			updateCode = CLEAR;
 		}
 		//Switch to tuning function
-		else if(input == 0x0040){
+		else if(input == 0x0004){
 			/*tuner ^= 1;			//signal for timer0 to not sample out to SPI
 			updateLcd = 1;
 			updateCode = TUNER;
@@ -463,96 +463,6 @@ int toggleEffectOnDisplay(int effect){
 	}
 	return i;
 }
-/*
-interrupt void xint1_isr(void){
-
-	DELAY_US(DEBOUNCE);
-	int presetUp = GpioDataRegs.GPADAT.bit.GPIO5;
-	int presetDown = GpioDataRegs.GPADAT.bit.GPIO21;
-	int presetLoad = GpioDataRegs.GPADAT.bit.GPIO20;
-	int presetSave = GpioDataRegs.GPADAT.bit.GPIO16;
-	int input = (GpioDataRegs.GPADAT.all & 0x000001E) >> 1;
-
-	if(presetUp + presetDown + presetLoad + presetSave + input){
-		intCounter++;
-		//Get user input, shift for clearer comparisons
-		//Scroll up through presets
-		if(presetUp){
-			//If initial entry into preset, set up timer and flag
-			if(!preset){
-				CpuTimer1Regs.TCR.all = 0x4001;
-				preset = 1;
-			}
-			else{
-				presetNumber++;
-				if(presetNumber == 10) presetNumber= 1;
-			}
-			CpuTimer1Regs.TCR.bit.TRB = 1;
-			updateLcd = 1;
-			updateCode = PRESETUP;
-		}
-		//Scroll down through presets
-		else if(presetDown){
-			//If initial entry into preset, set up timer and flag
-			if(!preset){
-				CpuTimer1Regs.TCR.all = 0x4001;
-				preset = 1;
-			}
-			else{
-				presetNumber--;
-				if(presetNumber == 0) presetNumber= 9;
-			}
-			CpuTimer1Regs.TCR.bit.TRB = 1;
-			updateLcd = 1;
-			updateCode = PRESETDOWN;
-		}
-		//Load preset
-		else if(presetLoad){
-			//Stop timer and reset flag
-			CpuTimer1Regs.TCR.bit.TSS = 1;
-			preset = 0;
-			updateLcd = 1;
-			updateCode = LOADPRESET;
-			load = 1;
-		}
-		//Save Preset
-		else if(presetSave){
-			//Stop timer and reset flag
-			CpuTimer1Regs.TCR.bit.TSS = 1;
-			preset = 0;
-			updateLcd = 1;
-			updateCode = SAVEPRESET;
-			save = 1;
-		}
-			//Clear pipeline of all effects/ clear screen
-		else if(input == 0x0008){
-			updateLcd = 1;
-			clearPipeline();
-			updateCode = CLEAR;
-		}
-
-		//Switch to tuning function
-		else if(input == 0x0040){
-			tuner ^= 1;			//signal for timer0 to not sample out to SPI
-			updateLcd = 1;
-			updateCode = TUNER;
-			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
-			else updateTimer0(22.675f);		//FFT was toggled off, switch back to sample out to SPI
-		}
-
-		//Look to either queue effect or toggle state
-		else{
-			//Simple lookup vs mathematical computation gets the effect to be manipulated
-			int effect = indexLookup(input);
-			//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
-			if(!toggleOn_Off(effect)) queueEffect(effect);		//queue the effect
-			updateLcd = 1;
-			updateCode = effect;
-		}
-	}
-	//Acknowledge Interrupt
-	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
-}*/
 //Eliminates need to call log(input)/log(2).  Simple lookup will be faster
 
 int indexLookup(int input){

@@ -15,10 +15,19 @@
 //Similar to queue system.  mainDisplay contains what could possibly be printed to screen.
 //mainDisplay_show holds whether or not it is printed to screen (on_off[]);
 int numInMainDisplay, tunerScreen, currentPreset, presetScreen;
-/*
+
 #pragma CODE_SECTION(controlLCD, "secureRamFuncs")
 #pragma CODE_SECTION(printLCD, "secureRamFuncs")
-*/
+#pragma CODE_SECTION(updateLCD, "secureRamFuncs")
+#pragma CODE_SECTION(printTremolo, "secureRamFuncs")
+#pragma CODE_SECTION(printReverb, "secureRamFuncs")
+#pragma CODE_SECTION(updateLevel, "secureRamFuncs")
+#pragma CODE_SECTION(goToMain, "secureRamFuncs")
+#pragma CODE_SECTION(addToLCD, "secureRamFuncs")
+#pragma CODE_SECTION(shiftCursor, "secureRamFuncs")
+#pragma CODE_SECTION(toggleLCD, "secureRamFuncs")
+#pragma CODE_SECTION(printFreq, "secureRamFuncs")
+
 void printTremolo(){
 	controlLCD(CL);
 	controlLCD(SECOND);
@@ -243,7 +252,10 @@ void addToLCD(int effect){
 		printLCD(T);
 		printLCD(R);
 	}
-
+	else if(effect == REVERB){
+			printLCD(R);
+			printLCD(E);
+		}
 	else if(effect == DISTORTION){
 		printLCD(D);
 		printLCD(I);
@@ -260,10 +272,7 @@ void addToLCD(int effect){
 		printLCD(W);
 		printLCD(A);
 	}
-	else if(effect == REVERB){
-		printLCD(R);
-		printLCD(E);
-	}
+
 	else if(effect == SUSTAIN){
 			printLCD(S);
 			printLCD(U);
@@ -287,13 +296,13 @@ void addToLCD(int effect){
 }
 
 void toggleLCD(int effect, int index, int on, int numQueued){
-	controlLCD(0x02); //Return cursor to home;
+	//controlLCD(0x02); //Return cursor to home;
 	//Shift to beggining of section that needs to be changed
+
 	int i;
-	for(i = 0;i < index*5;i++){
-		controlLCD(0x14);
-		if(i == 14)controlLCD(0xB8);//Move to second line
-	}
+	int cursorShift = 0x80 | (index*5);
+	controlLCD(cursorShift);
+
 
 	//Went from off to on, reprint effect in proper spot.  Fill in proper vales
 	if(on){
@@ -305,13 +314,16 @@ void toggleLCD(int effect, int index, int on, int numQueued){
 	//Went from on to off, remove effect from spot
 	else{
 		for(i = 0; i < 4; i++) printLCD(0x20);
-
 	}
-
+/*
 	controlLCD(0x02); //Return cursor to home;
 	for(i = 0;i<numQueued*5;i++){
 			controlLCD(0x14);
 	}
+	*/
+	cursorShift = 0x80 | (numQueued*5);
+	controlLCD(cursorShift);
+
 }
 
 

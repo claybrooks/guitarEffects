@@ -8,6 +8,12 @@
 #include "DSP28x_Project.h"
 #include "F28335_example.h"
 
+#pragma CODE_SECTION(write_dac, "secureRamFuncs")
+#pragma CODE_SECTION(read_adc, "secureRamFuncs")
+#pragma CODE_SECTION(init_adc_spi, "secureRamFuncs")
+#pragma CODE_SECTION(init_mcbsp_spi, "secureRamFuncs")
+#pragma CODE_SECTION(mcbsp_xmit, "secureRamFuncs")
+
 void write_dac(int sample){
 	long temp = sample;
 	Uint32 command = 0x18000000 | (temp<<8);

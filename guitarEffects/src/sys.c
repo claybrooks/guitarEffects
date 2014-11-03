@@ -18,7 +18,7 @@ void initINTS(){
 	//InitPieVectTable();
 	EALLOW;
 	//Timer0
-			ConfigCpuTimer(&CpuTimer0, 150, 100);
+			ConfigCpuTimer(&CpuTimer0, 150, 22.675f);
 			PieVectTable.TINT0 = &cpu_timer0_isr;
 			CpuTimer0Regs.TCR.all = 0x4001;
 			PieCtrlRegs.PIEIER1.bit.INTx7 = 1;

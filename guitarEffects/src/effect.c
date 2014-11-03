@@ -9,10 +9,19 @@
 #include "effect.h"
 
 
-/*
+
 #pragma CODE_SECTION(loadPreset, "secureRamFuncs")
 #pragma CODE_SECTION(savePreset, "secureRamFuncs")
-*/
+#pragma CODE_SECTION(eepromWrite, "secureRamFuncs")
+#pragma CODE_SECTION(eepromRead, "secureRamFuncs")
+#pragma CODE_SECTION(i2c_int1a_isr, "secureRamFuncs")
+#pragma CODE_SECTION(savePreset, "secureRamFuncs")
+#pragma CODE_SECTION(process, "secureRamFuncs")
+#pragma CODE_SECTION(processTremolo, "secureRamFuncs")
+#pragma CODE_SECTION(processReverb, "secureRamFuncs")
+#pragma CODE_SECTION(processCrunch, "secureRamFuncs")
+#pragma CODE_SECTION(processDistortion, "secureRamFuncs")
+
 
 //For eeprom reading/writing
 int readDone, writeDone = 0;
