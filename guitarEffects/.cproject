@@ -88,7 +88,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="DSP2833x_known_working|Effects.c|src/fft.c|DSP2833x_Audio_App/DSP2833x_headers/cmd|F28335_nonBIOS_ram.cmd|DSP2833x_Headers_nonBIOS.cmd|src/butterworth_bp.c|F28335.cmd|cmd/KG_RAM_Link1.cmd|DSP2833x_Audio_App/DSP2833x_common/cmd|src/wah.c|src/initialize.c|DSP2833x_Audio_App|DSP2833x_Audio_App/AIC23_project|KG_RAM_Link1.cmd|DSP2833x_Audio_App/DSP2833x_headers" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="cmd/KG_RAM_Link1.cmd|DSP2833x_known_working|Effects.c|src/fft.c|DSP2833x_Audio_App/DSP2833x_headers/cmd|F28335_nonBIOS_ram.cmd|DSP2833x_Headers_nonBIOS.cmd|src/butterworth_bp.c|F28335.cmd|DSP2833x_Audio_App/DSP2833x_common/cmd|src/wah.c|src/initialize.c|DSP2833x_Audio_App|DSP2833x_Audio_App/AIC23_project|KG_RAM_Link1.cmd|DSP2833x_Audio_App/DSP2833x_headers" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

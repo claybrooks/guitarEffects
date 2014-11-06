@@ -1,5 +1,5 @@
 Analysis & Synthesis report for guitarEffects
-Fri Oct 31 23:45:24 2014
+Wed Nov 05 20:42:53 2014
 Quartus II Version 9.1 Build 350 03/24/2010 Service Pack 2 SJ Web Edition
 
 
@@ -39,13 +39,13 @@ applicable agreement for further details.
 +----------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                               ;
 +-----------------------------+----------------------------------------------+
-; Analysis & Synthesis Status ; Successful - Fri Oct 31 23:45:24 2014        ;
+; Analysis & Synthesis Status ; Successful - Wed Nov 05 20:42:53 2014        ;
 ; Quartus II Version          ; 9.1 Build 350 03/24/2010 SP 2 SJ Web Edition ;
 ; Revision Name               ; guitarEffects                                ;
 ; Top-level Entity Name       ; gutiarEffects                                ;
 ; Family                      ; MAX3000A                                     ;
-; Total macrocells            ; 3                                            ;
-; Total pins                  ; 9                                            ;
+; Total macrocells            ; 1                                            ;
+; Total pins                  ; 4                                            ;
 +-----------------------------+----------------------------------------------+
 
 
@@ -125,7 +125,7 @@ Parallel compilation was disabled, but you have multiple processors available. E
 ; File Name with User-Entered Path ; Used in Netlist ; File Type                          ; File Name with Absolute Path                               ;
 +----------------------------------+-----------------+------------------------------------+------------------------------------------------------------+
 ; gutiarEffects.bdf                ; yes             ; User Block Diagram/Schematic File  ; E:/Documents/Clone/guitarEffects/Quartus/gutiarEffects.bdf ;
-; xor8.bdf                         ; yes             ; Megafunction                       ; e:/altera/91sp2/quartus/libraries/others/maxplus2/xor8.bdf ;
+; xor3.bdf                         ; yes             ; Megafunction                       ; e:/altera/91sp2/quartus/libraries/others/maxplus2/xor3.bdf ;
 +----------------------------------+-----------------+------------------------------------+------------------------------------------------------------+
 
 
@@ -134,24 +134,24 @@ Parallel compilation was disabled, but you have multiple processors available. E
 +----------------------+----------------------+
 ; Resource             ; Usage                ;
 +----------------------+----------------------+
-; Logic cells          ; 3                    ;
+; Logic cells          ; 1                    ;
 ; Total registers      ; 0                    ;
-; I/O pins             ; 9                    ;
-; Maximum fan-out node ; xor8:inst11|53~0     ;
+; I/O pins             ; 4                    ;
+; Maximum fan-out node ; xor3:inst|1~0        ;
 ; Maximum fan-out      ; 1                    ;
-; Total fan-out        ; 11                   ;
-; Average fan-out      ; 0.92                 ;
+; Total fan-out        ; 4                    ;
+; Average fan-out      ; 0.80                 ;
 +----------------------+----------------------+
 
 
-+--------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Resource Utilization by Entity                                        ;
-+----------------------------+------------+------+----------------------------+--------------+
-; Compilation Hierarchy Node ; Macrocells ; Pins ; Full Hierarchy Name        ; Library Name ;
-+----------------------------+------------+------+----------------------------+--------------+
-; |gutiarEffects             ; 3          ; 9    ; |gutiarEffects             ; work         ;
-;    |xor8:inst11|           ; 3          ; 0    ; |gutiarEffects|xor8:inst11 ; work         ;
-+----------------------------+------------+------+----------------------------+--------------+
++------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                      ;
++----------------------------+------------+------+--------------------------+--------------+
+; Compilation Hierarchy Node ; Macrocells ; Pins ; Full Hierarchy Name      ; Library Name ;
++----------------------------+------------+------+--------------------------+--------------+
+; |gutiarEffects             ; 1          ; 4    ; |gutiarEffects           ; work         ;
+;    |xor3:inst|             ; 1          ; 0    ; |gutiarEffects|xor3:inst ; work         ;
++----------------------------+------------+------+--------------------------+--------------+
 
 
 +-------------------------------+
@@ -160,7 +160,7 @@ Parallel compilation was disabled, but you have multiple processors available. E
 Info: *******************************************************************
 Info: Running Quartus II Analysis & Synthesis
     Info: Version 9.1 Build 350 03/24/2010 Service Pack 2 SJ Web Edition
-    Info: Processing started: Fri Oct 31 23:45:24 2014
+    Info: Processing started: Wed Nov 05 20:42:52 2014
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off guitarEffects -c guitarEffects
 Info: Found 2 design units, including 1 entities, in source file debounce.vhd
     Info: Found design unit 1: debounce-logic
@@ -173,16 +173,16 @@ Info: Found 2 design units, including 1 entities, in source file clk_div.vhd
 Info: Found 1 design units, including 1 entities, in source file guitareffects_2.bdf
     Info: Found entity 1: guitarEffects_2
 Info: Elaborating entity "gutiarEffects" for the top level hierarchy
-Info: Elaborating entity "XOR8" for hierarchy "XOR8:inst11"
-Info: Elaborated megafunction instantiation "XOR8:inst11"
-Info: Implemented 12 device resources after synthesis - the final resource count might be different
-    Info: Implemented 8 input pins
+Info: Elaborating entity "XOR3" for hierarchy "XOR3:inst"
+Info: Elaborated megafunction instantiation "XOR3:inst"
+Info: Implemented 5 device resources after synthesis - the final resource count might be different
+    Info: Implemented 3 input pins
     Info: Implemented 1 output pins
-    Info: Implemented 3 macrocells
+    Info: Implemented 1 macrocells
 Info: Quartus II Analysis & Synthesis was successful. 0 errors, 0 warnings
     Info: Peak virtual memory: 231 megabytes
-    Info: Processing ended: Fri Oct 31 23:45:24 2014
-    Info: Elapsed time: 00:00:00
+    Info: Processing ended: Wed Nov 05 20:42:53 2014
+    Info: Elapsed time: 00:00:01
     Info: Total CPU time (on all processors): 00:00:01
 
 

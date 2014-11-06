@@ -10,6 +10,9 @@
 #include "DSP2833x_Mcbsp.h"
 #include "F28335_example.h"
 
+void getPot();
+int hungry = 0;
+
 /*********************************************************************************************************************************************************************
  * Effect variables/functions
  */
@@ -114,7 +117,7 @@ int load = 0, save = 0, presetNumber = 1;
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
 		//Initialize ADC
-			initAdc();
+			//initAdc();
 		//Initialize Effects
 			initEffects(&params);
 		//Initialize FFT
@@ -128,13 +131,20 @@ int load = 0, save = 0, presetNumber = 1;
 				adcVals[i] = 0;
 				mainDisplay[i] = -1;
 			}
+			//save to initialize eeprom, i have no idea why i have to do this
+			savePreset(15, location, on_off);
+			loadPreset(15, pipeline, list, location, on_off, &numQueued);
+			EALLOW;
 	while(1){
-		EALLOW;
+		//if(hungry >= 1000){
+		//	getPot();
+		//	hungry = 0;
+		//}
 		//Wait for signals
 		//Toggle LCD screen
 		if(toggle){
-			toggleLCD(effectToToggle,indexToToggle,on_off[indexToToggle], numQueued);
 			toggle = 0;
+			toggleLCD(effectToToggle,indexToToggle,on_off[indexToToggle], numQueued);
 		}
 		//Print lcd screen with signals generated from ISR
 		if(updateLcd){
@@ -164,9 +174,11 @@ int load = 0, save = 0, presetNumber = 1;
 
 interrupt void cpu_timer0_isr(void){
 	EALLOW;
+	hungry++;
 	//if(GpioDataRegs.GPADAT.bit.GPIO6 == 1)GpioDataRegs.GPADAT.bit.GPIO6 = 0;
 	//else GpioDataRegs.GPADAT.bit.GPIO6 = 1;
 	int sample = read_adc();	//Get sample from ADC
+	//int sample = AdcRegs.ADCRESULT2;// >> 4;
 	sample = process(sample,numQueued, on_off,&pipeline[0],&params);	//Process sample
 	write_dac(sample);			//write sample to DAC
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;	//Clear flag to accept more interrupts
@@ -191,7 +203,8 @@ interrupt void cpu_timer1_isr(void){
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
-interrupt void adc_isr(void){
+//interrupt void adc_isr(void){
+void getPot(){
 	/*Format for every if statement is the same, save for volume change because
 	because a signal needs to be sent to update volume registers on codec
 	Format:
@@ -208,8 +221,10 @@ interrupt void adc_isr(void){
 		-resetTimer resets the timer1 to start over counting down from 3 seconds.  This will cause a timeout signal
 		 to be sent to the LCD after 3 seconds of no change on any ADC channel.
 */
+	AdcRegs.ADCTRL2.all |= 0x2000;			// Start SEQ1
 	//TREMOLO
-	if(!preset){
+	if(sysStart) sysStart = 0;
+	else if(!preset){
 		if(abs(adcVals[0] - (AdcRegs.ADCRESULT0 >> 4)) > 0x00FF){
 			adcVals[0] = AdcRegs.ADCRESULT0 >> 4;
 			if(!tremoloChange|| currentChangeScreen != 1){
@@ -316,9 +331,7 @@ interrupt void adc_isr(void){
 	}
 		//Clear Flags
 		AdcRegs.ADCST.bit.INT_SEQ1_CLR = 1;       // Clear INT SEQ1 bit
-		PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;   // Acknowledge interrupt to PIE
 }
-
 //Preset Up
 interrupt void preset_up(void){
 	//If initial entry into preset, set up timer and flag
@@ -383,22 +396,22 @@ interrupt void save_preset(void){
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
 interrupt void effects(void){
-	DelayUs(DEBOUNCE);
-	int input = (GpioDataRegs.GPADAT.all & 0x000001E) >> 1;
+	DelayUs(1);
+	int input = (GpioDataRegs.GPADAT.all & 0x000000E) >> 1;
 	if(input){
-		if(input == 0x0008){
+		if(input == 0x0004){
 			updateLcd = 1;
 			clearPipeline();
 			updateCode = CLEAR;
 		}
 		//Switch to tuning function
-		else if(input == 0x0004){
+		/*else if(input == 0x0004){
 			/*tuner ^= 1;			//signal for timer0 to not sample out to SPI
 			updateLcd = 1;
 			updateCode = TUNER;
 			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
-			else updateTimer0(22.675f);		//FFT was toggled off, switch back to sample out to SPI*/
-		}
+			else updateTimer0(22.675f);		//FFT was toggled off, switch back to sample out to SPI
+		}*/
 
 		//Look to either queue effect or toggle state
 		else{

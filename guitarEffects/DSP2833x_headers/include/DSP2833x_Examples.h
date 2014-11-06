@@ -23,8 +23,8 @@ extern "C" {
 -----------------------------------------------------------------------------*/
 //#define DSP28_DIVSEL   0   // Enable /4 for SYSCLKOUT
 //#define DSP28_DIVSEL   1 // Enable /4 for SYSCKOUT
-//#define DSP28_DIVSEL     2 // Enable /2 for SYSCLKOUT
-#define DSP28_DIVSEL     3 // Enable /1 for SYSCLKOUT
+#define DSP28_DIVSEL     2 // Enable /2 for SYSCLKOUT
+//#define DSP28_DIVSEL     3 // Enable /1 for SYSCLKOUT
 
 #define DSP28_PLLCR   10
 //#define DSP28_PLLCR    9

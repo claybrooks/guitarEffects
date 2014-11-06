@@ -1,24 +1,14 @@
 |gutiarEffects
-xintrup <= XOR8:inst11.OUT
-GPIO_15 => XOR8:inst11.IN8
-GPIO_8 => XOR8:inst11.IN1
-GPIO_14 => XOR8:inst11.IN7
-GPIO_13 => XOR8:inst11.IN6
-GPIO_12 => XOR8:inst11.IN5
-GPIO_11 => XOR8:inst11.IN4
-GPIO_10 => XOR8:inst11.IN3
-GPIO_9 => XOR8:inst11.IN2
+xintrup <= XOR3:inst.OUT
+GPIO_10 => XOR3:inst.IN3
+GPIO_8 => XOR3:inst.IN1
+GPIO_9 => XOR3:inst.IN2
 
 
-|gutiarEffects|XOR8:inst11
-OUT <= 54.DB_MAX_OUTPUT_PORT_TYPE
-IN1 => 33.IN0
-IN2 => 33.IN1
-IN3 => 39.IN1
-IN4 => 48.IN0
-IN5 => 16.IN0
-IN6 => 16.IN1
-IN7 => 19.IN0
-IN8 => 19.IN1
+|gutiarEffects|XOR3:inst
+OUT <= 1.DB_MAX_OUTPUT_PORT_TYPE
+IN1 => 1.IN0
+IN2 => 3.IN0
+IN3 => 3.IN1
 
 

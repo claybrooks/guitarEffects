@@ -71,7 +71,7 @@ GPIO_8                       : 4         : input  : 3.3-V LVTTL       :         
 GPIO_9                       : 5         : input  : 3.3-V LVTTL       :         :           : Y              
 GPIO_10                      : 6         : input  : 3.3-V LVTTL       :         :           : Y              
 TDI                          : 7         : input  : 3.3-V LVTTL       :         :           : N              
-GPIO_11                      : 8         : input  : 3.3-V LVTTL       :         :           : Y              
+RESERVED                     : 8         :        :                   :         :           :                
 RESERVED                     : 9         :        :                   :         :           :                
 GND                          : 10        : gnd    :                   :         :           :                
 RESERVED                     : 11        :        :                   :         :           :                
@@ -81,10 +81,10 @@ RESERVED                     : 14        :        :                   :         
 VCCIO                        : 15        : power  :                   : 3.3V    :           :                
 xintrup                      : 16        : output : 3.3-V LVTTL       :         :           : Y              
 GND                          : 17        : gnd    :                   :         :           :                
-GPIO_12                      : 18        : input  : 3.3-V LVTTL       :         :           : Y              
-GPIO_13                      : 19        : input  : 3.3-V LVTTL       :         :           : Y              
-GPIO_14                      : 20        : input  : 3.3-V LVTTL       :         :           : Y              
-GPIO_15                      : 21        : input  : 3.3-V LVTTL       :         :           : Y              
+RESERVED                     : 18        :        :                   :         :           :                
+RESERVED                     : 19        :        :                   :         :           :                
+RESERVED                     : 20        :        :                   :         :           :                
+RESERVED                     : 21        :        :                   :         :           :                
 GND                          : 22        : gnd    :                   :         :           :                
 VCCINT                       : 23        : power  :                   : 3.3V    :           :                
 RESERVED                     : 24        :        :                   :         :           :                

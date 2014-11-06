@@ -9,12 +9,13 @@
 #include "effect.h"
 #include "math.h"
 #include "DSP28x_Project.h"
-
+#include "F28335_example.h"
 #define DELAYLCD 10000
 
 //Similar to queue system.  mainDisplay contains what could possibly be printed to screen.
 //mainDisplay_show holds whether or not it is printed to screen (on_off[]);
-int numInMainDisplay, tunerScreen, currentPreset, presetScreen;
+int numInMainDisplay, tunerScreen, currentPreset, presetScreen, reprint;
+
 
 #pragma CODE_SECTION(controlLCD, "secureRamFuncs")
 #pragma CODE_SECTION(printLCD, "secureRamFuncs")
@@ -84,18 +85,35 @@ void printChorus(){
 	printLCD(S+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
-void updateLevel(int level, int oldLevel){
-	//controlLCD(0x01);
-	controlLCD(HOME);//return home
-	int i;
-	for(i = 0; i < level; i++){
-		printLCD(BAR);
+void updateLevel(int newLevel, int oldLevel){
+	int i = 0;
+	//decreasing
+	if(oldLevel >= newLevel){
+		//Shift cursor to level, print spaces to oldLevel
+		if(reprint){
+			controlLCD(HOME);
+			for(i = 0; i < oldLevel; i++)printLCD(BAR);
+			reprint = 0;
+		}
+		int cursorShift = 0x80 | (newLevel);
+		controlLCD(cursorShift);
+		for(i = newLevel; i <= oldLevel; i++){
+			printLCD(SPACE);
+		}
 	}
-
-	for(i = level; i < 16; i++){
-		printLCD(SPACE);
+	//increasing
+	else{
+		if(reprint){
+			oldLevel = 0;
+			reprint = 0;
+		}
+		//Shift cursor to oldlevel, print bars to level
+		int cursorShift = 0x80 | (oldLevel);
+		controlLCD(cursorShift);
+		for(i = oldLevel; i < newLevel; i++){
+			printLCD(BAR);
+		}
 	}
-
 }
 
 //Eventually parses code and tells the printLCD() what to print
@@ -188,9 +206,11 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 	}
 	else if(*update == CHANGETREMOLO){
 		printTremolo();
+		reprint = 1;
 	}
 	else if(*update == CHANGEREVERB){
 		printReverb();
+		reprint = 1;
 	}
 	else if(*update == CHANGECHORUS){
 		printChorus();
@@ -385,7 +405,7 @@ void initLCD(){
 	//Write 0C, D = 1 for display on, C = 0 for cursor off, B = 0 for blinking off
 	controlLCD(0x0C);
 	//Write 01 to clear display
-	controlLCD(0x01);
+	controlLCD(CL);
 	//Entry mode set for inc and no shift
 	controlLCD(0x06);
 }
@@ -394,17 +414,19 @@ void controlLCD(int data){
 	GpioDataRegs.GPADAT.bit.GPIO21 = 0;
 	GpioDataRegs.GPADAT.all = data << 8;
 	GpioDataRegs.GPADAT.bit.GPIO25 = 1;
-	wait(DELAYLCD);
+	DelayUs(15);
 	GpioDataRegs.GPADAT.bit.GPIO25 = 0;
-	wait(DELAYLCD);
-
+	DelayUs(37);
+	if(data == CL || data == HOME){
+		DelayUs(1483);
+	}
 }
 
 void printLCD(int data){
 	GpioDataRegs.GPADAT.bit.GPIO21 = 1;
 	GpioDataRegs.GPADAT.all = data << 8;
 	GpioDataRegs.GPADAT.bit.GPIO25 = 1;
-	wait(DELAYLCD);
+	DelayUs(15);
 	GpioDataRegs.GPADAT.bit.GPIO25 = 0;
-	wait(DELAYLCD);
+	DelayUs(48);
 }

@@ -13,7 +13,7 @@ ptn_Child1=ViewFrame-0
 DocPathName=gutiarEffects.bdf
 DocumentCLSID={7b19e8f2-2bbe-11d1-a082-0020affa5bde}
 IsChildFrameDetached=False
-IsActiveChildFrame=True
+IsActiveChildFrame=False
 ptn_Child1=StateMap
 [ProjectWorkspace.Frames.ChildFrames.Document-1]
 ptn_Child1=ViewFrame-0
@@ -21,5 +21,17 @@ ptn_Child1=ViewFrame-0
 DocPathName=guitarEffects_2.bdf
 DocumentCLSID={7b19e8f2-2bbe-11d1-a082-0020affa5bde}
 IsChildFrameDetached=False
+IsActiveChildFrame=True
+ptn_Child1=StateMap
+[ProjectWorkspace.Frames.ChildFrames.Document-3]
+ptn_Child1=ViewFrame-0
+[ProjectWorkspace.Frames.ChildFrames.Document-3.ViewFrame-0]
+DocPathName=../../../../altera/91sp2/quartus/bin/pin_planner.ppl
+DocumentCLSID={428be327-2a68-4a16-a2c9-0502a8811afc}
+IsChildFrameDetached=True
 IsActiveChildFrame=False
 ptn_Child1=StateMap
+[ProjectWorkspace.Frames.ChildFrames.Document-3.ViewFrame-0.StateMap]
+AFC_CMP_AP_NAME=guitarEffects
+AFC_PROJ_DB_PATH=E:/Documents/Clone/guitarEffects/Quartus/db/guitarEffects.quartus_db
+AFC_IN_REPORT=False

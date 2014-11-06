@@ -18,12 +18,12 @@ void initINTS(){
 	//InitPieVectTable();
 	EALLOW;
 	//Timer0
-			ConfigCpuTimer(&CpuTimer0, 150, 22.675f);
+			ConfigCpuTimer(&CpuTimer0,75,23);
 			PieVectTable.TINT0 = &cpu_timer0_isr;
 			CpuTimer0Regs.TCR.all = 0x4001;
 			PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 	//Timer1
-		ConfigCpuTimer(&CpuTimer1, 150, 3000000);
+		ConfigCpuTimer(&CpuTimer1, 75, 3000000);
 		PieVectTable.XINT13 = &cpu_timer1_isr;
 		//CpuTimer1Regs.TCR.all = 0x4001;
 		PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
@@ -82,8 +82,9 @@ void initINTS(){
 			XIntruptRegs.XINT5CR.bit.ENABLE = 1;        //Enable Xint1
 
 	//ADC
-		PieVectTable.ADCINT = &adc_isr;
-		PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
+		//PieVectTable.ADCINT = &adc_isr;
+		//PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
+
 		AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
 	//I2C
 		PieVectTable.I2CINT1A = &i2c_int1a_isr;

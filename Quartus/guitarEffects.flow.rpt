@@ -1,5 +1,5 @@
 Flow report for guitarEffects
-Fri Oct 31 23:45:27 2014
+Wed Nov 05 20:42:56 2014
 Quartus II Version 9.1 Build 350 03/24/2010 Service Pack 2 SJ Web Edition
 
 
@@ -38,7 +38,7 @@ applicable agreement for further details.
 +------------------------------------------------------------------------+
 ; Flow Summary                                                           ;
 +-------------------------+----------------------------------------------+
-; Flow Status             ; Successful - Fri Oct 31 23:45:27 2014        ;
+; Flow Status             ; Successful - Wed Nov 05 20:42:56 2014        ;
 ; Quartus II Version      ; 9.1 Build 350 03/24/2010 SP 2 SJ Web Edition ;
 ; Revision Name           ; guitarEffects                                ;
 ; Top-level Entity Name   ; gutiarEffects                                ;
@@ -46,8 +46,8 @@ applicable agreement for further details.
 ; Device                  ; EPM3064ALC44-10                              ;
 ; Timing Models           ; Final                                        ;
 ; Met timing requirements ; Yes                                          ;
-; Total macrocells        ; 3 / 64 ( 5 % )                               ;
-; Total pins              ; 13 / 34 ( 38 % )                             ;
+; Total macrocells        ; 1 / 64 ( 2 % )                               ;
+; Total pins              ; 8 / 34 ( 24 % )                              ;
 +-------------------------+----------------------------------------------+
 
 
@@ -56,7 +56,7 @@ applicable agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 10/31/2014 23:45:24 ;
+; Start date & time ; 11/05/2014 20:42:52 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; guitarEffects       ;
 +-------------------+---------------------+
@@ -67,7 +67,7 @@ applicable agreement for further details.
 +------------------------------------+------------------------------------------------------------+---------------+-------------+----------------+
 ; Assignment Name                    ; Value                                                      ; Default Value ; Entity Name ; Section Id     ;
 +------------------------------------+------------------------------------------------------------+---------------+-------------+----------------+
-; COMPILER_SIGNATURE_ID              ; 198414846281555.141481352402680                            ; --            ; --          ; --             ;
+; COMPILER_SIGNATURE_ID              ; 24062491136.141523817208504                                ; --            ; --          ; --             ;
 ; MAX_CORE_JUNCTION_TEMP             ; 85                                                         ; --            ; --          ; --             ;
 ; MIN_CORE_JUNCTION_TEMP             ; 0                                                          ; --            ; --          ; --             ;
 ; MISC_FILE                          ; E:/Documents/Clone/guitarEffects/Quartus/guitarEffects.dpf ; --            ; --          ; --             ;
@@ -81,11 +81,11 @@ applicable agreement for further details.
 +-------------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name             ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +-------------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis    ; 00:00:00     ; 1.0                     ; 231 MB              ; 00:00:01                           ;
+; Analysis & Synthesis    ; 00:00:01     ; 1.0                     ; 231 MB              ; 00:00:01                           ;
 ; Fitter                  ; 00:00:00     ; 1.0                     ; 182 MB              ; 00:00:00                           ;
-; Assembler               ; 00:00:00     ; 1.0                     ; 191 MB              ; 00:00:00                           ;
-; Classic Timing Analyzer ; 00:00:00     ; 1.0                     ; 161 MB              ; 00:00:00                           ;
-; Total                   ; 00:00:00     ; --                      ; --                  ; 00:00:01                           ;
+; Assembler               ; 00:00:01     ; 1.0                     ; 190 MB              ; 00:00:00                           ;
+; Classic Timing Analyzer ; 00:00:01     ; 1.0                     ; 161 MB              ; 00:00:00                           ;
+; Total                   ; 00:00:03     ; --                      ; --                  ; 00:00:01                           ;
 +-------------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
