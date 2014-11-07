@@ -83,14 +83,14 @@ int load = 0, save = 0, presetNumber = 1;
 
 #pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
 #pragma CODE_SECTION(cpu_timer1_isr, "secureRamFuncs")
-#pragma CODE_SECTION(adc_isr, "secureRamFuncs")
+#pragma CODE_SECTION(getPot, "secureRamFuncs")
 #pragma CODE_SECTION(preset_up, "secureRamFuncs")
 #pragma CODE_SECTION(preset_down, "secureRamFuncs")
 #pragma CODE_SECTION(load_preset, "secureRamFuncs")
 #pragma CODE_SECTION(save_preset, "secureRamFuncs")
 #pragma CODE_SECTION(effects, "secureRamFuncs")
 
- int main(){
+A int main(){
 	InitSysCtrl();
 
 	memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
@@ -104,20 +104,18 @@ int load = 0, save = 0, presetNumber = 1;
 	    EALLOW;
 
 	    //GPIO for muxing
-	    //GpioCtrlRegs.GPAMUX1.bit.GPIO0 = 0;
-	    //GpioCtrlRegs.GPADIR.bit.GPIO6 = 1;
 
 		//Initialize I2C
 			InitI2CGpio();
 			I2CA_Init();
-		//I/nitialize ADC/DAC
+		//Initialize ADC/DAC
 			init_mcbsp_spi();
 			mcbsp_xmit(0x38000100);
 			GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
 		//Initialize ADC
-			//initAdc();
+			initAdc();
 		//Initialize Effects
 			initEffects(&params);
 		//Initialize FFT
@@ -174,13 +172,16 @@ int load = 0, save = 0, presetNumber = 1;
 
 interrupt void cpu_timer0_isr(void){
 	EALLOW;
-	hungry++;
+	//hungry++;
 	//if(GpioDataRegs.GPADAT.bit.GPIO6 == 1)GpioDataRegs.GPADAT.bit.GPIO6 = 0;
 	//else GpioDataRegs.GPADAT.bit.GPIO6 = 1;
+	//GpioDataRegs.GPADAT.bit.GPIO20 = 1;
+	//GpioDataRegs.GPATOGGLE.bit.GPIO22 = 1;
 	int sample = read_adc();	//Get sample from ADC
 	//int sample = AdcRegs.ADCRESULT2;// >> 4;
 	sample = process(sample,numQueued, on_off,&pipeline[0],&params);	//Process sample
 	write_dac(sample);			//write sample to DAC
+	//GpioDataRegs.GPADAT.bit.GPIO20 = 0;
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;	//Clear flag to accept more interrupts
 }
 
@@ -221,10 +222,11 @@ void getPot(){
 		-resetTimer resets the timer1 to start over counting down from 3 seconds.  This will cause a timeout signal
 		 to be sent to the LCD after 3 seconds of no change on any ADC channel.
 */
+	//AdcRegs.ADCST.bit.INT_SEQ1_CLR = 1;       // Clear INT SEQ1 bit
 	AdcRegs.ADCTRL2.all |= 0x2000;			// Start SEQ1
 	//TREMOLO
-	if(sysStart) sysStart = 0;
-	else if(!preset){
+
+	if(!preset){
 		if(abs(adcVals[0] - (AdcRegs.ADCRESULT0 >> 4)) > 0x00FF){
 			adcVals[0] = AdcRegs.ADCRESULT0 >> 4;
 			if(!tremoloChange|| currentChangeScreen != 1){
@@ -256,7 +258,7 @@ void getPot(){
 			reverbLevel = temp;
 			resetTimer = 1;
 		}
-		//VOLUME
+		/*//VOLUME
 		else if(abs(adcVals[2] - (AdcRegs.ADCRESULT2 >> 4)) > 0x00FF){
 			adcVals[2] = AdcRegs.ADCRESULT2 >> 4;
 			if(!volumeChange || currentChangeScreen != 3){
@@ -322,15 +324,13 @@ void getPot(){
 				resetTimer = 1;
 		}
 
-
+*/
 		if(resetTimer){
 			CpuTimer1Regs.TCR.all = 0x4001;
 			CpuTimer1Regs.TCR.bit.TRB = 1;
 			resetTimer = 0;
 		}
 	}
-		//Clear Flags
-		AdcRegs.ADCST.bit.INT_SEQ1_CLR = 1;       // Clear INT SEQ1 bit
 }
 //Preset Up
 interrupt void preset_up(void){
@@ -399,11 +399,11 @@ interrupt void effects(void){
 	DelayUs(1);
 	int input = (GpioDataRegs.GPADAT.all & 0x000000E) >> 1;
 	if(input){
-		if(input == 0x0004){
+		/*if(input == 0x0004){
 			updateLcd = 1;
 			clearPipeline();
 			updateCode = CLEAR;
-		}
+		}*/
 		//Switch to tuning function
 		/*else if(input == 0x0004){
 			/*tuner ^= 1;			//signal for timer0 to not sample out to SPI
@@ -414,7 +414,7 @@ interrupt void effects(void){
 		}*/
 
 		//Look to either queue effect or toggle state
-		else{
+		//else{
 			toggle = 1;
 			//Simple lookup vs mathematical computation gets the effect to be manipulated
 			int effect = indexLookup(input);
@@ -434,7 +434,7 @@ interrupt void effects(void){
 				}
 			}
 			effectToToggle = effect;
-		}
+		//}
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }

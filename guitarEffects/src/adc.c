@@ -4,7 +4,7 @@
 void initAdc(void)
 {
 	EALLOW;
-	SysCtrlRegs.HISPCP.all = 0xF;	// HSPCLK = SYSCLKOUT/ADC_MODCLK
+	SysCtrlRegs.HISPCP.all = 0x1;	// HSPCLK = SYSCLKOUT/ADC_MODCLK
 	EDIS;
 
 	InitAdc();
@@ -12,9 +12,9 @@ void initAdc(void)
 
 
 	// Specific ADC setup for this example:
-	AdcRegs.ADCTRL1.bit.ACQ_PS = 0xF;
-	AdcRegs.ADCTRL3.bit.ADCCLKPS = 0xF;
-	AdcRegs.ADCTRL1.bit.CPS = 1;
+	AdcRegs.ADCTRL1.bit.ACQ_PS = 0x1;
+	AdcRegs.ADCTRL3.bit.ADCCLKPS = 0x1;
+	AdcRegs.ADCTRL1.bit.CPS = 0;
 	AdcRegs.ADCTRL1.bit.SEQ_CASC = 1;		// 1  Cascaded mode
 	AdcRegs.ADCMAXCONV.all = 0x0001; 		//Number of conversions, hex + 1;
 
@@ -29,7 +29,7 @@ void initAdc(void)
 
 
 
-	AdcRegs.ADCTRL1.bit.CONT_RUN = 0;       // Setup continuous run
+	AdcRegs.ADCTRL1.bit.CONT_RUN = 1;       // Setup continuous run
 	AdcRegs.ADCTRL2.all |= 0x2000;			// Start SEQ1
 }
 

@@ -22,12 +22,11 @@ void write_dac(int sample){
 int read_adc(){
 	GpioDataRegs.GPADAT.bit.GPIO19 = 1;
 	//while(SpiaRegs.SPISTS.bit.INT_FLAG !=1) { }
-	DelayUs(3);
+	DelayUs(1.3);
 	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
 	//DELAY_US(.2);
 	SpiaRegs.SPITXBUF = 0xFFFF;
-	int sample = SpiaRegs.SPIRXBUF;
-	return sample;
+	return SpiaRegs.SPIRXBUF;
 }
 
 void init_adc_spi(){
@@ -67,7 +66,7 @@ void init_mcbsp_spi()
     McbspbRegs.XCR1.bit.XWDLEN1=4;       // 24-bit word
 
     McbspbRegs.SRGR2.all=0x2000; 	 	 // CLKSM=1, FPER = 1 CLKG periods
-    McbspbRegs.SRGR1.all= 0x0063;	     // Frame Width = 1 CLKG period, CLKGDV=99 baud rate = 3.75 MHz/(99+1)= 375 kHz
+    McbspbRegs.SRGR1.all= 0x004;	     // Frame Width = 1 CLKG period, CLKGDV=99 baud rate = 3.75 MHz/(99+1)= 375 kHz
     delay_loop();                        // Wait at least 2 SRG clock cycles
 	McbspbRegs.SPCR2.bit.GRST=1;         // Enable the sample rate generator
     clkg_delay_loop();                   // Wait at least 2 CLKG cycles

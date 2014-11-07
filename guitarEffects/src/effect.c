@@ -77,22 +77,29 @@ int processDistortion(int sample, struct params* p){
 	long temp = sample;
 	Uint32 command = 0x19000000 | (temp<<8);
 	mcbsp_xmit(command);
-	DelayUs(3);
-	return (sample);
+	DelayUs(.5);
+	sample = read_adc();
+	return sample;
 }
 int processCrunch(int sample, struct params* p){
 	//Spit out sample to analog Distortion circuit on DAC B.  Will need a GPIO to select where the signal goes from the analog switch
 	long temp = sample;
 	Uint32 command = 0x19000000 | (temp<<8);
 	mcbsp_xmit(command);
-	DelayUs(3);
-	return (sample);
+	DelayUs(.5);
+	sample = read_adc();
+	return sample;
 }
 int processTremolo(int sample, struct params* p){
 	//Sets rate at which the effect runs
-		double max = 0x0FFF;
-		double pedal = AdcRegs.ADCRESULT0>>4;
-		p->tremoloLimit = (double)1000*(pedal/max)+ 1000;
+		int pedal = AdcRegs.ADCRESULT0>>4;
+		//int temp1 = p->tremoloLimit;
+		p->tremoloLimit = (double)1000*(pedal/0xFFF)+ 1000;
+		//temp1 = pedal>>12;
+		//temp1 <<= 12;
+		//temp1 = pedal + 4000;
+		//temp1 += 4000;
+		p->tremoloLimit = pedal + 4000;
 
 		//Count up or down, if it hits upper limit then count up else count down
 		if(p->tremoloCounter >= p->tremoloLimit) p->tremoloCount = -1;
@@ -101,8 +108,10 @@ int processTremolo(int sample, struct params* p){
 
 		//Calculate new tremolo sample
 		double temp = (double)p->tremoloCounter*.7/(double)p->tremoloLimit;//*(double)sample;
+		//double temp = temp1>>1;
+		//temp /= p->tremoloLimit;
 
-		return (int)(temp*(double)sample);
+		return temp*(double)sample;
 }
 int processWah(int sample, struct params* p){
 	return AutoWah_process(sample);
