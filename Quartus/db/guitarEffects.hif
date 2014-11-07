@@ -6233,6 +6233,9 @@ db|guitarEffects.(49).cnf
 BLOCK_DESIGN_NAMING
 AUTO
 }
+# hierarchies {
+xor4:inst
+}
 # macro_sequence
 
 # end
@@ -7221,26 +7224,6 @@ a36c8ec425c8a2589af98b2d4daabc3
 
 # end
 # entity
-gutiarEffects
-# storage
-db|guitarEffects.(37).cnf
-db|guitarEffects.(37).cnf
-# case_insensitive
-# source_file
-gutiareffects.bdf
-b6f93f2146495822c13d9436156a6732
-26
-# internal_option {
-BLOCK_DESIGN_NAMING
-AUTO
-}
-# hierarchies {
-|
-}
-# macro_sequence
-
-# end
-# entity
 XOR3
 # storage
 db|guitarEffects.(64).cnf
@@ -7254,8 +7237,25 @@ e4431ff48639c2a79904a4f46f37ca8
 BLOCK_DESIGN_NAMING
 AUTO
 }
+# macro_sequence
+
+# end
+# entity
+gutiarEffects
+# storage
+db|guitarEffects.(37).cnf
+db|guitarEffects.(37).cnf
+# case_insensitive
+# source_file
+gutiareffects.bdf
+4cc27f1b5ca3f9d457d49eca307a6767
+26
+# internal_option {
+BLOCK_DESIGN_NAMING
+AUTO
+}
 # hierarchies {
-xor3:inst
+|
 }
 # macro_sequence
 

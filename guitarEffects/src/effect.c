@@ -54,7 +54,12 @@ void initEffects(struct params* params){
 	params->tremoloLimit = 0;
 	params->reverbCount = 0;
 	params->reverbStart = 0;
-
+	params->flangeLimit = 20000;
+	params->flangeCounter = 0;
+	params->flangeCount = 0;
+	params->flangeStart = 0;
+	params->flangeInit = 0;
+	params->flangeSweep = 0;
 }
 
 int process(int sample, int numQueued, int* on_off, FUNC**pipeline, struct params* params){
@@ -94,12 +99,12 @@ int processTremolo(int sample, struct params* p){
 	//Sets rate at which the effect runs
 		int pedal = AdcRegs.ADCRESULT0>>4;
 		//int temp1 = p->tremoloLimit;
-		p->tremoloLimit = (double)1000*(pedal/0xFFF)+ 1000;
+		p->tremoloLimit = (double)3000*((float)pedal/(float)0xFFF)+ 1000;
 		//temp1 = pedal>>12;
 		//temp1 <<= 12;
 		//temp1 = pedal + 4000;
 		//temp1 += 4000;
-		p->tremoloLimit = pedal + 4000;
+		//p->tremoloLimit = pedal + 4000;
 
 		//Count up or down, if it hits upper limit then count up else count down
 		if(p->tremoloCounter >= p->tremoloLimit) p->tremoloCount = -1;
@@ -120,7 +125,31 @@ int processPhaser(int sample, struct params* p){
 	return sample;
 }
 int processFlange(int sample, struct params* p){
-	return sample;
+	//Process sweep
+
+	if(p->flangeInit == 800 && p->flangeStart == 0){
+		p->flangeStart = 1;
+	}
+			double decay = 0x7FF;
+			decay = ((double)decay / (double)0xFFF)*.45 + .15;
+			//Once reinitialized, start to process reverb
+			if(p->flangeStart){
+					if(p->flangeCounter >= p->flangeLimit) p->flangeCount = -1;
+					else if(p->flangeCounter == 0) p->flangeCount = 1;
+					p->flangeCounter+=p->flangeCount;
+					p->flangeSweep = sin((float)p->flangeCounter/(float)p->flangeLimit) * 800;
+
+				int temp = p->flangeDelay[p->flangeSweep];
+				sample += p->flangeDelay[p->flangeSweep];
+				p->flangeDelay[p->flangeSweep] = (double)sample*decay + (double)temp*(decay-.08);
+			}
+			else{
+				p->flangeDelay[p->flangeInit] = (double)sample*decay;
+				p->flangeInit = p->flangeInit + 1;
+			}
+
+			p->flangeCount++;
+			return sample;
 }
 int processReverb(int sample, struct params* p){
 	//Reinitialize the reverb array on every start
@@ -129,8 +158,8 @@ int processReverb(int sample, struct params* p){
 			p->reverbStart = 1;
 			p->reverbCount = 0;
 		}
-		double decay = AdcRegs.ADCRESULT1 >> 4;
-		decay = ((double)decay / (double)0xFFF)*.5 + .15;
+		double decay = 0x7FF;
+		decay = ((double)decay / (double)0xFFF)*.45 + .15;
 		//Once reinitialized, start to process reverb
 		if(p->reverbStart){
 			int temp = p->reverbDelay[p->reverbCount];

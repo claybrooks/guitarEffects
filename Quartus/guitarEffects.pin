@@ -71,7 +71,7 @@ GPIO_8                       : 4         : input  : 3.3-V LVTTL       :         
 GPIO_9                       : 5         : input  : 3.3-V LVTTL       :         :           : Y              
 GPIO_10                      : 6         : input  : 3.3-V LVTTL       :         :           : Y              
 TDI                          : 7         : input  : 3.3-V LVTTL       :         :           : N              
-RESERVED                     : 8         :        :                   :         :           :                
+GPIO_7                       : 8         : input  : 3.3-V LVTTL       :         :           : Y              
 RESERVED                     : 9         :        :                   :         :           :                
 GND                          : 10        : gnd    :                   :         :           :                
 RESERVED                     : 11        :        :                   :         :           :                

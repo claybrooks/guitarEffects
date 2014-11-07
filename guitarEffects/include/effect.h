@@ -13,6 +13,7 @@
 struct params{
 	int tremoloCounter, tremoloRate, tremoloCount, tremoloLimit;
 		int reverbDelay[800], reverbCount, reverbStart; //15 ms delay length at 44.1 kHz
+		int flangeDelay[800], flangeCount, flangeCounter, flangeLimit, flangeStart, flangeInit, flangeSweep; //15 ms delay length at 44.1
 };
 
 typedef int FUNC(int, struct params*);

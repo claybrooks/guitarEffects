@@ -54,4 +54,4 @@ set_location_assignment PIN_4 -to GPIO_8
 set_location_assignment PIN_5 -to GPIO_9
 set_location_assignment PIN_6 -to GPIO_10
 set_location_assignment PIN_16 -to xintrup
-set_global_assignment -name BDF_FILE guitarEffects_2.bdf
+set_location_assignment PIN_8 -to GPIO_7

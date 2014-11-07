@@ -10,11 +10,11 @@
 
 #define TREMOLO			0
 #define REVERB	 		1
-#define CRUNCH 			2
+#define FLANGE 			2
 #define DELAY	 		3
 #define WAH 			4
 #define DISTORTION		5
-#define FLANGE 			6
+#define CRUNCH 			6
 #define PHASER 			7
 #define CHORUS 			8
 #define PITCHSHIFT 		9

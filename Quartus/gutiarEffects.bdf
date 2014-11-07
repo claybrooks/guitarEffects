@@ -69,6 +69,22 @@ applicable agreement for further details.
 	(text "VCC" (rect 136 7 156 17)(font "Arial" (font_size 6)))
 )
 (pin
+	(input)
+	(rect 608 352 776 368)
+	(text "INPUT" (rect 133 0 161 10)(font "Arial" (font_size 6)))
+	(text "GPIO_7" (rect 5 0 43 12)(font "Arial" ))
+	(pt 168 8)
+	(drawing
+		(line (pt 92 12)(pt 117 12)(line_width 1))
+		(line (pt 92 4)(pt 117 4)(line_width 1))
+		(line (pt 121 8)(pt 168 8)(line_width 1))
+		(line (pt 92 12)(pt 92 4)(line_width 1))
+		(line (pt 117 4)(pt 121 8)(line_width 1))
+		(line (pt 117 12)(pt 121 8)(line_width 1))
+	)
+	(text "VCC" (rect 136 7 156 17)(font "Arial" (font_size 6)))
+)
+(pin
 	(output)
 	(rect 968 384 1144 400)
 	(text "OUTPUT" (rect 1 0 39 10)(font "Arial" (font_size 6)))
@@ -85,9 +101,9 @@ applicable agreement for further details.
 	)
 )
 (symbol
-	(rect 840 352 944 432)
-	(text "XOR3" (rect 34 -1 71 15)(font "Courier New" (font_size 10)(bold)))
-	(text "inst" (rect 3 69 17 79)(font "Arial" (font_size 6)))
+	(rect 840 336 944 432)
+	(text "XOR4" (rect 34 -1 71 15)(font "Courier New" (font_size 10)(bold)))
+	(text "inst" (rect 3 85 17 95)(font "Arial" (font_size 6)))
 	(port
 		(pt 0 56)
 		(input)
@@ -96,11 +112,11 @@ applicable agreement for further details.
 		(line (pt 0 56)(pt 16 56)(line_width 1))
 	)
 	(port
-		(pt 0 24)
+		(pt 0 72)
 		(input)
-		(text "IN1" (rect 20 20 37 32)(font "Courier New" (bold)))
-		(text "IN1" (rect 20 20 37 32)(font "Courier New" (bold)))
-		(line (pt 0 24)(pt 16 24)(line_width 1))
+		(text "IN4" (rect 20 68 37 80)(font "Courier New" (bold)))
+		(text "IN4" (rect 20 68 37 80)(font "Courier New" (bold)))
+		(line (pt 0 72)(pt 16 72)(line_width 1))
 	)
 	(port
 		(pt 0 40)
@@ -110,17 +126,24 @@ applicable agreement for further details.
 		(line (pt 0 40)(pt 16 40)(line_width 1))
 	)
 	(port
-		(pt 104 40)
+		(pt 0 24)
+		(input)
+		(text "IN1" (rect 20 20 37 32)(font "Courier New" (bold)))
+		(text "IN1" (rect 20 20 37 32)(font "Courier New" (bold)))
+		(line (pt 0 24)(pt 16 24)(line_width 1))
+	)
+	(port
+		(pt 104 56)
 		(output)
-		(text "OUT" (rect 71 36 88 48)(font "Courier New" (bold)))
-		(text "OUT" (rect 71 36 88 48)(font "Courier New" (bold)))
-		(line (pt 88 40)(pt 104 40)(line_width 1))
+		(text "OUT" (rect 71 52 88 64)(font "Courier New" (bold)))
+		(text "OUT" (rect 71 52 88 64)(font "Courier New" (bold)))
+		(line (pt 88 56)(pt 104 56)(line_width 1))
 	)
 	(drawing
-		(line (pt 16 64)(pt 88 64)(line_width 1))
+		(line (pt 16 80)(pt 88 80)(line_width 1))
 		(line (pt 16 16)(pt 88 16)(line_width 1))
-		(line (pt 16 64)(pt 16 16)(line_width 1))
-		(line (pt 88 64)(pt 88 16)(line_width 1))
+		(line (pt 16 80)(pt 16 16)(line_width 1))
+		(line (pt 88 80)(pt 88 16)(line_width 1))
 	)
 )
 (connector
@@ -138,4 +161,8 @@ applicable agreement for further details.
 (connector
 	(pt 840 408)
 	(pt 776 408)
+)
+(connector
+	(pt 840 360)
+	(pt 776 360)
 )

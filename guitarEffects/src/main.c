@@ -9,10 +9,12 @@
 #include "eeprom.h"
 #include "DSP2833x_Mcbsp.h"
 #include "F28335_example.h"
-
-void getPot();
-int hungry = 0;
-
+void read_encoder();
+int enc_states[] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0};
+Uint16 enc_position = 0;
+int enc_value = 0;
+Uint16 old_enc_value = 0;
+Uint16 my_enc_val = 0;
 /*********************************************************************************************************************************************************************
  * Effect variables/functions
  */
@@ -25,10 +27,10 @@ int indexLookup(int);
 static struct params params;
 
 //Create FUNC variables
-FUNC processTremolo,processReverb,processCrunch,processDelay,processWah,processPhaser,processFlange,processReverb,processChorus,processPitchShift;
+FUNC processTremolo,processReverb,processFlange,processDelay,processWah,processPhaser,processCrunch,processReverb,processChorus,processPitchShift;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[10] = {processTremolo,processReverb,processDistortion,processCrunch,processDelay,processReverb,processPhaser,processFlange,processChorus,processPitchShift};
+FUNC *list[10] = {processTremolo,processReverb,processFlange,processCrunch,processDelay,processReverb,processPhaser,processCrunch,processChorus,processPitchShift};
 
 /*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
@@ -90,7 +92,8 @@ int load = 0, save = 0, presetNumber = 1;
 #pragma CODE_SECTION(save_preset, "secureRamFuncs")
 #pragma CODE_SECTION(effects, "secureRamFuncs")
 
-A int main(){
+
+int main(){
 	InitSysCtrl();
 
 	memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
@@ -133,6 +136,10 @@ A int main(){
 			savePreset(15, location, on_off);
 			loadPreset(15, pipeline, list, location, on_off, &numQueued);
 			EALLOW;
+
+			GpioCtrlRegs.GPAPUD.bit.GPIO20 = 0;
+			GpioCtrlRegs.GPAPUD.bit.GPIO22 = 0;
+			GpioCtrlRegs.GPAPUD.bit.GPIO23 = 0;
 	while(1){
 		//if(hungry >= 1000){
 		//	getPot();
@@ -170,18 +177,37 @@ A int main(){
 	}
 }
 
+void read_encoder()
+{
+	int temp20 = GpioDataRegs.GPADAT.bit.GPIO20;
+	int temp22 = GpioDataRegs.GPADAT.bit.GPIO22;
+	temp22<<=1;
+	int temp =temp22|temp20;
+	enc_position <<= 2;                       //remember previous state by                                                                              // shifting the lower bits up 2
+	enc_position |= ( temp );     // AND the lower 2 bits of                                                                                //port b, then OR them with var                                                                          //old_AB to set new value
+	enc_value += enc_states[enc_position];     // the lower 4 bits of old_AB & 16 are then
+	// the index for enc_states
+
+	if ( enc_value == old_enc_value ) {
+	return;
+	}
+	if( enc_value <= 0 ) {
+	enc_value = 0;
+	}
+
+	if( enc_value >= 4000 ) {               // Arbitrary max value for testing purposes
+	enc_value = 400;
+	}
+	my_enc_val = enc_value;                 // This is the value you will pass to
+	//whatever needs the encoder data - change as required
+	old_enc_value = enc_value;
+}
+
+
 interrupt void cpu_timer0_isr(void){
-	EALLOW;
-	//hungry++;
-	//if(GpioDataRegs.GPADAT.bit.GPIO6 == 1)GpioDataRegs.GPADAT.bit.GPIO6 = 0;
-	//else GpioDataRegs.GPADAT.bit.GPIO6 = 1;
-	//GpioDataRegs.GPADAT.bit.GPIO20 = 1;
-	//GpioDataRegs.GPATOGGLE.bit.GPIO22 = 1;
 	int sample = read_adc();	//Get sample from ADC
-	//int sample = AdcRegs.ADCRESULT2;// >> 4;
 	sample = process(sample,numQueued, on_off,&pipeline[0],&params);	//Process sample
 	write_dac(sample);			//write sample to DAC
-	//GpioDataRegs.GPADAT.bit.GPIO20 = 0;
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;	//Clear flag to accept more interrupts
 }
 
@@ -397,13 +423,13 @@ interrupt void save_preset(void){
 }
 interrupt void effects(void){
 	DelayUs(1);
-	int input = (GpioDataRegs.GPADAT.all & 0x000000E) >> 1;
+	int input = (GpioDataRegs.GPADAT.all & 0x000000F);
 	if(input){
-		/*if(input == 0x0004){
+		if(input == 0x0008){
 			updateLcd = 1;
 			clearPipeline();
 			updateCode = CLEAR;
-		}*/
+		}
 		//Switch to tuning function
 		/*else if(input == 0x0004){
 			/*tuner ^= 1;			//signal for timer0 to not sample out to SPI
@@ -414,7 +440,7 @@ interrupt void effects(void){
 		}*/
 
 		//Look to either queue effect or toggle state
-		//else{
+		else{
 			toggle = 1;
 			//Simple lookup vs mathematical computation gets the effect to be manipulated
 			int effect = indexLookup(input);
@@ -434,7 +460,7 @@ interrupt void effects(void){
 				}
 			}
 			effectToToggle = effect;
-		//}
+		}
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
