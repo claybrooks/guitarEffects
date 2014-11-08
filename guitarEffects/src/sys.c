@@ -18,7 +18,7 @@ void initINTS(){
 	//InitPieVectTable();
 	EALLOW;
 	//Timer0
-			ConfigCpuTimer(&CpuTimer0,150,23);
+			ConfigCpuTimer(&CpuTimer0,75,44);
 			PieVectTable.TINT0 = &cpu_timer0_isr;
 			CpuTimer0Regs.TCR.all = 0x4001;
 			PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
@@ -104,6 +104,6 @@ void initINTS(){
 
 
 void updateTimer0(float time){
-	ConfigCpuTimer(&CpuTimer0, 150, time);
+	ConfigCpuTimer(&CpuTimer0, 75, time);
 	CpuTimer0Regs.TCR.bit.TSS = 0;      // 1 = Stop timer, 0 = Start/Restart Timer
 }

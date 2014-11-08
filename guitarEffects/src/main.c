@@ -52,8 +52,8 @@ int	toggleEffectOnDisplay(int);	//Sticks effect into queue
 //LCD Display Queue
 int mainDisplay[10];
 int toggle = 0, effectToToggle = 0, indexToToggle = 0;
-int tuner = 0, preset = 0, currentChangeScreen = 0, resetTimer = 0, sysStart = 1;
-int updateLcd = 0, updateCode = 0, updateChange, newLevel = 0, oldLevel = 0;
+int tuner = 0, preset = 0, currentChangeScreen = 0, resetTimer = 0, sysStart = 1, freq = 0;
+int updateLcd = 0, updateCode = 0, updateChange, newLevel = 0, oldLevel = 0, updateFrequency = 0;
 /********************************************************************************************************************************************************************/
 
 /*********************************************************************************************************************************************************************
@@ -81,6 +81,8 @@ int adcVals[10];
 int load = 0, save = 0, presetNumber = 1;
 /********************************************************************************************************************************************************************/
 
+int sampleCount = 0;
+
 #define DEBOUNCE 50000
 
 #pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
@@ -91,6 +93,7 @@ int load = 0, save = 0, presetNumber = 1;
 #pragma CODE_SECTION(load_preset, "secureRamFuncs")
 #pragma CODE_SECTION(save_preset, "secureRamFuncs")
 #pragma CODE_SECTION(effects, "secureRamFuncs")
+
 
 
 int main(){
@@ -118,11 +121,11 @@ int main(){
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
 		//Initialize ADC
-			initAdc();
+			//initAdc();
 		//Initialize Effects
 			initEffects(&params);
 		//Initialize FFT
-			//initFFT();
+			initFFT();
 		//Initialize LCD
 			initLCD();
 		//Initialize Interrupts
@@ -140,6 +143,7 @@ int main(){
 			GpioCtrlRegs.GPAPUD.bit.GPIO20 = 0;
 			GpioCtrlRegs.GPAPUD.bit.GPIO22 = 0;
 			GpioCtrlRegs.GPAPUD.bit.GPIO23 = 0;
+
 	while(1){
 		//if(hungry >= 1000){
 		//	getPot();
@@ -174,6 +178,10 @@ int main(){
 			savePreset(presetNumber, location, on_off);
 			save = 0;
 		}
+		if(updateFrequency){
+			printFreq(freq);
+			updateFrequency = 0;
+		}
 	}
 }
 
@@ -206,8 +214,17 @@ void read_encoder()
 
 interrupt void cpu_timer0_isr(void){
 	int sample = read_adc();	//Get sample from ADC
+	if(tuner){// && sampleCount == 23){
+		if(storeFFT(sample>>4)){
+			freq = findFrequency();
+			updateFrequency = 1;
+		}
+	}
+	//else sampleCount++;
+	else{
 	sample = process(sample,numQueued, on_off,&pipeline[0],&params);	//Process sample
 	write_dac(sample);			//write sample to DAC
+	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;	//Clear flag to accept more interrupts
 }
 
@@ -431,13 +448,13 @@ interrupt void effects(void){
 			updateCode = CLEAR;
 		}
 		//Switch to tuning function
-		/*else if(input == 0x0004){
-			/*tuner ^= 1;			//signal for timer0 to not sample out to SPI
+		else if(input == 0x0004){
+			tuner ^= 1;			//signal for timer0 to not sample out to SPI
 			updateLcd = 1;
 			updateCode = TUNER;
 			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
-			else updateTimer0(22.675f);		//FFT was toggled off, switch back to sample out to SPI
-		}*/
+			else updateTimer0(44);		//FFT was toggled off, switch back to sample out to SPI
+		}
 
 		//Look to either queue effect or toggle state
 		else{

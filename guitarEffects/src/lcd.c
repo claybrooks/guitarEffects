@@ -15,7 +15,7 @@
 //Similar to queue system.  mainDisplay contains what could possibly be printed to screen.
 //mainDisplay_show holds whether or not it is printed to screen (on_off[]);
 int numInMainDisplay, tunerScreen, currentPreset, presetScreen, reprint;
-
+int noteChart[355];
 
 #pragma CODE_SECTION(controlLCD, "secureRamFuncs")
 #pragma CODE_SECTION(printLCD, "secureRamFuncs")
@@ -348,7 +348,7 @@ void toggleLCD(int effect, int index, int on, int numQueued){
 
 
 void printFreq(int data){
-
+	int frequency = data;
 	controlLCD(SECOND); //Second line;
 	int i;
 	for(i = 0; i < 3; i++){
@@ -368,19 +368,113 @@ void printFreq(int data){
 	for(; counter > 0; counter--, array--){
 		printLCD(*array+0x30);
 	}
+	findNote(frequency);
 
 	controlLCD(HOME); //Return cursor to home;
 
 }
 
-
-
-
-void wait(int temp){
-	while(temp != 0) temp--;
+void findNote(frequency){
+	//F
+	int note = noteChart[frequency];
+	controlLCD(0x87);
+	if(note == A){
+		frequency -= 110;
+		if(frequency > 50) frequency -= 110;
+		printLCD(A);
+	}
+	else if(note == As){
+		frequency -= 117;
+		if(frequency > 50) frequency -= 116;
+		printLCD(A);
+		printLCD(SHARP);
+	}
+	else if(note == B){
+		frequency -= 123;
+		if(frequency > 50) frequency -= 124;
+		printLCD(B);
+	}
+	else if(note == C){
+		frequency -= 131;
+		if(frequency > 50) frequency -= 131;
+		printLCD(C);
+	}
+	else if(note == Cs){
+		frequency -= 139;
+		if(frequency > 50) frequency -= 138;
+		printLCD(C);
+		printLCD(SHARP);
+	}
+	else if(note == D){
+		frequency -= 147;
+		if(frequency > 50) frequency -= 147;
+		printLCD(D);
+	}
+	else if(note == Ds){
+		frequency -= 156;
+		if(frequency > 50) frequency -= 155;
+		printLCD(D);
+		printLCD(SHARP);
+	}
+	else if(note == E){
+		frequency -= 82;
+		if(frequency > 200) frequency -= 248;
+		else if(frequency > 50) frequency -= 83;
+		printLCD(E);
+	}
+	else if(note == F){
+		frequency -= 87;
+		if(frequency > 200) frequency -= 262;
+		else if(frequency > 50)  frequency -= 88;
+		printLCD(F);
+	}
+	else if(note == Fs){
+		frequency -= 92;
+		if(frequency > 50) frequency -= 93;
+		printLCD(F);
+		printLCD(SHARP);
+	}
+	else if(note == G){
+		frequency -= 98;
+		if(frequency > 50) frequency -= 98;
+		printLCD(G);
+	}
+	else if(note == Gs){
+		frequency -= 104;
+		if(frequency > 50) frequency -= 104;
+		printLCD(G);
+		printLCD(SHARP);
+	}
+	if(note == A || note == B || note == C || note == D || note == E || note == F || note == G) printLCD(SPACE);
+	printLCD(SPACE);
+	if(frequency >= -1 && frequency <=1){
+		printLCD(BAR);
+	}
+	else if(frequency > 1){
+		printLCD(LEFT);
+	}
+	else{
+		printLCD(RIGHT);
+	}
 }
 
 void initLCD(){
+	int i;
+	for(i = 0; i < 355; i++){
+		if((i >= 75 && i <= 84) || (i >= 161 && i <= 170) || (i >= 320 && i <= 340)) noteChart[i] = E;
+		else if((i >= 85 && i <= 89) || (i >= 171 && i <= 180) || (i >= 341 && i <= 360)) noteChart[i] = F;
+		else if((i >= 90 && i <= 95) || (i >= 181 && i <= 190)) noteChart[i] = Fs;
+		else if((i >= 96 && i <= 101) ||(i >= 191 && i <= 201)) noteChart[i] = G;
+		else if((i >= 102&& i <= 106) ||(i >= 202 && i <= 214)) noteChart[i] = Gs;
+		else if((i >= 107&& i <= 113) ||(i >= 215 && i <= 226)) noteChart[i] = A;
+		else if((i >= 114&& i <= 120) ||(i >= 227 && i <= 240)) noteChart[i] = As;
+		else if((i >= 121&& i <= 127) ||(i >= 241 && i <= 254)) noteChart[i] = B;
+		else if((i >= 128&& i <= 135) ||(i >= 255 && i <= 269)) noteChart[i] = C;
+		else if((i >= 136&& i <= 143) ||(i >= 270 && i <= 285)) noteChart[i] = Cs;
+		else if((i >= 144&& i <= 151) ||(i >= 286 && i <= 304)) noteChart[i] = D;
+		else if((i >= 152&& i <= 160) ||(i >= 305 && i <= 319)) noteChart[i] = Ds;
+		else noteChart[i] == 0xFFFF;
+	}
 	tunerScreen = 0;
 	currentPreset = 1;
 	presetScreen = 0;

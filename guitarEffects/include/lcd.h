@@ -38,7 +38,7 @@
 #define	CHANGETREBLE	29
 
 
-
+void	findNote(int);
 void 	initLCD(void);
 void 	printLCD(int);
 void 	addToLCD(int);

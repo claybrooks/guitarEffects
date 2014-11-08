@@ -7,6 +7,8 @@ float RFFToutBuff[RFFT_SIZE];		//Calculated FFT result
 float RFFTF32Coef[RFFT_SIZE];    	//Coefficient table buffer
 float RFFTmagBuff[RFFT_SIZE/2+1];  	//Magnitude of frequency spectrum
 
+#pragma CODE_SECTION(findFrequency, "secureRamFuncs")
+
 //--- Global Variables
 uint16_t AdcBuf[ADC_BUF_LEN];		// ADC buffer allocation
 

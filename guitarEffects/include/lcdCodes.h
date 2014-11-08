@@ -43,6 +43,14 @@
 #define BAR		0x7C
 #define SPACE	0X20
 #define COLON	0x3A
-#define SHIFTR	0X14
-
+#define SHIFTR	0x14
+#define LEFT	0xBB
+#define RIGHT	0xBC
+#define SHARP	0x23
+#define STAR	0x2A
+#define As		0xF0
+#define Cs		0xF1
+#define Ds		0xF2
+#define Fs		0xF3
+#define Gs		0xF4
 #endif /* LCDCODES_H_ */
