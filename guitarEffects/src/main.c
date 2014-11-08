@@ -121,7 +121,7 @@ int main(){
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
 		//Initialize ADC
-			//initAdc();
+			initAdc();
 		//Initialize Effects
 			initEffects(&params);
 		//Initialize FFT

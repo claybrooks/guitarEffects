@@ -449,20 +449,25 @@ void findNote(frequency){
 	printLCD(SPACE);
 	if(frequency >= -1 && frequency <=1){
 		printLCD(BAR);
+		printLCD(SPACE);
 	}
 	else if(frequency > 1){
+		printLCD(BAR);
 		printLCD(LEFT);
 	}
 	else{
+		controlLCD(0x89);
 		printLCD(RIGHT);
+		printLCD(BAR);
+		printLCD(SPACE);
 	}
 }
 
 void initLCD(){
 	int i;
 	for(i = 0; i < 355; i++){
-		if((i >= 75 && i <= 84) || (i >= 161 && i <= 170) || (i >= 320 && i <= 340)) noteChart[i] = E;
-		else if((i >= 85 && i <= 89) || (i >= 171 && i <= 180) || (i >= 341 && i <= 360)) noteChart[i] = F;
+		if((i >= 75 && i <= 85) || (i >= 161 && i <= 170) || (i >= 320 && i <= 340)) noteChart[i] = E;
+		else if((i >= 86 && i <= 89) || (i >= 171 && i <= 180) || (i >= 341 && i <= 360)) noteChart[i] = F;
 		else if((i >= 90 && i <= 95) || (i >= 181 && i <= 190)) noteChart[i] = Fs;
 		else if((i >= 96 && i <= 101) ||(i >= 191 && i <= 201)) noteChart[i] = G;
 		else if((i >= 102&& i <= 106) ||(i >= 202 && i <= 214)) noteChart[i] = Gs;
@@ -473,7 +478,7 @@ void initLCD(){
 		else if((i >= 136&& i <= 143) ||(i >= 270 && i <= 285)) noteChart[i] = Cs;
 		else if((i >= 144&& i <= 151) ||(i >= 286 && i <= 304)) noteChart[i] = D;
 		else if((i >= 152&& i <= 160) ||(i >= 305 && i <= 319)) noteChart[i] = Ds;
-		else noteChart[i] == 0xFFFF;
+		else noteChart[i] = 0xFFFF;
 	}
 	tunerScreen = 0;
 	currentPreset = 1;
