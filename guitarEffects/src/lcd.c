@@ -253,12 +253,15 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 		printFlanger();
 	}
 	else if(*update == CHANGEVOLUME){
+		reprint = 1;
 		printVolume();
 	}
 	else if(*update == CHANGEBASS){
+		reprint = 1;
 		printBass();
 	}
 	else if(*update == CHANGETREBLE){
+		reprint = 1;
 		printTreble();
 	}
 }

@@ -82,7 +82,8 @@ void initINTS(){
 			XIntruptRegs.XINT5CR.bit.POLARITY = 1;      //Rising edge interrupt
 			XIntruptRegs.XINT5CR.bit.ENABLE = 1;        //Enable Xint1
 
-			//Effects
+			//Rotary
+
 			PieCtrlRegs.PIEIER12.bit.INTx4 = 1;          //Enable PIE Gropu 1 INT4
 			GpioCtrlRegs.GPBDIR.bit.GPIO34 = 0;			//As input
 			GpioIntRegs.GPIOXINT6SEL.bit.GPIOSEL = 2;	//GPIO 5 as interrupt

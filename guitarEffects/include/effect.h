@@ -13,28 +13,28 @@
 struct params{
 	int tremoloCounter, tremoloRate, tremoloCount, tremoloLimit;
 		int reverbDelay[800], reverbCount, reverbStart; //15 ms delay length at 44.1 kHz
-		int flangerDelay[200], flangerSweepCount, flangerCounter, flangerLimit, flangerStart, flangerIndex;
+		int flangerDelay[600], flangerSweepCount, flangerCounter, flangerLimit, flangerStart, flangerCount;
 		double flangerSweep; //15 ms delay length at 44.1
 };
 
-typedef int FUNC(int, struct params*);
-int processDelay(int,struct params*);
-int processDistortion(int, struct params*);
-int processCrunch(int, struct params*);
-int processTremolo(int, struct params*);
-int processWah(int, struct params*);
-int processPhaser(int, struct params*);
-int processFlanger(int, struct params*);
-int processReverb(int, struct params*);
-int processChorus(int, struct params*);
-int processDelay(int, struct params*);
-int processPitchShift(int, struct params*);
+typedef int FUNC(int, struct params*, int*);
+int processDelay(int, struct params*, int*);
+int processDistortion(int, struct params*, int*);
+int processCrunch(int, struct params*, int*);
+int processTremolo(int, struct params*, int*);
+int processWah(int, struct params*, int*);
+int processPhaser(int, struct params*, int*);
+int processFlanger(int, struct params*, int*);
+int processReverb(int, struct params*, int*);
+int processChorus(int, struct params*, int*);
+int processDelay(int, struct params*, int*);
+int processPitchShift(int, struct params*, int*);
 
 void savePreset(int presetNum, int* location, int* on_off);
 void loadPreset(int presetNum, FUNC**pipeline,FUNC**list, int* location, int* on_off, int* numQueued);
 void	queueEffect(int);	//Sticks effect into queue
 void 	clearPipeline();	//Clears the queue
-int 	process(int, int,int*, FUNC**, struct params*);		//Process the effects in the queue, FIFO
+int 	process(int, int,int*, FUNC**, struct params*, int*);		//Process the effects in the queue, FIFO
 void 	initEffects(struct params*);		//Initialize registers
 int 	indexLookup(int);	//Maps GPIO input to an effect
 int 	toggleOn_Off(int);	//Toggles effect on/off once its in the queue

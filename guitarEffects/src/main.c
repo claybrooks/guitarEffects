@@ -79,6 +79,7 @@ int adcVals[10];
 int load = 0, save = 0, presetNumber = 1;
 /********************************************************************************************************************************************************************/
 
+int interruptCount = 0;
 #define DEBOUNCE 50000
 
 #pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
@@ -91,6 +92,7 @@ int load = 0, save = 0, presetNumber = 1;
 #pragma CODE_SECTION(effects, "secureRamFuncs")
 
 void getInputs();
+
 
 int main(){
 	InitSysCtrl();
@@ -182,6 +184,7 @@ int main(){
 }
 
 interrupt void rotary(){
+	interruptCount++;
 	if(currentChangeScreen != -1){
 		previousUpdateNumber = updateNumber;
 		updateNumber++;
@@ -204,7 +207,7 @@ void getInputs(){
 		prevCounts[updateNumber] = counts[updateNumber];
 		change = 1;
 		if(A){
-			if(counts[updateNumber] <32) counts[updateNumber]++;
+			if(counts[updateNumber] <16) counts[updateNumber]++;
 		}
 		else{
 			if(counts[updateNumber] >0) counts[updateNumber]--;
@@ -238,14 +241,14 @@ void getInputs(){
 interrupt void cpu_timer0_isr(void){
 	int sample = read_adc();	//Get sample from ADC
 	if(tuner){// && sampleCount == 23){
-		if(storeFFT(sample>>4)){
+		if(storeFFT(sample - 8900)){
 			freq = findFrequency();
 			updateFrequency = 1;
 		}
 	}
 	//else sampleCount++;
 	else{
-	sample = process(sample,numQueued, on_off,&pipeline[0],&params);	//Process sample
+	sample = process(sample,numQueued, on_off,&pipeline[0],&params, counts);	//Process sample
 	write_dac(sample);			//write sample to DAC
 	updateInputs = 1;
 	}
@@ -463,7 +466,6 @@ interrupt void save_preset(void){
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
 interrupt void effects(void){
-	DelayUs(1);
 	int input = (GpioDataRegs.GPADAT.all & 0x000000F);
 	if(input){
 		if(input == 0x0008){
@@ -472,13 +474,13 @@ interrupt void effects(void){
 			updateCode = CLEAR;
 		}
 		//Switch to tuning function
-		else if(input == 0x0004){
+		/*else if(input == 0x0004){
 			tuner ^= 1;			//signal for timer0 to not sample out to SPI
 			updateLcd = 1;
 			updateCode = TUNER;
 			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
 			else updateTimer0(44);		//FFT was toggled off, switch back to sample out to SPI
-		}
+		}*/
 
 		//Look to either queue effect or toggle state
 		else{
