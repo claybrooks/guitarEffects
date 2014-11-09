@@ -9,7 +9,6 @@
 #include "effect.h"
 
 
-
 #pragma CODE_SECTION(loadPreset, "secureRamFuncs")
 #pragma CODE_SECTION(savePreset, "secureRamFuncs")
 #pragma CODE_SECTION(eepromWrite, "secureRamFuncs")
@@ -54,12 +53,13 @@ void initEffects(struct params* params){
 	params->tremoloLimit = 0;
 	params->reverbCount = 0;
 	params->reverbStart = 0;
-	params->flangeLimit = 20000;
-	params->flangeCounter = 0;
-	params->flangeCount = 0;
-	params->flangeStart = 0;
-	params->flangeInit = 0;
-	params->flangeSweep = 0;
+	params->flangerLimit = 20000;
+	params->flangerCounter = 0;
+	params->flangerStart = 0;
+	params->flangerIndex = 0;
+	params->flangerSweep = 0;
+	int i;
+	for(i = 0; i < 70; i++) params->flangerDelay[i] = 0;
 }
 
 int process(int sample, int numQueued, int* on_off, FUNC**pipeline, struct params* params){
@@ -124,32 +124,27 @@ int processWah(int sample, struct params* p){
 int processPhaser(int sample, struct params* p){
 	return sample;
 }
-int processFlange(int sample, struct params* p){
+int processFlanger(int sample, struct params* p){
 	//Process sweep
+	//Max delay = 15ms
+	//Delay sweep at 1 Hz
+	//int Fs = 22727;
+	//int rate = 1;
+	double sineConstant = .0000454545;
+	double maxSampleDelay = 200;
+	double decay = .7;
+		//Once reinitialized, start to process reverb
 
-	if(p->flangeInit == 800 && p->flangeStart == 0){
-		p->flangeStart = 1;
-	}
-			double decay = 0x7FF;
-			decay = ((double)decay / (double)0xFFF)*.45 + .15;
-			//Once reinitialized, start to process reverb
-			if(p->flangeStart){
-					if(p->flangeCounter >= p->flangeLimit) p->flangeCount = -1;
-					else if(p->flangeCounter == 0) p->flangeCount = 1;
-					p->flangeCounter+=p->flangeCount;
-					p->flangeSweep = sin((float)p->flangeCounter/(float)p->flangeLimit) * 800;
-
-				int temp = p->flangeDelay[p->flangeSweep];
-				sample += p->flangeDelay[p->flangeSweep];
-				p->flangeDelay[p->flangeSweep] = (double)sample*decay + (double)temp*(decay-.08);
-			}
-			else{
-				p->flangeDelay[p->flangeInit] = (double)sample*decay;
-				p->flangeInit = p->flangeInit + 1;
-			}
-
-			p->flangeCount++;
-			return sample;
+	if(p->flangerIndex == 200) p->flangerIndex =0;
+	p->flangerSweep = abs(sin((double)2*PI*(double)p->flangerCounter*1.0/(double)22000));
+	p->flangerCounter++;
+	if(p->flangerCounter == 22000)p->flangerCounter = 0;
+	int delay = p->flangerSweep * maxSampleDelay;
+	int delayIndex = abs(p->flangerIndex - delay);
+	sample += p->flangerDelay[delayIndex];
+	p->flangerDelay[p->flangerIndex] = decay*sample + decay*p->flangerDelay[p->flangerIndex];
+	p->flangerIndex++;
+	return sample;
 }
 int processReverb(int sample, struct params* p){
 	//Reinitialize the reverb array on every start

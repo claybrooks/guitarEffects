@@ -1,5 +1,5 @@
 Fitter report for guitarEffects
-Thu Nov 06 21:16:20 2014
+Sat Nov 08 22:33:37 2014
 Quartus II Version 9.1 Build 350 03/24/2010 Service Pack 2 SJ Web Edition
 
 
@@ -48,15 +48,15 @@ applicable agreement for further details.
 +----------------------------------------------------------------------+
 ; Fitter Summary                                                       ;
 +-----------------------+----------------------------------------------+
-; Fitter Status         ; Successful - Thu Nov 06 21:16:20 2014        ;
+; Fitter Status         ; Successful - Sat Nov 08 22:33:37 2014        ;
 ; Quartus II Version    ; 9.1 Build 350 03/24/2010 SP 2 SJ Web Edition ;
 ; Revision Name         ; guitarEffects                                ;
 ; Top-level Entity Name ; gutiarEffects                                ;
 ; Family                ; MAX3000A                                     ;
 ; Device                ; EPM3064ALC44-10                              ;
 ; Timing Models         ; Final                                        ;
-; Total macrocells      ; 1 / 64 ( 2 % )                               ;
-; Total pins            ; 9 / 34 ( 26 % )                              ;
+; Total macrocells      ; 2 / 64 ( 3 % )                               ;
+; Total pins            ; 12 / 34 ( 35 % )                             ;
 +-----------------------+----------------------------------------------+
 
 
@@ -99,29 +99,29 @@ Parallel compilation was disabled, but you have multiple processors available. E
 The pin-out file can be found in E:/Documents/Clone/guitarEffects/Quartus/guitarEffects.pin.
 
 
-+-----------------------------------------------------+
-; Fitter Resource Usage Summary                       ;
-+-----------------------------------+-----------------+
-; Resource                          ; Usage           ;
-+-----------------------------------+-----------------+
-; Logic cells                       ; 1 / 64 ( 2 % )  ;
-; Registers                         ; 0 / 64 ( 0 % )  ;
-; Number of pterms used             ; 5               ;
-; User inserted logic elements      ; 0               ;
-; I/O pins                          ; 9 / 34 ( 26 % ) ;
-;     -- Clock pins                 ; 0 / 2 ( 0 % )   ;
-;     -- Dedicated input pins       ; 0 / 2 ( 0 % )   ;
-; Global signals                    ; 0               ;
-; Shareable expanders               ; 0 / 64 ( 0 % )  ;
-; Parallel expanders                ; 0 / 60 ( 0 % )  ;
-; Cells using turbo bit             ; 1 / 64 ( 2 % )  ;
-; Maximum fan-out node              ; xor4:inst|3~0   ;
-; Maximum fan-out                   ; 1               ;
-; Highest non-global fan-out signal ; xor4:inst|3~0   ;
-; Highest non-global fan-out        ; 1               ;
-; Total fan-out                     ; 5               ;
-; Average fan-out                   ; 0.50            ;
-+-----------------------------------+-----------------+
++------------------------------------------------------+
+; Fitter Resource Usage Summary                        ;
++-----------------------------------+------------------+
+; Resource                          ; Usage            ;
++-----------------------------------+------------------+
+; Logic cells                       ; 2 / 64 ( 3 % )   ;
+; Registers                         ; 0 / 64 ( 0 % )   ;
+; Number of pterms used             ; 7                ;
+; User inserted logic elements      ; 0                ;
+; I/O pins                          ; 12 / 34 ( 35 % ) ;
+;     -- Clock pins                 ; 0 / 2 ( 0 % )    ;
+;     -- Dedicated input pins       ; 0 / 2 ( 0 % )    ;
+; Global signals                    ; 0                ;
+; Shareable expanders               ; 0 / 64 ( 0 % )   ;
+; Parallel expanders                ; 0 / 60 ( 0 % )   ;
+; Cells using turbo bit             ; 2 / 64 ( 3 % )   ;
+; Maximum fan-out node              ; inst1~0          ;
+; Maximum fan-out                   ; 1                ;
+; Highest non-global fan-out signal ; inst1~0          ;
+; Highest non-global fan-out        ; 1                ;
+; Total fan-out                     ; 8                ;
+; Average fan-out                   ; 0.57             ;
++-----------------------------------+------------------+
 
 
 +------------------------------------------------------------------------------------------------------------------------------+
@@ -130,19 +130,22 @@ The pin-out file can be found in E:/Documents/Clone/guitarEffects/Quartus/guitar
 ; Name    ; Pin # ; I/O Bank ; LAB ; Combinational Fan-Out ; Registered Fan-Out ; Global ; I/O Standard ; Location assigned by ;
 +---------+-------+----------+-----+-----------------------+--------------------+--------+--------------+----------------------+
 ; GPIO_10 ; 6     ; --       ; 1   ; 1                     ; 0                  ; no     ; 3.3-V LVTTL  ; User                 ;
+; GPIO_11 ; 9     ; --       ; 1   ; 1                     ; 0                  ; no     ; 3.3-V LVTTL  ; User                 ;
+; GPIO_12 ; 11    ; --       ; 1   ; 1                     ; 0                  ; no     ; 3.3-V LVTTL  ; User                 ;
 ; GPIO_7  ; 8     ; --       ; 1   ; 1                     ; 0                  ; no     ; 3.3-V LVTTL  ; User                 ;
 ; GPIO_8  ; 4     ; --       ; 1   ; 1                     ; 0                  ; no     ; 3.3-V LVTTL  ; User                 ;
 ; GPIO_9  ; 5     ; --       ; 1   ; 1                     ; 0                  ; no     ; 3.3-V LVTTL  ; User                 ;
 +---------+-------+----------+-----+-----------------------+--------------------+--------+--------------+----------------------+
 
 
-+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Output Pins                                                                                                                                                                                 ;
-+---------+-------+----------+-----+-----------------+----------------+------------+---------------+--------------+----------------------+-------+----------------------+---------------------+
-; Name    ; Pin # ; I/O Bank ; LAB ; Output Register ; Slow Slew Rate ; Open Drain ; TRI Primitive ; I/O Standard ; Location assigned by ; Load  ; Output Enable Source ; Output Enable Group ;
-+---------+-------+----------+-----+-----------------+----------------+------------+---------------+--------------+----------------------+-------+----------------------+---------------------+
-; xintrup ; 16    ; --       ; 2   ; no              ; no             ; no         ; no            ; 3.3-V LVTTL  ; User                 ; 10 pF ; -                    ; -                   ;
-+---------+-------+----------+-----+-----------------+----------------+------------+---------------+--------------+----------------------+-------+----------------------+---------------------+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Output Pins                                                                                                                                                                                  ;
++----------+-------+----------+-----+-----------------+----------------+------------+---------------+--------------+----------------------+-------+----------------------+---------------------+
+; Name     ; Pin # ; I/O Bank ; LAB ; Output Register ; Slow Slew Rate ; Open Drain ; TRI Primitive ; I/O Standard ; Location assigned by ; Load  ; Output Enable Source ; Output Enable Group ;
++----------+-------+----------+-----+-----------------+----------------+------------+---------------+--------------+----------------------+-------+----------------------+---------------------+
+; xintrup  ; 16    ; --       ; 2   ; no              ; no             ; no         ; no            ; 3.3-V LVTTL  ; User                 ; 10 pF ; -                    ; -                   ;
+; xintrup2 ; 12    ; --       ; 1   ; no              ; no             ; no         ; no            ; 3.3-V LVTTL  ; User                 ; 10 pF ; -                    ; -                   ;
++----------+-------+----------+-----+-----------------+----------------+------------+---------------+--------------+----------------------+-------+----------------------+---------------------+
 
 
 +-------------------------------------------------------------------------------------------------------+
@@ -158,10 +161,10 @@ The pin-out file can be found in E:/Documents/Clone/guitarEffects/Quartus/guitar
 ; 6        ; 5          ; --       ; GPIO_10        ; input  ; 3.3-V LVTTL  ;         ; Y               ;
 ; 7        ; 6          ; --       ; TDI            ; input  ; 3.3-V LVTTL  ;         ; N               ;
 ; 8        ; 7          ; --       ; GPIO_7         ; input  ; 3.3-V LVTTL  ;         ; Y               ;
-; 9        ; 8          ; --       ; RESERVED       ;        ;              ;         ;                 ;
+; 9        ; 8          ; --       ; GPIO_11        ; input  ; 3.3-V LVTTL  ;         ; Y               ;
 ; 10       ; 9          ; --       ; GND            ; gnd    ;              ;         ;                 ;
-; 11       ; 10         ; --       ; RESERVED       ;        ;              ;         ;                 ;
-; 12       ; 11         ; --       ; RESERVED       ;        ;              ;         ;                 ;
+; 11       ; 10         ; --       ; GPIO_12        ; input  ; 3.3-V LVTTL  ;         ; Y               ;
+; 12       ; 11         ; --       ; xintrup2       ; output ; 3.3-V LVTTL  ;         ; Y               ;
 ; 13       ; 12         ; --       ; TMS            ; input  ; 3.3-V LVTTL  ;         ; N               ;
 ; 14       ; 13         ; --       ; RESERVED       ;        ;              ;         ;                 ;
 ; 15       ; 14         ; --       ; VCCIO          ; power  ;              ; 3.3V    ;                 ;
@@ -216,7 +219,7 @@ Note: User assignments will override these defaults. The user specified values a
 +----------------------------+------------+------+--------------------------+--------------+
 ; Compilation Hierarchy Node ; Macrocells ; Pins ; Full Hierarchy Name      ; Library Name ;
 +----------------------------+------------+------+--------------------------+--------------+
-; |gutiarEffects             ; 1          ; 9    ; |gutiarEffects           ; work         ;
+; |gutiarEffects             ; 2          ; 12   ; |gutiarEffects           ; work         ;
 ;    |xor4:inst|             ; 1          ; 0    ; |gutiarEffects|xor4:inst ; work         ;
 +----------------------------+------------+------+--------------------------+--------------+
 
@@ -226,11 +229,14 @@ Note: User assignments will override these defaults. The user specified values a
 +---------------+-----------------+
 ; Name          ; Fan-Out         ;
 +---------------+-----------------+
+; GPIO_12       ; 1               ;
+; GPIO_11       ; 1               ;
 ; GPIO_7        ; 1               ;
 ; GPIO_8        ; 1               ;
 ; GPIO_10       ; 1               ;
 ; GPIO_9        ; 1               ;
 ; xor4:inst|3~0 ; 1               ;
+; inst1~0       ; 1               ;
 +---------------+-----------------+
 
 
@@ -240,27 +246,28 @@ Note: User assignments will override these defaults. The user specified values a
 ; Interconnect Resource Type ; Usage           ;
 +----------------------------+-----------------+
 ; Output enables             ; 0 / 6 ( 0 % )   ;
-; PIA buffers                ; 4 / 144 ( 3 % ) ;
+; PIA buffers                ; 6 / 144 ( 4 % ) ;
 +----------------------------+-----------------+
 
 
 +----------------------------------------------------------------------+
 ; LAB Macrocells                                                       ;
 +----------------------------------------+-----------------------------+
-; Number of Macrocells  (Average = 0.25) ; Number of LABs  (Total = 1) ;
+; Number of Macrocells  (Average = 0.50) ; Number of LABs  (Total = 2) ;
 +----------------------------------------+-----------------------------+
-; 0                                      ; 3                           ;
-; 1                                      ; 1                           ;
+; 0                                      ; 2                           ;
+; 1                                      ; 2                           ;
 +----------------------------------------+-----------------------------+
 
 
-+--------------------------------------------------------------+
-; Logic Cell Interconnection                                   ;
-+-----+------------+---------------------------------+---------+
-; LAB ; Logic Cell ; Input                           ; Output  ;
-+-----+------------+---------------------------------+---------+
-;  B  ; LC25       ; GPIO_8, GPIO_10, GPIO_7, GPIO_9 ; xintrup ;
-+-----+------------+---------------------------------+---------+
++---------------------------------------------------------------+
+; Logic Cell Interconnection                                    ;
++-----+------------+---------------------------------+----------+
+; LAB ; Logic Cell ; Input                           ; Output   ;
++-----+------------+---------------------------------+----------+
+;  A  ; LC1        ; GPIO_11, GPIO_12                ; xintrup2 ;
+;  B  ; LC25       ; GPIO_8, GPIO_10, GPIO_7, GPIO_9 ; xintrup  ;
++-----+------------+---------------------------------+----------+
 
 
 +---------------------------------------------------------------+
@@ -284,12 +291,12 @@ Note: User assignments will override these defaults. The user specified values a
 Info: *******************************************************************
 Info: Running Quartus II Fitter
     Info: Version 9.1 Build 350 03/24/2010 Service Pack 2 SJ Web Edition
-    Info: Processing started: Thu Nov 06 21:16:20 2014
+    Info: Processing started: Sat Nov 08 22:33:37 2014
 Info: Command: quartus_fit --read_settings_files=off --write_settings_files=off guitarEffects -c guitarEffects
 Info: Selected device EPM3064ALC44-10 for design "guitarEffects"
 Info: Quartus II Fitter was successful. 0 errors, 0 warnings
     Info: Peak virtual memory: 208 megabytes
-    Info: Processing ended: Thu Nov 06 21:16:20 2014
+    Info: Processing ended: Sat Nov 08 22:33:37 2014
     Info: Elapsed time: 00:00:00
     Info: Total CPU time (on all processors): 00:00:00
 

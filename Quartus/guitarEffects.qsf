@@ -55,3 +55,6 @@ set_location_assignment PIN_5 -to GPIO_9
 set_location_assignment PIN_6 -to GPIO_10
 set_location_assignment PIN_16 -to xintrup
 set_location_assignment PIN_8 -to GPIO_7
+set_location_assignment PIN_9 -to GPIO_11
+set_location_assignment PIN_11 -to GPIO_12
+set_location_assignment PIN_12 -to xintrup2

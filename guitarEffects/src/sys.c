@@ -35,6 +35,7 @@ void initINTS(){
 			PieVectTable.XINT3 = &load_preset;
 			PieVectTable.XINT4 = &save_preset;
 			PieVectTable.XINT5 = &effects;
+			PieVectTable.XINT6 = &rotary;
 
 			//preset up
 			PieCtrlRegs.PIEIER1.bit.INTx4 = 1;          //Enable PIE Gropu 1 INT4
@@ -75,11 +76,21 @@ void initINTS(){
 			//Effects
 			PieCtrlRegs.PIEIER12.bit.INTx3 = 1;          //Enable PIE Gropu 1 INT4
 			GpioCtrlRegs.GPBDIR.bit.GPIO36 = 0;			//As input
-			GpioIntRegs.GPIOXINT5SEL.bit.GPIOSEL = 4;	//GPIO 5 as interrupt
+			GpioIntRegs.GPIOXINT5SEL.bit.GPIOSEL = 4;	//GPIO 36 as interrupt
 			GpioCtrlRegs.GPBQSEL1.bit.GPIO36 = 2;		//XINT1 Qual using 6 samples
 			GpioCtrlRegs.GPBCTRL.bit.QUALPRD0 = 0xFF;   //Each sampling window is 510*SYSCLKOUT
 			XIntruptRegs.XINT5CR.bit.POLARITY = 1;      //Rising edge interrupt
 			XIntruptRegs.XINT5CR.bit.ENABLE = 1;        //Enable Xint1
+
+			//Effects
+			PieCtrlRegs.PIEIER12.bit.INTx4 = 1;          //Enable PIE Gropu 1 INT4
+			GpioCtrlRegs.GPBDIR.bit.GPIO34 = 0;			//As input
+			GpioIntRegs.GPIOXINT6SEL.bit.GPIOSEL = 2;	//GPIO 5 as interrupt
+			GpioCtrlRegs.GPBQSEL1.bit.GPIO34 = 2;		//XINT1 Qual using 6 samples
+			GpioCtrlRegs.GPBCTRL.bit.QUALPRD0 = 0xFF;   //Each sampling window is 510*SYSCLKOUT
+			XIntruptRegs.XINT6CR.bit.POLARITY = 1;      //Rising edge interrupt
+			XIntruptRegs.XINT6CR.bit.ENABLE = 1;        //Enable Xint1*/
+
 
 	//ADC
 		//PieVectTable.ADCINT = &adc_isr;

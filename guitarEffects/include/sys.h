@@ -21,6 +21,7 @@ interrupt void xint8_isr(void);*/
 interrupt void adc_isr(void);
 interrupt void cpu_timer1_isr(void);
 interrupt void i2c_int1a_isr(void);
+interrupt void rotary(void);
 
 void initINTS();
 void initXINT1();

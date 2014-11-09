@@ -9,12 +9,10 @@
 #include "eeprom.h"
 #include "DSP2833x_Mcbsp.h"
 #include "F28335_example.h"
-void read_encoder();
-int enc_states[] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0};
-Uint16 enc_position = 0;
-int enc_value = 0;
-Uint16 old_enc_value = 0;
-Uint16 my_enc_val = 0;
+
+#define numRotary 5
+int tremoloBprev=0, reverbBprev = 0, updateInputs = 0, updateNumber = 0, previousUpdateNumber;
+int prevs[numRotary], counts[numRotary], prevCounts[numRotary], effectChange[numRotary];
 /*********************************************************************************************************************************************************************
  * Effect variables/functions
  */
@@ -27,10 +25,10 @@ int indexLookup(int);
 static struct params params;
 
 //Create FUNC variables
-FUNC processTremolo,processReverb,processFlange,processDelay,processWah,processPhaser,processCrunch,processReverb,processChorus,processPitchShift;
+FUNC processTremolo,processReverb,processFlanger,processDelay,processWah,processPhaser,processCrunch,processReverb,processChorus,processPitchShift;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[10] = {processTremolo,processReverb,processFlange,processCrunch,processDelay,processReverb,processPhaser,processCrunch,processChorus,processPitchShift};
+FUNC *list[10] = {processTremolo,processReverb,processFlanger,processCrunch,processDelay,processReverb,processPhaser,processCrunch,processChorus,processPitchShift};
 
 /*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
@@ -48,11 +46,11 @@ FUNC *pipeline[10];
  */
 int 	toggleDisplayOn_Off(int);	//Toggles effect on/off once its in the queue
 void	queueDisplay(int);	//Sticks effect into queue
-int	toggleEffectOnDisplay(int);	//Sticks effect into queue
+int		toggleEffectOnDisplay(int);	//Sticks effect into queue
 //LCD Display Queue
 int mainDisplay[10];
 int toggle = 0, effectToToggle = 0, indexToToggle = 0;
-int tuner = 0, preset = 0, currentChangeScreen = 0, resetTimer = 0, sysStart = 1, freq = 0;
+int tuner = 0, preset = 0, currentChangeScreen = -1, resetTimer = 0, sysStart = 1, freq = 0;
 int updateLcd = 0, updateCode = 0, updateChange, newLevel = 0, oldLevel = 0, updateFrequency = 0;
 /********************************************************************************************************************************************************************/
 
@@ -81,8 +79,6 @@ int adcVals[10];
 int load = 0, save = 0, presetNumber = 1;
 /********************************************************************************************************************************************************************/
 
-int sampleCount = 0;
-
 #define DEBOUNCE 50000
 
 #pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
@@ -94,7 +90,7 @@ int sampleCount = 0;
 #pragma CODE_SECTION(save_preset, "secureRamFuncs")
 #pragma CODE_SECTION(effects, "secureRamFuncs")
 
-
+void getInputs();
 
 int main(){
 	InitSysCtrl();
@@ -120,8 +116,6 @@ int main(){
 			GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
-		//Initialize ADC
-			initAdc();
 		//Initialize Effects
 			initEffects(&params);
 		//Initialize FFT
@@ -135,22 +129,24 @@ int main(){
 				adcVals[i] = 0;
 				mainDisplay[i] = -1;
 			}
+			for(i = 0; i < numRotary; i++){
+				prevs[i] = 0;
+				counts[i] = 0;
+				prevCounts[i] = 0;
+				effectChange[i] = 0;
+			}
 			//save to initialize eeprom, i have no idea why i have to do this
-			savePreset(15, location, on_off);
-			loadPreset(15, pipeline, list, location, on_off, &numQueued);
+		//	savePreset(15, location, on_off);
+			//loadPreset(15, pipeline, list, location, on_off, &numQueued);
 			EALLOW;
 
-			GpioCtrlRegs.GPAPUD.bit.GPIO20 = 0;
-			GpioCtrlRegs.GPAPUD.bit.GPIO22 = 0;
-			GpioCtrlRegs.GPAPUD.bit.GPIO23 = 0;
-
 	while(1){
-		//if(hungry >= 1000){
-		//	getPot();
-		//	hungry = 0;
-		//}
 		//Wait for signals
 		//Toggle LCD screen
+		if(updateInputs){
+			getInputs();
+			updateInputs = 0;
+		}
 		if(toggle){
 			toggle = 0;
 			toggleLCD(effectToToggle,indexToToggle,on_off[indexToToggle], numQueued);
@@ -162,7 +158,7 @@ int main(){
 		}
 		//Print level of change from pot input
 		if(updateChange){
-			updateLevel(newLevel, oldLevel);
+			updateLevel(updateNumber, counts, prevCounts);
 			updateChange = 0;
 		}
 		//Load preset in effect and lcd controller
@@ -185,30 +181,57 @@ int main(){
 	}
 }
 
-void read_encoder()
-{
-	int temp20 = GpioDataRegs.GPADAT.bit.GPIO20;
-	int temp22 = GpioDataRegs.GPADAT.bit.GPIO22;
-	temp22<<=1;
-	int temp =temp22|temp20;
-	enc_position <<= 2;                       //remember previous state by                                                                              // shifting the lower bits up 2
-	enc_position |= ( temp );     // AND the lower 2 bits of                                                                                //port b, then OR them with var                                                                          //old_AB to set new value
-	enc_value += enc_states[enc_position];     // the lower 4 bits of old_AB & 16 are then
-	// the index for enc_states
+interrupt void rotary(){
+	if(currentChangeScreen != -1){
+		previousUpdateNumber = updateNumber;
+		updateNumber++;
+		if(updateNumber == numRotary) updateNumber = 0;
+	}
+	updateLcd = 1;
+	updateCode = updateNumber+21;
+	updateChange = 1;
+	currentChangeScreen = updateNumber;
+	CpuTimer1Regs.TCR.all = 0x4001;
+	CpuTimer1Regs.TCR.bit.TRB = 1;
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;	//Clear flag to accept more interrupts
+}
 
-	if ( enc_value == old_enc_value ) {
-	return;
+void getInputs(){
+	int change = 0;
+	int B = GpioDataRegs.GPADAT.bit.GPIO23;
+	int A = GpioDataRegs.GPADAT.bit.GPIO22;
+	if((!B) && (prevs[updateNumber])){
+		prevCounts[updateNumber] = counts[updateNumber];
+		change = 1;
+		if(A){
+			if(counts[updateNumber] <32) counts[updateNumber]++;
+		}
+		else{
+			if(counts[updateNumber] >0) counts[updateNumber]--;
+		}
 	}
-	if( enc_value <= 0 ) {
-	enc_value = 0;
+	prevs[updateNumber] = B;
+
+	if(!preset && change){
+		/*if(!effectChange[updateNumber] || currentChangeScreen != updateNumber){
+			currentChangeScreen = updateNumber;
+			updateLcd = 1;
+			updateCode = updateNumber+21;
+			effectChange[updateNumber] = 1;
+			effectChange[previousUpdateNumber] = 0;
+		}*/
+		//updateLcd = 1;
+					//updateCode = updateNumber+21;
+		updateChange = 1;
+		resetTimer = 1;
 	}
 
-	if( enc_value >= 4000 ) {               // Arbitrary max value for testing purposes
-	enc_value = 400;
+	if(resetTimer){
+		CpuTimer1Regs.TCR.all = 0x4001;
+		CpuTimer1Regs.TCR.bit.TRB = 1;
+		resetTimer = 0;
 	}
-	my_enc_val = enc_value;                 // This is the value you will pass to
-	//whatever needs the encoder data - change as required
-	old_enc_value = enc_value;
+
 }
 
 
@@ -224,6 +247,7 @@ interrupt void cpu_timer0_isr(void){
 	else{
 	sample = process(sample,numQueued, on_off,&pipeline[0],&params);	//Process sample
 	write_dac(sample);			//write sample to DAC
+	updateInputs = 1;
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;	//Clear flag to accept more interrupts
 }
@@ -241,7 +265,7 @@ interrupt void cpu_timer1_isr(void){
 	//Reset flag bits that may have caused this
 	preset = 0;
 	bassChange = 0, volumeChange = 0, trebleChange = 0, midChange = 0, flangeChange = 0,delayChange = 0, chorusChange = 0, reverbChange = 0, tremoloChange = 0;
-	currentChangeScreen = 0;
+	currentChangeScreen = -1;
 
 	//Acknowledge Interrupt
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;

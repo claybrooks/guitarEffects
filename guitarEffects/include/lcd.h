@@ -10,7 +10,7 @@
 
 #define TREMOLO			0
 #define REVERB	 		1
-#define FLANGE 			2
+#define FLANGER			2
 #define DELAY	 		3
 #define WAH 			4
 #define DISTORTION		5
@@ -29,14 +29,14 @@
 #define PRESETTIMEOUT	20
 #define CHANGETREMOLO	21
 #define CHANGEREVERB	22
-#define	CHANGECHORUS	23
-#define CHANGEDELAY		24
-#define	CHANGEFLANGE	25
-#define CHANGEVOLUME	26
-#define CHANGEBASS		27
-#define CHANGEMID		28
-#define	CHANGETREBLE	29
-
+#define CHANGEBASS		23
+#define CHANGEVOLUME	24
+#define	CHANGETREBLE	25
+#define CHANGEMID		26
+#define	CHANGEFLANGER	27
+#define CHANGEDELAY		28
+#define	CHANGECHORUS	29
+#define CHANGEMID		30
 
 void	findNote(int);
 void 	initLCD(void);
@@ -57,6 +57,6 @@ void 	printReverb();
 void 	printDelay();
 void 	printChorus();
 void 	printFlange();
-void 	updateLevel(int,int);
+void 	updateLevel(int,int*,int*);
 
 #endif /* LCD_H_ */

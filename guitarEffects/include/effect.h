@@ -13,7 +13,8 @@
 struct params{
 	int tremoloCounter, tremoloRate, tremoloCount, tremoloLimit;
 		int reverbDelay[800], reverbCount, reverbStart; //15 ms delay length at 44.1 kHz
-		int flangeDelay[800], flangeCount, flangeCounter, flangeLimit, flangeStart, flangeInit, flangeSweep; //15 ms delay length at 44.1
+		int flangerDelay[200], flangerSweepCount, flangerCounter, flangerLimit, flangerStart, flangerIndex;
+		double flangerSweep; //15 ms delay length at 44.1
 };
 
 typedef int FUNC(int, struct params*);
@@ -23,7 +24,7 @@ int processCrunch(int, struct params*);
 int processTremolo(int, struct params*);
 int processWah(int, struct params*);
 int processPhaser(int, struct params*);
-int processFlange(int, struct params*);
+int processFlanger(int, struct params*);
 int processReverb(int, struct params*);
 int processChorus(int, struct params*);
 int processDelay(int, struct params*);

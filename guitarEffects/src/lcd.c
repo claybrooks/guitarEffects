@@ -63,7 +63,7 @@ void printDelay(){
 	printLCD(Y+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
-void printFlange(){
+void printFlanger(){
 	controlLCD(CL);
 	controlLCD(SECOND);
 	printLCD(F);
@@ -85,32 +85,63 @@ void printChorus(){
 	printLCD(S+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
-void updateLevel(int newLevel, int oldLevel){
+void printVolume(){
+	controlLCD(CL);
+	controlLCD(SECOND);
+	printLCD(V);
+	printLCD(O+lc);
+	printLCD(L+lc);
+	printLCD(U+lc);
+	printLCD(M+lc);
+	printLCD(E+lc);
+	controlLCD(HOME); //Return cursor to home;
+}
+void printBass(){
+	controlLCD(CL);
+	controlLCD(SECOND);
+	printLCD(B);
+	printLCD(A+lc);
+	printLCD(S+lc);
+	printLCD(S+lc);
+	controlLCD(HOME); //Return cursor to home;
+}
+void printTreble(){
+	controlLCD(CL);
+	controlLCD(SECOND);
+	printLCD(T);
+	printLCD(R+lc);
+	printLCD(E+lc);
+	printLCD(B+lc);
+	printLCD(L+lc);
+	printLCD(E+lc);
+	controlLCD(HOME); //Return cursor to home;
+}
+void updateLevel(int updateNumber, int* count, int* prevCount){
 	int i = 0;
 	//decreasing
-	if(oldLevel >= newLevel){
+	if(prevCount[updateNumber] >= count[updateNumber]){
 		//Shift cursor to level, print spaces to oldLevel
 		if(reprint){
 			controlLCD(HOME);
-			for(i = 0; i < oldLevel; i++)printLCD(BAR);
+			for(i = 0; i < prevCount[updateNumber]; i++)printLCD(BAR);
 			reprint = 0;
 		}
-		int cursorShift = 0x80 | (newLevel);
+		int cursorShift = 0x80 | (count[updateNumber]);
 		controlLCD(cursorShift);
-		for(i = newLevel; i <= oldLevel; i++){
+		for(i = count[updateNumber]; i <= prevCount[updateNumber]; i++){
 			printLCD(SPACE);
 		}
 	}
 	//increasing
 	else{
 		if(reprint){
-			oldLevel = 0;
+			prevCount[updateNumber] = 0;
 			reprint = 0;
 		}
 		//Shift cursor to oldlevel, print bars to level
-		int cursorShift = 0x80 | (oldLevel);
+		int cursorShift = 0x80 | (prevCount[updateNumber]);
 		controlLCD(cursorShift);
-		for(i = oldLevel; i < newLevel; i++){
+		for(i = prevCount[updateNumber]; i < count[updateNumber]; i++){
 			printLCD(BAR);
 		}
 	}
@@ -218,8 +249,17 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 	else if(*update == CHANGEDELAY){
 		printDelay();
 	}
-	else if(*update == CHANGEFLANGE){
-		printFlange();
+	else if(*update == CHANGEFLANGER){
+		printFlanger();
+	}
+	else if(*update == CHANGEVOLUME){
+		printVolume();
+	}
+	else if(*update == CHANGEBASS){
+		printBass();
+	}
+	else if(*update == CHANGETREBLE){
+		printTreble();
 	}
 }
 
@@ -297,7 +337,7 @@ void addToLCD(int effect){
 			printLCD(S);
 			printLCD(U);
 	}
-	else if(effect == FLANGE){
+	else if(effect == FLANGER){
 	 	printLCD(F);
 		printLCD(L);
 	}
