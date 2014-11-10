@@ -45,27 +45,25 @@ void AutoWah_init(short effect_rate,short sampling,short maxf,short minf,short Q
 
         a[1] = 2*b[0]*(1-pow(C,2));
         a[2] = b[0]*(1-2*0.7071*C+pow(C,2));
+        bp_iir_setup(&H,0);
 }
 
-Uint16 AutoWah_process(double xin) {
+int AutoWah_process(int xin) {
         double yout;
 
         yout = bp_iir_filter(xin,&H);
-        #ifdef INPUT_UNSIGNED
-                yout += 32767;
-        #endif
 
         return yout;
 }
 
-void AutoWah_sweep(double xin) {
-        unsigned int filter_index;
+void AutoWah_sweep(int xin) {
+        int filter_index;
         //double yout;
         double detect;
 
         /*The input is 16 bit unsigned so it
         has to be centered to 0*/
-        detect = (xin - 32767.0);
+        //detect = (xin - 32767.0);
         x[0] = x[1];
         x[1] = x[2];
         /*Here the input to the filter

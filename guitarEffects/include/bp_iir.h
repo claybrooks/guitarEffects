@@ -24,6 +24,6 @@ struct bp_filter{
 
 extern void bp_iir_init(double fsfilt,double gb,double Q,short fstep, short fmin,struct bp_filter * H);
 extern void bp_iir_setup(struct bp_filter * H,int index);
-extern double bp_iir_filter(double yin,struct bp_filter * H);
+extern int bp_iir_filter(int yin,struct bp_filter * H);
 
 #endif /* BP_IIR_H_ */

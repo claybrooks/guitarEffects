@@ -59,12 +59,12 @@ into a band pass filter object
 H = filter object
 ind = index of the array mapped to a center frequency
 */
-double bp_iir_filter(double yin,struct bp_filter * H) {
-        double yout;
+int bp_iir_filter(int yin,struct bp_filter * H) {
+        int yout;
 
         H->x[0] =  H->x[1];
         H->x[1] =  H->x[2];
-        H->x[2] = yin;
+        H->x[2] = (double)yin;
 
         H->y[0] =  H->y[1];
         H->y[1] =  H->y[2];

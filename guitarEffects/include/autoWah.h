@@ -9,7 +9,7 @@
 #define AUTOWAH_H_
 #include "DSP28x_Project.h"
 extern void AutoWah_init(short effect_rate,short sampling,short maxf,short minf,short Q,double gainfactor,short freq_step);
-extern Uint16 AutoWah_process(double xin);
-extern void AutoWah_sweep(double xin);
+extern int AutoWah_process(int xin);
+extern void AutoWah_sweep(int xin);
 
 #endif /* AUTOWAH_H_ */

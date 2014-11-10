@@ -43,7 +43,7 @@ void initEffects(struct params* params){
 	//lowpass = lowpass_create();
 	messageOut.MsgStatus = I2C_MSGSTAT_INACTIVE;
 	//Autowah
-	AutoWah_init(2000,  /*Effect rate 2000*/16000, /*Sampling Frequency*/1000,  /*Maximum frequency*/500,   /*Minimum frequency*/ 4,     /*Q*/0.707, /*Gain factor*/10     /*Frequency increment*/);
+	//AutoWah_init(2000,  /*Effect rate 2000*/22000, /*Sampling Frequency*/1500,  /*Maximum frequency*/200,   /*Minimum frequency*/ 4,     /*Q*/0.707, /*Gain factor*/5     /*Frequency increment*/);
 	//Clear the queue
 	clearPipeline();
 	//Tremolo
@@ -58,18 +58,20 @@ void initEffects(struct params* params){
 	params->flangerStart = 0;
 	params->flangerCount = 0;
 	params->flangerSweep = 0;
+	params->wahCount = 0;
+	params->wahCounter = 500;
+	params->wahStart = 0;
 	int i;
 	for(i = 0; i < 600; i++) params->flangerDelay[i] = 0;
 }
 
 int process(int sample, int numQueued, int* on_off, FUNC**pipeline, struct params* params, int* counts){
 	int index;
-	sample-= 8900;
 	//Loop through the entire queue, if its on -> process, else skip
 	for(index = 0; index < numQueued; index++){
 		if(on_off[index]) sample = pipeline[index](sample, params, counts);  //pipeline[index] maps to a function, (sample, &params) is the prototype
 	}
-	return sample+8900;
+	return sample;
 }
 
 /*
@@ -97,6 +99,7 @@ int processCrunch(int sample, struct params* p, int* counts){
 	return sample;
 }
 int processTremolo(int sample, struct params* p, int* counts){
+	sample-=8900;
 	//Sets rate at which the effect runs
 		int pedal = counts[0];
 		//int temp1 = p->tremoloLimit;
@@ -116,11 +119,44 @@ int processTremolo(int sample, struct params* p, int* counts){
 		double temp = (double)p->tremoloCounter*.7/(double)p->tremoloLimit;//*(double)sample;
 		//double temp = temp1>>1;
 		//temp /= p->tremoloLimit;
-
-		return temp*(double)sample;
+		sample = temp*(double)sample;
+		sample += 8900;
+		return sample;
 }
 int processWah(int sample, struct params* p, int* counts){
-	return AutoWah_process(sample);
+	sample-=8900;
+	// sample = (int)AutoWah_process(sample);
+	double damp = .05;
+	int minf = 500;
+	int maxf = 3000;
+	double Fw = 3000;
+	double Fs = 22000;
+	double delta = Fw/Fs;
+
+
+	if(p->wahCounter >= maxf) p->wahCount = -delta;
+	else if(p->wahCounter <= minf) p->wahCount = delta;
+	p->wahCounter+=p->wahCount;
+
+	double F1 = 2*sin(((double)PI*(double)p->wahCounter)/Fs);
+	double Q1 = 2*damp;
+	if(!p->wahStart){
+		p->wahStart = 1;
+		p->yh[0] = sample;
+		p->yb[0] = F1*p->yh[0];
+		p->yl[0] = F1*p->yb[0];
+		p->yb[1] = sample;
+	}
+	else{
+		p->yh[1] = (double)sample - p->yl[0] - Q1*p->yb[0];
+		p->yb[1] = F1*p->yh[1] + p->yb[0];
+		p->yl[1] = F1*p->yb[1] + p->yl[0];
+	}
+	sample = (int)p->yb[1] + 10;
+	p->yb[0] = p->yb[1];
+	p->yl[0] = p->yl[1];
+	sample+=8900;
+	return sample;
 }
 int processPhaser(int sample, struct params* p, int* counts){
 	return sample;
@@ -131,7 +167,8 @@ int processFlanger(int sample, struct params* p, int* counts){
 	//Delay sweep at 1 Hz
 	//int Fs = 22727;
 	//int rate = 1;
-	double decay = .6;
+	sample-=8900;
+	double decay = .7;
 		//Once reinitialized, start to process reverb
 	if(p->flangerCount == 600){
 		p->flangerStart = 1;
@@ -144,12 +181,12 @@ int processFlanger(int sample, struct params* p, int* counts){
 	//int delayIndex = delay;//abs(p->flangerCount - delay);
 	if(p->flangerStart){
 
-		double toSine = 2.0*(double)PI*(double)p->flangerSweepCount*(double)1/(double)22000;
+		double toSine = 2.0*(double)PI*(double)p->flangerSweepCount*(double)1/(double)44000;
 
 		p->flangerSweep = sin(toSine);
 		if(p->flangerSweep < 0) p->flangerSweep *= (double)-1.0;
 		p->flangerSweepCount++;
-		if(p->flangerSweepCount == 22000) p->flangerSweepCount = 0;
+		if(p->flangerSweepCount == 44000) p->flangerSweepCount = 0;
 		int sweepDelay = p->flangerSweep * (double)224;
 		int delayIndex = p->flangerCount;
 		delayIndex = delayIndex - sweepDelay;
@@ -163,11 +200,12 @@ int processFlanger(int sample, struct params* p, int* counts){
 	else p->flangerDelay[p->flangerCount] = (double)sample*decay;
 
 	p->flangerCount++;
+	sample += 8900;
 	return sample;
 }
 int processReverb(int sample, struct params* p, int* counts){
 	//Reinitialize the reverb array on every start
-
+	sample-=8900;
 	if(p->reverbCount == 800){
 			p->reverbStart = 1;
 			p->reverbCount = 0;
@@ -183,6 +221,7 @@ int processReverb(int sample, struct params* p, int* counts){
 		else p->reverbDelay[p->reverbCount] = (double)sample*decay;
 
 		p->reverbCount++;
+		sample += 8900;
 		return sample;
 }
 int processChorus(int sample, struct params* p, int* counts){
