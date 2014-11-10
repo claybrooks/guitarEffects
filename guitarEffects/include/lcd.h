@@ -29,14 +29,13 @@
 #define PRESETTIMEOUT	20
 #define CHANGETREMOLO	21
 #define CHANGEREVERB	22
-#define CHANGEBASS		23
-#define CHANGEVOLUME	24
-#define	CHANGETREBLE	25
-#define CHANGEMID		26
-#define	CHANGEFLANGER	27
-#define CHANGEDELAY		28
-#define	CHANGECHORUS	29
-#define CHANGEMID		30
+#define CHANGEFLANGER	23
+#define CHANGEBASS		24
+#define CHANGEVOLUME	25
+#define	CHANGETREBLE	26
+#define CHANGEMID		27
+#define CHANGEDELAY		29
+#define	CHANGECHORUS	30
 
 void	findNote(int);
 void 	initLCD(void);

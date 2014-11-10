@@ -25,10 +25,10 @@ int indexLookup(int);
 static struct params params;
 
 //Create FUNC variables
-FUNC processTremolo,processReverb,processWah,processDelay,processFlanger,processPhaser,processCrunch,processReverb,processChorus,processPitchShift;
+FUNC processTremolo,processReverb,processFlanger,processDelay,processFlanger,processPhaser,processCrunch,processReverb,processChorus,processPitchShift;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[10] = {processTremolo,processReverb,processWah,processCrunch,processDelay,processFlanger,processPhaser,processCrunch,processChorus,processPitchShift};
+FUNC *list[10] = {processTremolo,processReverb,processFlanger,processCrunch,processDelay,processFlanger,processPhaser,processCrunch,processChorus,processPitchShift};
 
 /*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to

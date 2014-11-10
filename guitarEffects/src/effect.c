@@ -126,6 +126,7 @@ int processTremolo(int sample, struct params* p, int* counts){
 int processWah(int sample, struct params* p, int* counts){
 	sample-=8900;
 	// sample = (int)AutoWah_process(sample);
+
 	double damp = .05;
 	int minf = 500;
 	int maxf = 3000;
@@ -168,7 +169,7 @@ int processFlanger(int sample, struct params* p, int* counts){
 	//int Fs = 22727;
 	//int rate = 1;
 	sample-=8900;
-	double decay = .7;
+	double decay = .6;
 		//Once reinitialized, start to process reverb
 	if(p->flangerCount == 600){
 		p->flangerStart = 1;
@@ -181,16 +182,20 @@ int processFlanger(int sample, struct params* p, int* counts){
 	//int delayIndex = delay;//abs(p->flangerCount - delay);
 	if(p->flangerStart){
 
-		double toSine = 2.0*(double)PI*(double)p->flangerSweepCount*(double)1/(double)44000;
+		double rate = counts[2];
+		rate /= 16;
+		rate = rate*(double)22000 + (double)22000;
+
+		double toSine = 2.0*(double)PI*(double)p->flangerSweepCount*(double)1/(double)rate;
 
 		p->flangerSweep = sin(toSine);
 		if(p->flangerSweep < 0) p->flangerSweep *= (double)-1.0;
 		p->flangerSweepCount++;
-		if(p->flangerSweepCount == 44000) p->flangerSweepCount = 0;
-		int sweepDelay = p->flangerSweep * (double)224;
+		if(p->flangerSweepCount == rate) p->flangerSweepCount = 0;
+		int sweepDelay = p->flangerSweep * (double)100;
 		int delayIndex = p->flangerCount;
 		delayIndex = delayIndex - sweepDelay;
-		if(delayIndex < 0) delayIndex += 600;
+		if(delayIndex < 0) delayIndex += 100;
 		int temp = p->flangerDelay[delayIndex];
 		p->flangerDelay[p->flangerCount] = (double)sample*decay + (double)p->flangerDelay[p->flangerCount]* decay;
 		p->flangerCount++;
