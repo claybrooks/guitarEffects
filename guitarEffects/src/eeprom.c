@@ -16,12 +16,7 @@ void I2CA_Init(void)
    // Initialize I2C
    I2caRegs.I2CSAR = 0x0050;		// Slave address - EEPROM control code
 
-   #if (CPU_FRQ_150MHZ)             // Default - For 150MHz SYSCLKOUT
-        I2caRegs.I2CPSC.all = 15;   // Prescaler - need 7-12 Mhz on module clk (150/15 = 10MHz)
-   #endif
-   #if (CPU_FRQ_100MHZ)             // For 100 MHz SYSCLKOUT
-     I2caRegs.I2CPSC.all = 9;	    // Prescaler - need 7-12 Mhz on module clk (100/10 = 10MHz)
-   #endif
+   I2caRegs.I2CPSC.all = 15;   // Prescaler - need 7-12 Mhz on module clk (150/15 = 10MHz)
 
    I2caRegs.I2CCLKL = 7;			// NOTE: must be non zero
    I2caRegs.I2CCLKH = 7;			// NOTE: must be non zero

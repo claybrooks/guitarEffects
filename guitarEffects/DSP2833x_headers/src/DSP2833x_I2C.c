@@ -40,8 +40,6 @@ void InitI2C(void)
 
 void InitI2CGpio()
 {
-
-   EALLOW;
 /* Enable internal pull-up for the selected pins */
 // Pull-ups can be enabled or disabled disabled by the user.  
 // This will enable the pullups for the specified pins.
@@ -63,8 +61,6 @@ void InitI2CGpio()
 
 	GpioCtrlRegs.GPBMUX1.bit.GPIO32 = 1;   // Configure GPIO32 for SDAA operation
 	GpioCtrlRegs.GPBMUX1.bit.GPIO33 = 1;   // Configure GPIO33 for SCLA operation
-	
-    EDIS;
 }
 
 

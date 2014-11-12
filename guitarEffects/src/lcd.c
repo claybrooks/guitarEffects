@@ -72,6 +72,7 @@ void printFlanger(){
 	printLCD(N+lc);
 	printLCD(G+lc);
 	printLCD(E+lc);
+	printLCD(R+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
 void printChorus(){
@@ -116,32 +117,32 @@ void printTreble(){
 	printLCD(E+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
-void updateLevel(int updateNumber, int* count, int* prevCount){
+void updateLevel(int input, int previousInput){
 	int i = 0;
 	//decreasing
-	if(prevCount[updateNumber] >= count[updateNumber]){
+	if(previousInput >= input){
 		//Shift cursor to level, print spaces to oldLevel
-		if(reprint){
+		/*if(reprint){
 			controlLCD(HOME);
-			for(i = 0; i < prevCount[updateNumber]; i++)printLCD(BAR);
+			for(i = 0; i < previousInput; i++)printLCD(BAR);
 			reprint = 0;
-		}
-		int cursorShift = 0x80 | (count[updateNumber]);
+		}*/
+		int cursorShift = 0x80 | (input);
 		controlLCD(cursorShift);
-		for(i = count[updateNumber]; i <= prevCount[updateNumber]; i++){
+		for(i = input; i <= previousInput; i++){
 			printLCD(SPACE);
 		}
 	}
 	//increasing
 	else{
-		if(reprint){
-			prevCount[updateNumber] = 0;
+		/*if(reprint){
+			previousInput = 0;
 			reprint = 0;
-		}
+		}*/
 		//Shift cursor to oldlevel, print bars to level
-		int cursorShift = 0x80 | (prevCount[updateNumber]);
+		int cursorShift = 0x80 | (previousInput);
 		controlLCD(cursorShift);
-		for(i = prevCount[updateNumber]; i < count[updateNumber]; i++){
+		for(i = previousInput; i < input; i++){
 			printLCD(BAR);
 		}
 	}
@@ -237,11 +238,9 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 	}
 	else if(*update == CHANGETREMOLO){
 		printTremolo();
-		reprint = 1;
 	}
 	else if(*update == CHANGEREVERB){
 		printReverb();
-		reprint = 1;
 	}
 	else if(*update == CHANGECHORUS){
 		printChorus();
@@ -253,15 +252,12 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 		printFlanger();
 	}
 	else if(*update == CHANGEVOLUME){
-		reprint = 1;
 		printVolume();
 	}
 	else if(*update == CHANGEBASS){
-		reprint = 1;
 		printBass();
 	}
 	else if(*update == CHANGETREBLE){
-		reprint = 1;
 		printTreble();
 	}
 }
@@ -418,7 +414,7 @@ void printFreq(int data){
 }
 
 void findNote(frequency){
-	//F
+	int input = 1;
 	int note = noteChart[frequency];
 	controlLCD(0x87);
 	if(note == A){
@@ -488,21 +484,26 @@ void findNote(frequency){
 		printLCD(G);
 		printLCD(SHARP);
 	}
-	if(note == A || note == B || note == C || note == D || note == E || note == F || note == G) printLCD(SPACE);
-	printLCD(SPACE);
-	if(frequency >= -1 && frequency <=1){
-		printLCD(BAR);
-		printLCD(SPACE);
-	}
-	else if(frequency > 1){
-		printLCD(BAR);
-		printLCD(LEFT);
-	}
 	else{
-		controlLCD(0x89);
-		printLCD(RIGHT);
-		printLCD(BAR);
+		input = 0;
+	}
+	if(input){
+		if(note == A || note == B || note == C || note == D || note == E || note == F || note == G) printLCD(SPACE);
 		printLCD(SPACE);
+		if(frequency >= -1 && frequency <=1){
+			printLCD(BAR);
+			printLCD(SPACE);
+		}
+		else if(frequency > 1){
+			printLCD(BAR);
+			printLCD(LEFT);
+		}
+		else{
+			controlLCD(0x89);
+			printLCD(RIGHT);
+			printLCD(BAR);
+			printLCD(SPACE);
+		}
 	}
 }
 

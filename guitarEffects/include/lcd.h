@@ -9,12 +9,12 @@
 #define LCD_H_
 
 #define TREMOLO			0
-#define REVERB	 		1
-#define FLANGER			2
+#define REVERB	 		5
+#define FLANGER			1
 #define DELAY	 		3
 #define WAH 			4
-#define DISTORTION		5
-#define CRUNCH 			6
+#define DISTORTION		6
+#define CRUNCH 			2
 #define PHASER 			7
 #define CHORUS 			8
 #define PITCHSHIFT 		9
@@ -56,6 +56,6 @@ void 	printReverb();
 void 	printDelay();
 void 	printChorus();
 void 	printFlange();
-void 	updateLevel(int,int*,int*);
+void 	updateLevel(int,int);
 
 #endif /* LCD_H_ */

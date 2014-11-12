@@ -15,7 +15,6 @@ void initINTS(){
 	PieCtrlRegs.PIECTRL.bit.ENPIE = 1;        //Enable the PIE block
 	// Disable CPU interrupts and clear all CPU interrupt flags:
 	InitCpuTimers();
-	//InitPieVectTable();
 	EALLOW;
 	//Timer0
 			ConfigCpuTimer(&CpuTimer0,75,44);
@@ -92,12 +91,6 @@ void initINTS(){
 			XIntruptRegs.XINT6CR.bit.POLARITY = 1;      //Rising edge interrupt
 			XIntruptRegs.XINT6CR.bit.ENABLE = 1;        //Enable Xint1*/
 
-
-	//ADC
-		//PieVectTable.ADCINT = &adc_isr;
-		//PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
-
-		AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
 	//I2C
 		PieVectTable.I2CINT1A = &i2c_int1a_isr;
 		PieCtrlRegs.PIEIER8.bit.INTx1 = 1;

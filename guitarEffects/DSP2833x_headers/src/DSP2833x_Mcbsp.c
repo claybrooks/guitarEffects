@@ -267,7 +267,6 @@ void InitMcbspaGpio(void)
 #if DSP28_MCBSPB
 void InitMcbspbGpio(void)
 {
-    EALLOW;
 /* Configure McBSP-A pins using GPIO regs*/
 // This specifies which of the possible GPIO pins will be McBSP functional pins.
 // Comment out other unwanted lines.
@@ -316,9 +315,6 @@ void InitMcbspbGpio(void)
 	//GpioCtrlRegs.GPAQSEL1.bit.GPIO15 = 3; // Asynch input GPIO15 (MFSXB) (Comment as needed)
 	//GpioCtrlRegs.GPAQSEL1.bit.GPIO1 = 3;    // Asynch input GPIO1 (MFSRB) (Comment as needed)
 	//GpioCtrlRegs.GPBQSEL2.bit.GPIO61 = 3; // Asynch input GPIO61 (MFSRB) (Comment as needed)
-
-
-	EDIS;
 }
 #endif                // end DSP28_MCBSPB
 
