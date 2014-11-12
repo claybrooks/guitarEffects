@@ -25,7 +25,6 @@ int noteChart[355];
 #pragma CODE_SECTION(updateLevel, "secureRamFuncs")
 #pragma CODE_SECTION(goToMain, "secureRamFuncs")
 #pragma CODE_SECTION(addToLCD, "secureRamFuncs")
-#pragma CODE_SECTION(shiftCursor, "secureRamFuncs")
 #pragma CODE_SECTION(toggleLCD, "secureRamFuncs")
 #pragma CODE_SECTION(printFreq, "secureRamFuncs")
 
@@ -149,7 +148,7 @@ void updateLevel(int input, int previousInput){
 }
 
 //Eventually parses code and tells the printLCD() what to print
-void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, int* numQueued){
+void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, int* numQueued, int distortion){
 	//Clear Screen, called by a reset on the queue. Block input if on tuner screen or preset screen
 	if(*update == CLEAR && !tunerScreen && !presetScreen){
 		*numQueued = 0;
@@ -158,13 +157,13 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 	//Block input if tunerScreen
 	else if(*update == PRESETTIMEOUT || *update == MAIN){
 		presetScreen = 0;
-		goToMain(mainDisplay, on_off, numQueued);
+		goToMain(mainDisplay, on_off, numQueued,distortion);
 
 	}
 	else if(*update == TUNER){
 		if(tunerScreen){
 			tunerScreen = 0;
-			goToMain(mainDisplay, on_off, numQueued);
+			goToMain(mainDisplay, on_off, numQueued,distortion);
 		}
 		else{
 			tunerScreen = 1;
@@ -184,7 +183,8 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 		if(presetScreen){
 			controlLCD(HOME); //Return cursor to home;
 			//Shift Cursor over to correct position
-			shiftCursor(8);
+			int cursorShift = 0x80 | 8;
+			controlLCD(cursorShift);
 			printLCD(*currentPreset+0x30);
 		}
 		else{
@@ -207,7 +207,8 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 		if(presetScreen){
 			controlLCD(HOME); //Return cursor to home;
 			//Shift Cursor over to correct position
-			shiftCursor(8);
+			int cursorShift = 0x80 | 8;
+			controlLCD(cursorShift);
 			printLCD(*currentPreset+0x30);
 		}
 		else{
@@ -229,12 +230,12 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 	else if(*update == SAVEPRESET && presetScreen){
 		//Save presets.  Method of calling needs to be moved to main
 		presetScreen = 0;
-		goToMain(mainDisplay, on_off, numQueued);
+		goToMain(mainDisplay, on_off, numQueued, distortion);
 	}
 	else if(*update == LOADPRESET && presetScreen){
 		//Load presets.  Method of calling needs to be moved to main
 		presetScreen = 0;
-		goToMain(mainDisplay, on_off, numQueued);
+		goToMain(mainDisplay, on_off, numQueued, distortion);
 	}
 	else if(*update == CHANGETREMOLO){
 		printTremolo();
@@ -277,13 +278,30 @@ void loadPresetScreen(int* location, int* mainDisplay, int* numQueued){
 	}
 }
 
-void goToMain(int* mainDisplay, int* on_off, int* numQueued){
+void goToMain(int* mainDisplay, int* on_off, int* numQueued, int distortion){
 	//Reprint main screen.  Usually called after a load/save preset or presettimeout or tuner screen toggle
 	controlLCD(CL);
+	if(distortion){
+		controlLCD(SECOND);
+		printLCD(C);
+		printLCD(R);
+		printLCD(U);
+		printLCD(N);
+		printLCD(C);
+		printLCD(H);
+	}
+	else{
+		controlLCD(SECOND);
+		printLCD(C);
+		printLCD(L);
+		printLCD(E);
+		printLCD(A);
+		printLCD(N);
+		printLCD(0x20);
+	}
 	controlLCD(HOME);
 	int i;
 	for(i = 0; i < *numQueued; i++){
-		if(i == 3) controlLCD(0xB8); //Second line;
 		if(on_off[i]){
 			printLCD(i+1 + 0x30);
 			printLCD(0x3A);
@@ -296,13 +314,6 @@ void goToMain(int* mainDisplay, int* on_off, int* numQueued){
 			printLCD(SPACE);
 		}
 		printLCD(SPACE);
-	}
-}
-
-void shiftCursor(int shift){
-	int i;
-	for(i = 0;i < shift;i++){
-		controlLCD(SHIFTR);	//Shift to the right
 	}
 }
 
@@ -353,35 +364,49 @@ void addToLCD(int effect){
 		printLCD(I);
 	}
 }
-
+void toggleDistortion(int distortion){
+	controlLCD(HOME);
+	controlLCD(SECOND);
+	if(distortion){
+		printLCD(C);
+		printLCD(R);
+		printLCD(U);
+		printLCD(N);
+		printLCD(C);
+		printLCD(H);
+	}
+	else{
+		printLCD(C);
+		printLCD(L);
+		printLCD(E);
+		printLCD(A);
+		printLCD(N);
+		printLCD(0x20);
+	}
+}
 void toggleLCD(int effect, int index, int on, int numQueued){
 	//controlLCD(0x02); //Return cursor to home;
 	//Shift to beggining of section that needs to be changed
+	if(effect != CRUNCH){
+		int i;
+		int cursorShift = 0x80 | (index*5);
+		controlLCD(cursorShift);
 
-	int i;
-	int cursorShift = 0x80 | (index*5);
-	controlLCD(cursorShift);
 
+		//Went from off to on, reprint effect in proper spot.  Fill in proper vales
+		if(on){
+			printLCD(index+1 + 0x30);
+			printLCD(0x3A);
+			addToLCD(effect);
+		}
 
-	//Went from off to on, reprint effect in proper spot.  Fill in proper vales
-	if(on){
-		printLCD(index+1 + 0x30);
-		printLCD(0x3A);
-		addToLCD(effect);
-	}
-
-	//Went from on to off, remove effect from spot
-	else{
-		for(i = 0; i < 4; i++) printLCD(0x20);
-	}
-/*
-	controlLCD(0x02); //Return cursor to home;
-	for(i = 0;i<numQueued*5;i++){
-			controlLCD(0x14);
-	}
-	*/
+		//Went from on to off, remove effect from spot
+		else{
+			for(i = 0; i < 4; i++) printLCD(0x20);
+		}
 	cursorShift = 0x80 | (numQueued*5);
 	controlLCD(cursorShift);
+	}
 
 }
 

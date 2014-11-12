@@ -232,13 +232,11 @@ void savePreset(int presetNum, int* location, int* on_off, int* counts){
 	//Calculate addresses based on presetNum
 	int i = 0;
 	int locationMessage1 = (presetNum-1)*32;
-	int locationMessage2 = locationMessage1 + 5;
-	int on_offMessage1 = locationMessage2 + 5;
-	int on_offMessage2 = on_offMessage1 + 5;
-	int countsMessage1 = on_offMessage2 + 5;
-	int tLocation[10];
+	int on_offMessage1 = locationMessage1 + 3;
+	int countsMessage1 = on_offMessage1 + 3;
+	int tLocation[3];
 	//Inc location array by 1 because I don't want to save -1 in eeprom
-	for(i = 0; i < 10; i++){
+	for(i = 0; i < 3; i++){
 		int temp = location[i];
 		tLocation[i] = ++temp;
 	}
@@ -248,22 +246,22 @@ void savePreset(int presetNum, int* location, int* on_off, int* counts){
 	messageOut.MemoryHighAddr = (locationMessage1 & 0xFF00)>>8;
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
 	messageOut.SlaveAddress = 0x50;
-	messageOut.NumOfBytes = 5;
+	messageOut.NumOfBytes = 3;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = tLocation[i];
 	eepromWrite();
 	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
-
+/*
 	//write second half of location array
 	messageOut.MemoryLowAddr = locationMessage2 & 0x00FF;
 	messageOut.MemoryHighAddr = (locationMessage2 & 0xFF00)>>8;
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
 	messageOut.SlaveAddress = 0x50;
-	messageOut.NumOfBytes = 5;
+	messageOut.NumOfBytes = 3;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = tLocation[i+5];
 	eepromWrite();
 	DelayUs(EEPROMWRITEDELAY);
-	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};*/
 
 
 	//write first half of on_off array
@@ -271,12 +269,12 @@ void savePreset(int presetNum, int* location, int* on_off, int* counts){
 	messageOut.MemoryHighAddr = (on_offMessage1 & 0xFF00)>>8;
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
 	messageOut.SlaveAddress = 0x50;
-	messageOut.NumOfBytes = 5;
+	messageOut.NumOfBytes = 3;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = on_off[i];
 	eepromWrite();
 	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
-
+/*
 	//write second half of on_off array
 	messageOut.MemoryLowAddr = on_offMessage2 & 0x00FF;
 	messageOut.MemoryHighAddr = (on_offMessage2 & 0xFF00)>>8;
@@ -286,7 +284,7 @@ void savePreset(int presetNum, int* location, int* on_off, int* counts){
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = on_off[i+5];
 	eepromWrite();
 	DelayUs(EEPROMWRITEDELAY);
-	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};*/
 
 	//write out counts values
 	messageOut.MemoryLowAddr = countsMessage1 & 0x00FF;
@@ -304,25 +302,23 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	int i = 0;
 	//Calculate addresses based on presetNum
 	int locationMessage1 = (presetNum-1)*32;
-	int locationMessage2 = locationMessage1 + 5;
-	int on_offMessage1 = locationMessage2 + 5;
-	int on_offMessage2 = on_offMessage1 + 5;
-	int countsMessage1 = on_offMessage2 + 5;
+	int on_offMessage1 = locationMessage1 + 3;
+	int countsMessage1 = on_offMessage1 + 3;
 
 	//Read in first half of location array
 	messageIn.MemoryLowAddr = locationMessage1 & 0x00FF;
 	messageIn.MemoryHighAddr = (locationMessage1 & 0xFF00)>>8;
 	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
 	messageIn.SlaveAddress = 0x50;
-	messageIn.NumOfBytes = 5;
+	messageIn.NumOfBytes = 3;
 	eepromRead();
 	DelayUs(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++) {
+	for(i = 0; i < 3; i++) {
 		location[i] = messageIn.MsgBuffer[i];
 		returnArray[i] = location[i];
 	}
 	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
-
+/*
 	//Read in second half of location array
 	messageIn.MemoryLowAddr = locationMessage2 & 0x00FF;
 	messageIn.MemoryHighAddr = (locationMessage2 & 0xFF00)>>8;
@@ -334,21 +330,21 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	for(i = 0; i < 5; i++) {
 		location[i+5] = messageIn.MsgBuffer[i];
 	}
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);*/
 
 	//Read in second half of on_off array
 	messageIn.MemoryLowAddr = on_offMessage1 & 0x00FF;
 	messageIn.MemoryHighAddr = (on_offMessage1 & 0xFF00)>>8;
 	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
 	messageIn.SlaveAddress = 0x50;
-	messageIn.NumOfBytes = 5;
+	messageIn.NumOfBytes = 3;
 	eepromRead();
 	DelayUs(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++){
+	for(i = 0; i < 3; i++){
 		on_off[i] = messageIn.MsgBuffer[i];
 	}
 	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
-
+/*
 	//Read in second half of on_off array
 	messageIn.MemoryLowAddr = on_offMessage2 & 0x00FF;
 	messageIn.MemoryHighAddr = (on_offMessage2 & 0xFF00)>>8;
@@ -360,7 +356,7 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	for(i = 0; i < 5; i++){
 		on_off[i+5] = messageIn.MsgBuffer[i];
 	}
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);*/
 
 	//Read in counts values
 	messageIn.MemoryLowAddr = countsMessage1 & 0x00FF;
@@ -376,14 +372,14 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Dec location array by 1 because I don't want to save -1 in eeprom
-	for(i = 0; i < 10; i++){
+	for(i = 0; i < 3; i++){
 		int temp = location[i];
 		temp = temp - 1;
 		location[i] = temp;
 	}
 
 	*numQueued = 0;
-	for(i = 0; i < 10; i++){
+	for(i = 0; i < 3; i++){
 		int temp = location[i];
 		if(temp != -1){
 			location[i] = temp;

@@ -9,12 +9,12 @@
 #define LCD_H_
 
 #define TREMOLO			0
-#define REVERB	 		5
-#define FLANGER			1
+#define REVERB	 		1
+#define CRUNCH			2
 #define DELAY	 		3
 #define WAH 			4
-#define DISTORTION		6
-#define CRUNCH 			2
+#define DISTORTION		5
+#define FLANGER			6
 #define PHASER 			7
 #define CHORUS 			8
 #define PITCHSHIFT 		9
@@ -41,11 +41,11 @@ void	findNote(int);
 void 	initLCD(void);
 void 	printLCD(int);
 void 	addToLCD(int);
-void 	goToMain(int* mainDisplay, int* on_off, int* numQueued);
-void  	shiftCursor(int);
+void 	goToMain(int* mainDisplay, int* on_off, int* numQueued, int distortion);
 void 	toggleLCD(int,int,int,int);
+void	toggleDistortion(int);
 void 	controlLCD(int);
-void	updateLCD(int* update, int* mainDisplay, int* on_off, int* presetNumber, int* numQueued);
+void	updateLCD(int* update, int* mainDisplay, int* on_off, int* presetNumber, int* numQueued, int distortion);
 void 	printFreq(int);
 void 	presetUp(int);
 void 	presetDown(int);

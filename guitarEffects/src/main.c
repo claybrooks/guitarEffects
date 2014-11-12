@@ -14,7 +14,7 @@
 /*********************************************************************************************************************************************************************
  * Effect variables/functions
  */
-#define numEffects 4
+#define numEffects 3
 int toggleOn_Off(int effect);
 void queueEffect(int effect);
 void clearPipeline();
@@ -24,10 +24,10 @@ int indexLookup(int);
 static struct params params;
 
 //Create FUNC variables
-FUNC processTremolo,processReverb,processFlanger, processCrunch;
+FUNC processTremolo,processReverb,processFlanger;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[numEffects] = {processTremolo,processReverb, processCrunch,processFlanger};
+FUNC *list[numEffects] = {processTremolo,processReverb,processFlanger};
 
 /*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
@@ -48,7 +48,7 @@ void	queueDisplay(int);	//Sticks effect into queue
 int		toggleEffectOnDisplay(int);	//Sticks effect into queue
 //LCD Display Queue
 int mainDisplay[numEffects];
-int toggle = 0, effectToToggle = 0, indexToToggle = 0;
+int toggle = 0, effectToToggle = 0, indexToToggle = 0, toggleDist = 0;
 int tuner = 0, preset = 0, currentChangeScreen = -1, resetTimer = 0, sysStart = 1, freq = 0;
 int updateLcd = 0, updateCode = 0, updateChange, newLevel = 0, oldLevel = 0, updateFrequency = 0;
 /********************************************************************************************************************************************************************/
@@ -108,8 +108,6 @@ int main(){
 			GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
-		//Initialize Effects
-			initEffects(&params);
 		//Initialize FFT
 			initFFT();
 		//Initialize LCD
@@ -125,11 +123,19 @@ int main(){
 				previousInputs[i] = 0;
 			}
 			//Run through save/load sequence to start I2C properly
-			savePreset(15, location, on_off, inputs);
-			//loadPreset(15, pipeline, list, location, on_off, &numQueued, inputs);
+				initEffects(&params);
+				savePreset(20, location, on_off, inputs);
+				loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs);
+			//Initialize Effects
+
+			toggleDistortion(distortion);
 	while(1){
 		//Wait for signals
 		//Retrieve inputs from rotary switch
+		if(toggleDist){
+			toggleDistortion(distortion);
+			toggleDist = 0;
+		}
 		if(updateInputs){
 			getInputs();
 			updateInputs = 0;
@@ -141,8 +147,11 @@ int main(){
 		}
 		//Update LCD
 		if(updateLcd){
-			updateLCD(&updateCode, mainDisplay, on_off, &presetNumber, &numQueued);
+			updateLCD(&updateCode, mainDisplay, on_off, &presetNumber, &numQueued, distortion);
 			updateLcd = 0;
+			if(updateCode == CLEAR){
+				toggleDistortion(distortion);
+			}
 		}
 		//Update new level on LCD
 		if(updateChange){
@@ -216,7 +225,7 @@ void getInputs(){
 
 interrupt void cpu_timer0_isr(void){
 	int sample = read_adc();	//Get sample from ADC
-	if(distortion != -1 && on_off[distortion]){
+	if(distortion == 1){
 		GpioDataRegs.GPADAT.bit.GPIO20 = 0;
 	}
 	else{
@@ -365,22 +374,31 @@ interrupt void effects(void){
 int toggleOn_Off(int effect){
 	//If location[] == 0, then the effect is not in the queue so return 0 to signal
 	//that this effect needs to be queued up.  Else just toggle the state.
-	if(location[effect] != -1){
-		on_off[location[effect]] ^= 1;
+	if(effect == CRUNCH){
+		toggleDist = 1;
+		if(distortion){
+			distortion = 0;
+		}
+		else{
+			distortion = 1;
+		}
 		return 1;
 	}
-	else return 0;
+	else{
+		if(location[effect] != -1){
+			on_off[location[effect]] ^= 1;
+			return 1;
+		}
+		else return 0;
+	}
 }
 void queueEffect(int effect){
-	if(effect == CRUNCH){
-		distortion = numQueued;
-	}
-
+	if(effect != CRUNCH){
 		location[effect] = numQueued;			//Set location of the effect in the location array, corresponds to the index in the queue, -1 because we inc numQueued first
 		pipeline[numQueued] = list[effect];	//queue function pointer into the pipeline, -1 because we inc numQueued first
 		on_off[numQueued] = 1;					//Turn effect on, makes sense for the user
 		numQueued++;
-
+	}
 }
 
 void clearPipeline(){
@@ -392,7 +410,7 @@ void clearPipeline(){
 		mainDisplay[i] = -1;
 		if(i < numRotary) inputs[i] = 0;
 	}
-	distortion = -1;
+	distortion = 0;
 	numQueued = 0;
 }
 int toggleEffectOnDisplay(int effect){
