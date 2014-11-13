@@ -121,11 +121,11 @@ void updateLevel(int input, int previousInput){
 	//decreasing
 	if(previousInput >= input){
 		//Shift cursor to level, print spaces to oldLevel
-		/*if(reprint){
+		if(reprint){
 			controlLCD(HOME);
 			for(i = 0; i < previousInput; i++)printLCD(BAR);
 			reprint = 0;
-		}*/
+		}
 		int cursorShift = 0x80 | (input);
 		controlLCD(cursorShift);
 		for(i = input; i <= previousInput; i++){
@@ -134,10 +134,10 @@ void updateLevel(int input, int previousInput){
 	}
 	//increasing
 	else{
-		/*if(reprint){
+		if(reprint){
 			previousInput = 0;
 			reprint = 0;
-		}*/
+		}
 		//Shift cursor to oldlevel, print bars to level
 		int cursorShift = 0x80 | (previousInput);
 		controlLCD(cursorShift);
@@ -238,9 +238,11 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 		goToMain(mainDisplay, on_off, numQueued, distortion);
 	}
 	else if(*update == CHANGETREMOLO){
+		reprint = 1;
 		printTremolo();
 	}
 	else if(*update == CHANGEREVERB){
+		reprint = 1;
 		printReverb();
 	}
 	else if(*update == CHANGECHORUS){
@@ -250,6 +252,7 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 		printDelay();
 	}
 	else if(*update == CHANGEFLANGER){
+		reprint = 1;
 		printFlanger();
 	}
 	else if(*update == CHANGEVOLUME){

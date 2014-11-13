@@ -147,17 +147,20 @@ int main(){
 			toggleLCD(effectToToggle,indexToToggle,on_off[indexToToggle], numQueued);
 		}
 		//Update LCD
-		if(updateLcd){
-			updateLCD(&updateCode, mainDisplay, on_off, &presetNumber, &numQueued, distortion);
-			updateLcd = 0;
-			if(updateCode == CLEAR){
-				toggleDistortion(distortion);
+		if(updateLcd || updateChange){
+			if(updateLcd){
+				updateLCD(&updateCode, mainDisplay, on_off, &presetNumber, &numQueued, distortion);
+				updateLcd = 0;
+				if(updateCode == CLEAR){
+					toggleDistortion(distortion);
+				}
 			}
-		}
-		//Update new level on LCD
-		if(updateChange){
-			updateLevel(inputs[inputNumber], previousInputs[inputNumber]);
-			updateChange = 0;
+			//Must be called after the update LCD function because updateLCD could potentially call a clear screen.
+			//This would clear out the level and it won't display.
+			if(updateChange){
+				updateLevel(inputs[inputNumber], previousInputs[inputNumber]);
+				updateChange = 0;
+			}
 		}
 		//Load Preset
 		if(load){
@@ -184,42 +187,46 @@ interrupt void rotary(){
 	//If the LCD is currently displaying a change screen.  This stops inputs after
 	//A presetTimeout to incrememnt the inputNumber before the change screen is
 	//reprinted
-	if(currentChangeScreen != -1){
-		inputNumber++;
-		if(inputNumber == numRotary) inputNumber = 0;
+	if(!preset){
+		if(currentChangeScreen != -1){
+			inputNumber++;
+			if(inputNumber == numRotary) inputNumber = 0;
+		}
+		//previousInputs[inputNumber] = 0;	//Forces LCD to reprint entire line of bars
+		updateLcd = 1;	//Signal LCD to change based on updatCode
+		updateCode = inputNumber+21;
+		updateChange = 1;	//update an input
+		currentChangeScreen = inputNumber;
+		//Reset Timer
+		CpuTimer1Regs.TCR.all = 0x4001;
+		CpuTimer1Regs.TCR.bit.TRB = 1;
 	}
-	previousInputs[inputNumber] = 0;	//Forces LCD to reprint entire line of bars
-	updateLcd = 1;	//Signal LCD to change based on updatCode
-	updateCode = inputNumber+21;
-	updateChange = 1;	//update an input
-	currentChangeScreen = inputNumber;
-	//Reset Timer
-	CpuTimer1Regs.TCR.all = 0x4001;
-	CpuTimer1Regs.TCR.bit.TRB = 1;
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;	//Clear flag to accept more interrupts
 }
 
 void getInputs(){
 	//Get input from rotary switch
-	int change = 0;
-	int B = GpioDataRegs.GPADAT.bit.GPIO23;
-	int A = GpioDataRegs.GPADAT.bit.GPIO22;
-	if((!B) && (previous)){
-		previousInputs[inputNumber] = inputs[inputNumber];
-		change = 1;
-		if(A){
-			if(inputs[inputNumber] <16) inputs[inputNumber]++;
+	if(currentChangeScreen!=-1 && !preset){
+		int change = 0;
+		int B = GpioDataRegs.GPADAT.bit.GPIO23;
+		int A = GpioDataRegs.GPADAT.bit.GPIO22;
+		if((!B) && (previous)){
+			previousInputs[inputNumber] = inputs[inputNumber];
+			change = 1;
+			if(A){
+				if(inputs[inputNumber] <16) inputs[inputNumber]++;
+			}
+			else{
+				if(inputs[inputNumber] >0) inputs[inputNumber]--;
+			}
 		}
-		else{
-			if(inputs[inputNumber] >0) inputs[inputNumber]--;
-		}
-	}
-	previous= B;
+		previous= B;
 
-	if(!preset && change){
-		updateChange = 1;
-		CpuTimer1Regs.TCR.all = 0x4001;
-		CpuTimer1Regs.TCR.bit.TRB = 1;
+		if(!preset && change){
+			updateChange = 1;
+			CpuTimer1Regs.TCR.all = 0x4001;
+			CpuTimer1Regs.TCR.bit.TRB = 1;
+		}
 	}
 }
 
@@ -270,7 +277,7 @@ interrupt void cpu_timer1_isr(void){
 //Preset Up
 interrupt void preset_up(void){
 	//If initial entry into preset, set up timer and flag
-	if(GpioDataRegs.GPADAT.bit.GPIO5){
+	if(GpioDataRegs.GPADAT.bit.GPIO5 && currentChangeScreen == -1){
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
 			preset = 1;
@@ -289,7 +296,7 @@ interrupt void preset_up(void){
 //Preset Down
 interrupt void preset_down(void){
 	//If initial entry into preset, set up timer and flag
-	if(GpioDataRegs.GPADAT.bit.GPIO6){
+	if(GpioDataRegs.GPADAT.bit.GPIO6 && currentChangeScreen == -1){
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
 			preset = 1;
@@ -308,7 +315,7 @@ interrupt void preset_down(void){
 //Load Preset
 interrupt void load_preset(void){
 	//Stop timer and reset flag
-	if(GpioDataRegs.GPBDAT.bit.GPIO48){
+	if(GpioDataRegs.GPBDAT.bit.GPIO48 && preset){
 		CpuTimer1Regs.TCR.bit.TSS = 1;
 		preset = 0;
 		load = 1;
@@ -320,7 +327,7 @@ interrupt void load_preset(void){
 //Save Preset
 interrupt void save_preset(void){
 	//Stop timer and reset flag
-	if(GpioDataRegs.GPBDAT.bit.GPIO49){
+	if(GpioDataRegs.GPBDAT.bit.GPIO49 && preset){
 		CpuTimer1Regs.TCR.bit.TSS = 1;
 		preset = 0;
 		updateLcd = 1;
@@ -349,25 +356,27 @@ interrupt void effects(void){
 
 		//Look to either queue effect or toggle state
 		else{
-			toggle = 1;
-			//Simple lookup vs mathematical computation gets the effect to be manipulated
-			int effect = indexLookup(input);
-			//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
-			if(!toggleOn_Off(effect)){
-				queueEffect(effect);					//queue the effect
-				mainDisplay[numQueued-1] = effect;		//queue the display
-			}
-			//Initialize Variables
-			int i = 0;//, inMainDisplay = 0;
-			//Loop through mainDisplay to see if the effect is already set to print to LCD
-			for(;i<10;i++){
-				//If it is in main display, break
-				if(mainDisplay[i] == effect){
-					indexToToggle = i;
-					break;
+			if(!preset){
+				toggle = 1;
+				//Simple lookup vs mathematical computation gets the effect to be manipulated
+				int effect = indexLookup(input);
+				//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
+				if(!toggleOn_Off(effect)){
+					queueEffect(effect);					//queue the effect
+					mainDisplay[numQueued-1] = effect;		//queue the display
 				}
+				//Initialize Variables
+				int i = 0;//, inMainDisplay = 0;
+				//Loop through mainDisplay to see if the effect is already set to print to LCD
+				for(;i<10;i++){
+					//If it is in main display, break
+					if(mainDisplay[i] == effect){
+						indexToToggle = i;
+						break;
+					}
+				}
+				effectToToggle = effect;
 			}
-			effectToToggle = effect;
 		}
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
