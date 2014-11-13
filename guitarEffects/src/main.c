@@ -104,7 +104,7 @@ int main(){
 			I2CA_Init();
 		//Initialize ADC/DAC
 			init_mcbsp_spi();
-			mcbsp_xmit(0x02000200);
+			mcbsp_xmit(0x38000100);
 			GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
@@ -124,10 +124,11 @@ int main(){
 			}
 			//Run through save/load sequence to start I2C properly
 				initEffects(&params);
-				savePreset(20, location, on_off, inputs);
-				loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs);
-			//Initialize Effects
 
+				savePreset(20, location, on_off, inputs, distortion);
+				loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs,&distortion);
+			//Initialize Effects
+			distortion = 0;
 			toggleDistortion(distortion);
 	while(1){
 		//Wait for signals
@@ -160,7 +161,7 @@ int main(){
 		}
 		//Load Preset
 		if(load){
-			loadPreset(presetNumber, pipeline, list, location, on_off, &numQueued, inputs);
+			loadPreset(presetNumber, pipeline, list, location, on_off, &numQueued, inputs, &distortion);
 			loadPresetScreen(location,mainDisplay, &numQueued);
 			updateCode = MAIN;
 			updateLcd = 1;
@@ -168,7 +169,7 @@ int main(){
 		}
 		//Save Preset
 		if(save){
-			savePreset(presetNumber, location, on_off, inputs);
+			savePreset(presetNumber, location, on_off, inputs,distortion);
 			save = 0;
 		}
 		//Update Input Frequency

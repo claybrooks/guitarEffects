@@ -33,8 +33,8 @@ int processChorus(int, struct params*, int*);
 int processDelay(int, struct params*, int*);
 int processPitchShift(int, struct params*, int*);
 
-void savePreset(int presetNum, int* location, int* on_off, int* counts);
-void loadPreset(int presetNum, FUNC**pipeline,FUNC**list, int* location, int* on_off, int* numQueued, int* counts);
+void savePreset(int presetNum, int* location, int* on_off, int* counts, int distortion);
+void loadPreset(int presetNum, FUNC**pipeline,FUNC**list, int* location, int* on_off, int* numQueued, int* counts, int *distortion);
 void	queueEffect(int);	//Sticks effect into queue
 void 	clearPipeline();	//Clears the queue
 int 	process(int, int,int*, FUNC**, struct params*, int*);		//Process the effects in the queue, FIFO

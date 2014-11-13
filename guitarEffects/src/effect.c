@@ -228,12 +228,13 @@ int processPitchShift(int sample, struct params* p, int* counts){
 
 
 
-void savePreset(int presetNum, int* location, int* on_off, int* counts){
+void savePreset(int presetNum, int* location, int* on_off, int* counts, int distortion){
 	//Calculate addresses based on presetNum
 	int i = 0;
 	int locationMessage1 = (presetNum-1)*32;
 	int on_offMessage1 = locationMessage1 + 3;
 	int countsMessage1 = on_offMessage1 + 3;
+	int distortionMessage1 = countsMessage1+3;
 	int tLocation[3];
 	//Inc location array by 1 because I don't want to save -1 in eeprom
 	for(i = 0; i < 3; i++){
@@ -296,14 +297,26 @@ void savePreset(int presetNum, int* location, int* on_off, int* counts){
 	eepromWrite();
 	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
+
+	//write out counts values
+	messageOut.MemoryLowAddr = distortionMessage1 & 0x00FF;
+	messageOut.MemoryHighAddr = (distortionMessage1 & 0xFF00)>>8;
+	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
+	messageOut.SlaveAddress = 0x50;
+	messageOut.NumOfBytes = 1;
+	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = distortion;
+	eepromWrite();
+	DelayUs(EEPROMWRITEDELAY);
+	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 }
 
-void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* on_off, int* numQueued, int* counts){
+void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* on_off, int* numQueued, int* counts, int *distortion){
 	int i = 0;
 	//Calculate addresses based on presetNum
 	int locationMessage1 = (presetNum-1)*32;
 	int on_offMessage1 = locationMessage1 + 3;
 	int countsMessage1 = on_offMessage1 + 3;
+	int distortionMessage1 = countsMessage1+3;
 
 	//Read in first half of location array
 	messageIn.MemoryLowAddr = locationMessage1 & 0x00FF;
@@ -368,6 +381,19 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	DelayUs(EEPROMREADDELAY);
 	for(i = 0; i < 3; i++){
 		counts[i] = messageIn.MsgBuffer[i];
+	}
+	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
+
+	//Read in counts values
+	messageIn.MemoryLowAddr = distortionMessage1 & 0x00FF;
+	messageIn.MemoryHighAddr = (distortionMessage1 & 0xFF00)>>8;
+	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
+	messageIn.SlaveAddress = 0x50;
+	messageIn.NumOfBytes = 1;
+	eepromRead();
+	DelayUs(EEPROMREADDELAY);
+	for(i = 0; i < 1; i++){
+		*distortion = messageIn.MsgBuffer[i];
 	}
 	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
