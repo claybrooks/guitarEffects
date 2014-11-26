@@ -51,17 +51,6 @@ void printReverb(){
 	printLCD(B+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
-
-void printDelay(){
-	controlLCD(CL);
-	controlLCD(SECOND);
-	printLCD(D);
-	printLCD(E+lc);
-	printLCD(L+lc);
-	printLCD(A+lc);
-	printLCD(Y+lc);
-	controlLCD(HOME); //Return cursor to home;
-}
 void printFlanger(){
 	controlLCD(CL);
 	controlLCD(SECOND);
@@ -74,46 +63,12 @@ void printFlanger(){
 	printLCD(R+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
-void printChorus(){
+void printWah(){
 	controlLCD(CL);
 	controlLCD(SECOND);
-	printLCD(C);
-	printLCD(H+lc);
-	printLCD(O+lc);
-	printLCD(R+lc);
-	printLCD(U+lc);
-	printLCD(S+lc);
-	controlLCD(HOME); //Return cursor to home;
-}
-void printVolume(){
-	controlLCD(CL);
-	controlLCD(SECOND);
-	printLCD(V);
-	printLCD(O+lc);
-	printLCD(L+lc);
-	printLCD(U+lc);
-	printLCD(M+lc);
-	printLCD(E+lc);
-	controlLCD(HOME); //Return cursor to home;
-}
-void printBass(){
-	controlLCD(CL);
-	controlLCD(SECOND);
-	printLCD(B);
+	printLCD(W);
 	printLCD(A+lc);
-	printLCD(S+lc);
-	printLCD(S+lc);
-	controlLCD(HOME); //Return cursor to home;
-}
-void printTreble(){
-	controlLCD(CL);
-	controlLCD(SECOND);
-	printLCD(T);
-	printLCD(R+lc);
-	printLCD(E+lc);
-	printLCD(B+lc);
-	printLCD(L+lc);
-	printLCD(E+lc);
+	printLCD(H+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
 void updateLevel(int input, int previousInput){
@@ -245,24 +200,13 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 		reprint = 1;
 		printReverb();
 	}
-	else if(*update == CHANGECHORUS){
-		printChorus();
-	}
-	else if(*update == CHANGEDELAY){
-		printDelay();
+	else if(*update == CHANGEWAH){
+		reprint = 1;
+		printWah();
 	}
 	else if(*update == CHANGEFLANGER){
 		reprint = 1;
 		printFlanger();
-	}
-	else if(*update == CHANGEVOLUME){
-		printVolume();
-	}
-	else if(*update == CHANGEBASS){
-		printBass();
-	}
-	else if(*update == CHANGETREBLE){
-		printTreble();
 	}
 }
 
@@ -284,7 +228,7 @@ void loadPresetScreen(int* location, int* mainDisplay, int* numQueued){
 void goToMain(int* mainDisplay, int* on_off, int* numQueued, int distortion){
 	//Reprint main screen.  Usually called after a load/save preset or presettimeout or tuner screen toggle
 	controlLCD(CL);
-	if(distortion){
+	if(distortion == 1){
 		controlLCD(SECOND);
 		printLCD(C);
 		printLCD(R);
@@ -292,7 +236,24 @@ void goToMain(int* mainDisplay, int* on_off, int* numQueued, int distortion){
 		printLCD(N);
 		printLCD(C);
 		printLCD(H);
+		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
 	}
+	else if(distortion == 2){
+			controlLCD(SECOND);
+			printLCD(D);
+			printLCD(I);
+			printLCD(S);
+			printLCD(T);
+			printLCD(O);
+			printLCD(R);
+			printLCD(T);
+			printLCD(I);
+			printLCD(O);
+			printLCD(N);
+		}
 	else{
 		controlLCD(SECOND);
 		printLCD(C);
@@ -300,6 +261,10 @@ void goToMain(int* mainDisplay, int* on_off, int* numQueued, int distortion){
 		printLCD(E);
 		printLCD(A);
 		printLCD(N);
+		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
 		printLCD(0x20);
 	}
 	controlLCD(HOME);
@@ -337,46 +302,41 @@ void addToLCD(int effect){
 		printLCD(C);
 		printLCD(R);
 	}
-	else if(effect == DELAY){
-		printLCD(D);
-		printLCD(E);
-	}
 	else if(effect == WAH){
 		printLCD(W);
 		printLCD(A);
 	}
-
-	else if(effect == SUSTAIN){
-			printLCD(S);
-			printLCD(U);
-	}
 	else if(effect == FLANGER){
-	 	printLCD(F);
+		printLCD(F);
 		printLCD(L);
-	}
-	else if(effect == PHASER){
-		printLCD(P);
-		printLCD(H);
-	}
-	else if(effect == CHORUS){
-		printLCD(C);
-		printLCD(H);
-	}
-	else if(effect == PITCHSHIFT){
-		printLCD(P);
-		printLCD(I);
 	}
 }
 void toggleDistortion(int distortion){
 	controlLCD(HOME);
 	controlLCD(SECOND);
-	if(distortion){
+	if(distortion == 1){
 		printLCD(C);
 		printLCD(R);
 		printLCD(U);
 		printLCD(N);
 		printLCD(C);
 		printLCD(H);
+		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
+	}
+	else if(distortion == 2){
+		printLCD(D);
+		printLCD(I);
+		printLCD(S);
+		printLCD(T);
+		printLCD(O);
+		printLCD(R);
+		printLCD(T);
+		printLCD(I);
+		printLCD(O);
+		printLCD(N);
 	}
 	else{
 		printLCD(C);
@@ -385,12 +345,16 @@ void toggleDistortion(int distortion){
 		printLCD(A);
 		printLCD(N);
 		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
+		printLCD(0x20);
 	}
 }
 void toggleLCD(int effect, int index, int on, int numQueued){
 	//controlLCD(0x02); //Return cursor to home;
 	//Shift to beggining of section that needs to be changed
-	if(effect != CRUNCH){
+	if(effect != CRUNCH && effect != DISTORTION){
 		int i;
 		int cursorShift = 0x80 | (index*5);
 		controlLCD(cursorShift);

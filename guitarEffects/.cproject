@@ -37,6 +37,8 @@
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_FOR_SPEED.681925918" name="Speed vs. size trade-offs (--opt_for_speed, -mf)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_FOR_SPEED" value="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.OPT_FOR_SPEED._none" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.INCLUDE_PATH.1286621251" name="Add dir to #include search path (--include_path, -I)" superClass="com.ti.ccstudio.buildDefinitions.C2000_6.2.compilerID.INCLUDE_PATH" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${CG_TOOL_ROOT}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;E:\ti\controlSUITE\libs\dsp\FixedPointLib\v101\source&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;E:\ti\controlSUITE\libs\dsp\FixedPointLib\v101\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/guitarEffects/DSP2833x_headers/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;E:\ti\controlSUITE\libs\dsp\FPU\v1_40_00_00\include&quot;"/>

@@ -14,7 +14,7 @@
 /*********************************************************************************************************************************************************************
  * Effect variables/functions
  */
-#define numEffects 3
+#define numEffects 4
 int toggleOn_Off(int effect);
 void queueEffect(int effect);
 void clearPipeline();
@@ -24,10 +24,10 @@ int indexLookup(int);
 static struct params params;
 
 //Create FUNC variables
-FUNC processTremolo,processReverb,processFlanger;
+FUNC processTremolo,processReverb,processFlanger,processWah, processPhaser;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[numEffects] = {processTremolo,processReverb,processFlanger};
+FUNC *list[numEffects] = {processTremolo,processPhaser,processWah, processWah};
 
 /*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
@@ -66,10 +66,9 @@ int numQueued;
 /********************************************************************************************************************************************************************
  * Input variables/functions
  */
-#define numRotary 3	//Number of inputs that can be changed by the rotary dial
 void getInputs();
 int updateInputs = 0, inputNumber = 0;
-int previous, inputs[numRotary], previousInputs[numRotary];
+int previous, inputs[numEffects], previousInputs[numEffects];
 /********************************************************************************************************************************************************************/
 
 /**********************************************************************************************************************************************************************
@@ -104,7 +103,7 @@ int main(){
 			I2CA_Init();
 		//Initialize ADC/DAC
 			init_mcbsp_spi();
-			mcbsp_xmit(0x38000100);
+			mcbsp_xmit(0x02000100);
 			GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
@@ -117,11 +116,10 @@ int main(){
 			int i = 0;
 			for(;i < numEffects; i++){
 				mainDisplay[i] = -1;
-			}
-			for(i = 0; i < numRotary; i++){
 				inputs[i] = 0;
 				previousInputs[i] = 0;
 			}
+
 			//Run through save/load sequence to start I2C properly
 				initEffects(&params);
 
@@ -190,7 +188,7 @@ interrupt void rotary(){
 	if(!preset){
 		if(currentChangeScreen != -1){
 			inputNumber++;
-			if(inputNumber == numRotary) inputNumber = 0;
+			if(inputNumber == numEffects) inputNumber = 0;
 		}
 		//previousInputs[inputNumber] = 0;	//Forces LCD to reprint entire line of bars
 		updateLcd = 1;	//Signal LCD to change based on updatCode
@@ -235,9 +233,20 @@ interrupt void cpu_timer0_isr(void){
 	int sample = read_adc();	//Get sample from ADC
 	if(distortion == 1){
 		GpioDataRegs.GPADAT.bit.GPIO20 = 0;
+//		GpioDataRegs.GPCDAT.bit.GPIO85 = 0;
+//		GpioDataRegs.GPCDAT.bit.GPIO86 = 1;
+//		GpioDataRegs.GPCDAT.bit.GPIO87 = 0;
+	}
+	else if(distortion == 2){
+//		GpioDataRegs.GPCDAT.bit.GPIO85 = 0;
+//		GpioDataRegs.GPCDAT.bit.GPIO86 = 0;
+//		GpioDataRegs.GPCDAT.bit.GPIO87 = 1;
 	}
 	else{
 		GpioDataRegs.GPADAT.bit.GPIO20 = 1;
+//		GpioDataRegs.GPCDAT.bit.GPIO85 = 1;
+//		GpioDataRegs.GPCDAT.bit.GPIO86 = 0;
+//		GpioDataRegs.GPCDAT.bit.GPIO87 = 0;
 	}
 	if(tuner){// && sampleCount == 23){
 		if(storeFFT(sample - 5000)){
@@ -339,7 +348,46 @@ interrupt void save_preset(void){
 }
 interrupt void effects(void){
 	int input = (GpioDataRegs.GPADAT.all & 0x000000F);
-	if(input){
+	//int input = (GpioDataRegs.GPBDAT.all & 0x03FC0000) >> 18;
+	if(input && !preset && currentChangeScreen == -1){
+		/*
+		if(input == 0x80){
+			updateLcd = 1;
+			clearPipeline();
+			updateCode = CLEAR;
+		}
+		else if(input == 0x40){
+			tuner ^= 1;			//signal for timer0 to not sample out to SPI
+			updateLcd = 1;
+			updateCode = TUNER;
+			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
+			else updateTimer0(44);		//FFT was toggled off, switch back to sample out to SPI
+		}
+		else{
+			if(!preset){
+				toggle = 1;
+				//Simple lookup vs mathematical computation gets the effect to be manipulated
+				int effect = indexLookup(input);
+				//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
+				if(!toggleOn_Off(effect)){
+					queueEffect(effect);					//queue the effect
+					mainDisplay[numQueued-1] = effect;		//queue the display
+				}
+				//Initialize Variables
+				int i = 0;//, inMainDisplay = 0;
+				//Loop through mainDisplay to see if the effect is already set to print to LCD
+				for(;i<10;i++){
+					//If it is in main display, break
+					if(mainDisplay[i] == effect){
+						indexToToggle = i;
+						break;
+					}
+				}
+				effectToToggle = effect;
+			}
+		}
+		 */
+
 		if(input == 0x0008){
 			updateLcd = 1;
 			clearPipeline();
@@ -386,11 +434,27 @@ int toggleOn_Off(int effect){
 	//that this effect needs to be queued up.  Else just toggle the state.
 	if(effect == CRUNCH){
 		toggleDist = 1;
-		if(distortion){
+		if(distortion == 0){
+			distortion = 1;
+		}
+		else if(distortion == 1){
 			distortion = 0;
 		}
 		else{
 			distortion = 1;
+		}
+		return 1;
+	}
+	else if(effect == DISTORTION){
+		toggleDist = 1;
+		if(distortion == 0){
+			distortion = 2;
+		}
+		else if(distortion == 1){
+			distortion = 2;
+		}
+		else{
+			distortion = 0;
 		}
 		return 1;
 	}
@@ -418,7 +482,7 @@ void clearPipeline(){
 		location[i] = -1;
 		on_off[i] = 0;
 		mainDisplay[i] = -1;
-		if(i < numRotary) inputs[i] = 0;
+		inputs[i] = 0;
 	}
 	distortion = 0;
 	numQueued = 0;
@@ -438,13 +502,10 @@ int toggleEffectOnDisplay(int effect){
 //Eliminates need to call log(input)/log(2).  Simple lookup will be faster
 
 int indexLookup(int input){
-	if(input == 1) return 0;
-	else if(input == 2) return 1;
-	else if(input == 4) return 2;
-	else if(input == 8) return 3;
-	else if(input == 16) return 4;
-	else if(input == 32) return 5;
-	else if(input == 64) return 6;
-	else if(input == 128) return 7;
-	else return 8;
+	if(input == 1) return 0;		//Tremolo
+	else if(input == 2) return 1;	//Reverb
+	else if(input == 4) return 2;	//Flanger
+	else if(input == 8) return 3;	//Wah
+	else if(input == 16) return 4;	//DISTORTION
+	else return 5;					//CRUNCH
 }

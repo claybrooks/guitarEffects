@@ -10,15 +10,11 @@
 
 #define TREMOLO			0
 #define REVERB	 		1
+#define FLANGER			4
+#define WAH		 		3
+#define DISTORTION 		5
 #define CRUNCH			2
-#define DELAY	 		3
-#define WAH 			4
-#define DISTORTION		5
-#define FLANGER			6
-#define PHASER 			7
-#define CHORUS 			8
-#define PITCHSHIFT 		9
-#define SUSTAIN			10
+
 #define MAIN 			11
 #define CLEAR 			14
 #define TUNER 			15
@@ -30,12 +26,9 @@
 #define CHANGETREMOLO	21
 #define CHANGEREVERB	22
 #define CHANGEFLANGER	23
-#define CHANGEBASS		24
-#define CHANGEVOLUME	25
-#define	CHANGETREBLE	26
-#define CHANGEMID		27
-#define CHANGEDELAY		29
-#define	CHANGECHORUS	30
+#define CHANGEWAH		24
+
+
 
 void	findNote(int);
 void 	initLCD(void);
@@ -53,9 +46,8 @@ void 	loadPresetScreen(int*, int*, int*);
 
 void 	printTremolo();
 void 	printReverb();
-void 	printDelay();
-void 	printChorus();
 void 	printFlange();
+void 	printWah();
 void 	updateLevel(int,int);
 
 #endif /* LCD_H_ */

@@ -36,13 +36,20 @@ Uint16 Error;
 void eepromWrite();
 void eepromRead();
 
+#define NZEROS 10
+#define NPOLES 10
+#define GAIN   2.015579946e+04
+static float xv[NZEROS+1], yv[NPOLES+1];
+
+#define nZEROS 1
+#define nPOLES 1
+#define gAIN   1.370620474e+01
+static float x[NZEROS+1], y[NPOLES+1];
+
+
 int returnArray[26];
 
 void initEffects(struct params* params){
-	//Lowpass Filter
-	//lowpass = lowpass_create();
-	//Autowah
-	//AutoWah_init(2000,  /*Effect rate 2000*/22000, /*Sampling Frequency*/1500,  /*Maximum frequency*/200,   /*Minimum frequency*/ 4,     /*Q*/0.707, /*Gain factor*/5     /*Frequency increment*/);
 	//Clear the queue
 	clearPipeline();
 	//Tremolo
@@ -62,35 +69,46 @@ void initEffects(struct params* params){
 	params->wahStart = 0;
 	int i;
 	for(i = 0; i < 600; i++) params->flangerDelay[i] = 0;
+	for(i = 0; i < NZEROS+1; i++){
+		xv[i] = 0;
+		yv[i] = 0;
+	}
+	for(i = 0; i < 3; i++){
+		params->phaserx[i] = 0;
+		params->phasery[i] = 0;
+	}
+	params->phaserCount = 0;
+	params->phaserCounter = 500;
 }
 
 int process(int sample, int numQueued, int* on_off, FUNC**pipeline, struct params* params, int* counts){
 	int index;
-	sample -= 1700;
-	//Loop through the entire queue, if its on -> process, else skip
+
+	sample -= 8500;
+	 xv[0] = xv[1]; xv[1] = xv[2]; xv[2] = xv[3]; xv[3] = xv[4]; xv[4] = xv[5]; xv[5] = xv[6]; xv[6] = xv[7]; xv[7] = xv[8]; xv[8] = xv[9]; xv[9] = xv[10];
+	        xv[10] = sample / GAIN;
+	        yv[0] = yv[1]; yv[1] = yv[2]; yv[2] = yv[3]; yv[3] = yv[4]; yv[4] = yv[5]; yv[5] = yv[6]; yv[6] = yv[7]; yv[7] = yv[8]; yv[8] = yv[9]; yv[9] = yv[10];
+	        yv[10] =   (xv[0] + xv[10]) + 10 * (xv[1] + xv[9]) + 45 * (xv[2] + xv[8])
+	                     + 120 * (xv[3] + xv[7]) + 210 * (xv[4] + xv[6]) + 252 * xv[5]
+	                     + ( -0.0017696319 * yv[0]) + (  0.0283358587 * yv[1])
+	                     + ( -0.2089123247 * yv[2]) + (  0.9364034626 * yv[3])
+	                     + ( -2.8352616543 * yv[4]) + (  6.0842140836 * yv[5])
+	                     + ( -9.4233371622 * yv[6]) + ( 10.4762753570 * yv[7])
+	                     + ( -8.0944065927 * yv[8]) + (  3.9876543673 * yv[9]);
+	        sample = yv[10];
+
 	for(index = 0; index < numQueued; index++){
 		if(on_off[index]){
 			sample = pipeline[index](sample, params, counts);  //pipeline[index] maps to a function, (sample, &params) is the prototype
 		}
 	}
-	sample += 1700;
+	sample += 8500;
 	return sample;
 }
 
 /*
  * Processing functions
  */
-int processDelay(int sample, struct params* p, int* counts){
-	return sample;
-}
-int processDistortion(int sample, struct params* p, int* counts){
-	//Spit out sample to analog Distortion circuit on DAC B.  Will need a GPIO to select where the signal goes from the analog switc
-	return sample;
-}
-int processCrunch(int sample, struct params* p, int* counts){
-
-	return sample;
-}
 int processTremolo(int sample, struct params* p, int* counts){
 	//Sets rate at which the effect runs
 		int pedal = counts[0];
@@ -117,11 +135,12 @@ int processTremolo(int sample, struct params* p, int* counts){
 int processWah(int sample, struct params* p, int* counts){
 	// sample = (int)AutoWah_process(sample);
 
-	double damp = .05;
+	double damp = .15;
 	int minf = 500;
 	int maxf = 3000;
 	double Fw = 3000;
-	double Fs = 22000;
+
+	double Fs = (double)counts[3]/(double)16 *(double)10000 + 10000;
 	double delta = Fw/Fs;
 
 
@@ -149,7 +168,46 @@ int processWah(int sample, struct params* p, int* counts){
 	return sample;
 }
 int processPhaser(int sample, struct params* p, int* counts){
-	return sample;
+	// sample = (int)AutoWah_process(sample);
+		int minf = 500;
+		int maxf = 3000;
+		double Fw = 3000;
+		double damp = .15;
+		double Fs = 20000;//(double)counts[3]/(double)16 *(double)10000 + 10000;
+		double delta = Fw/Fs;
+
+		if(p->phaserCounter >= maxf) p->phaserCount = -delta;
+		else if(p->phaserCounter <= minf) p->phaserCount = delta;
+		p->phaserCounter+=p->phaserCount;
+		double Vc = 2*PI*sin(((double)PI*(double)p->phaserCounter)/Fs);
+		double Q = .25;
+
+		double alpha = sin(Vc)/(2.0*Q);
+		double a0 = 1.0+alpha;
+		double a1 = -2.0*cos(Vc);
+		double a2 = 1.0-alpha;
+		double b0 = 1.0;
+		double b1 = -2.0*cos(Vc);
+		double b2 = 1.0;
+
+		p->phaserx[0] = (double)sample;
+
+//		p->phasery[0] = (b0/a0)*p->phaserx[0]+(b1/a0)*p->phaserx[1]+(b2/a0)*p->phaserx[2] - (a1/a0)*p->phasery[1] - (a2/a0)*p->phasery[2];
+
+		p->phasery[0] =  b0 * p->phaserx[0];
+		p->phasery[0] += b1 * p->phaserx[1];
+		p->phasery[0] += b1 * p->phaserx[1];
+		p->phasery[0] += b2 * p->phaserx[2];
+		p->phasery[0] -= a1 * p->phasery[1];
+		p->phasery[0] -= a1 * p->phasery[1];
+		p->phasery[0] -= a2 * p->phasery[2];
+
+		p->phasery[2] = p->phasery[1];
+		p->phasery[1] = p->phasery[0];
+		p->phaserx[2] = p->phaserx[1];
+		p->phaserx[1] = p->phaserx[0];
+
+		return (int)p->phasery[0];
 }
 int processFlanger(int sample, struct params* p, int* counts){
 	//Process sweep
@@ -172,7 +230,7 @@ int processFlanger(int sample, struct params* p, int* counts){
 
 		int rate = counts[2];
 		rate >>= 4;
-		rate = (double)rate*(double)11000 + (double)44000;
+		rate = (double)rate*(double)11000 + (double)20000;
 
 		double toSine = 2.0*(double)PI*(double)p->flangerSweepCount*(double)1/(double)rate;
 
@@ -207,7 +265,15 @@ int processReverb(int sample, struct params* p, int* counts){
 		if(p->reverbStart){
 			int temp = p->reverbDelay[p->reverbCount];
 			sample += p->reverbDelay[p->reverbCount];
-			p->reverbDelay[p->reverbCount] = (double)sample*decay + (double)temp*(decay-.08);
+
+			x[0] = x[1];
+			        x[1] = temp / GAIN;
+			        y[0] = y[1];
+			        y[1] =   (x[0] + x[1])
+			                     + (  0.8540806855 * y[0]);
+			        temp = y[1];
+
+			p->reverbDelay[p->reverbCount] = (double)sample*decay + (double)temp;
 		}
 		else p->reverbDelay[p->reverbCount] = (double)sample*decay;
 
@@ -232,12 +298,12 @@ void savePreset(int presetNum, int* location, int* on_off, int* counts, int dist
 	//Calculate addresses based on presetNum
 	int i = 0;
 	int locationMessage1 = (presetNum-1)*32;
-	int on_offMessage1 = locationMessage1 + 3;
-	int countsMessage1 = on_offMessage1 + 3;
-	int distortionMessage1 = countsMessage1+3;
-	int tLocation[3];
+	int on_offMessage1 = locationMessage1 + 4;
+	int countsMessage1 = on_offMessage1 + 4;
+	int distortionMessage1 = countsMessage1+4;
+	int tLocation[4];
 	//Inc location array by 1 because I don't want to save -1 in eeprom
-	for(i = 0; i < 3; i++){
+	for(i = 0; i < 4; i++){
 		int temp = location[i];
 		tLocation[i] = ++temp;
 	}
@@ -247,58 +313,35 @@ void savePreset(int presetNum, int* location, int* on_off, int* counts, int dist
 	messageOut.MemoryHighAddr = (locationMessage1 & 0xFF00)>>8;
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
 	messageOut.SlaveAddress = 0x50;
-	messageOut.NumOfBytes = 3;
+	messageOut.NumOfBytes = 4;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = tLocation[i];
 	eepromWrite();
 	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
-/*
-	//write second half of location array
-	messageOut.MemoryLowAddr = locationMessage2 & 0x00FF;
-	messageOut.MemoryHighAddr = (locationMessage2 & 0xFF00)>>8;
-	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
-	messageOut.SlaveAddress = 0x50;
-	messageOut.NumOfBytes = 3;
-	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = tLocation[i+5];
-	eepromWrite();
-	DelayUs(EEPROMWRITEDELAY);
-	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};*/
-
 
 	//write first half of on_off array
 	messageOut.MemoryLowAddr = on_offMessage1 & 0x00FF;
 	messageOut.MemoryHighAddr = (on_offMessage1 & 0xFF00)>>8;
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
 	messageOut.SlaveAddress = 0x50;
-	messageOut.NumOfBytes = 3;
+	messageOut.NumOfBytes = 4;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = on_off[i];
 	eepromWrite();
 	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
-/*
-	//write second half of on_off array
-	messageOut.MemoryLowAddr = on_offMessage2 & 0x00FF;
-	messageOut.MemoryHighAddr = (on_offMessage2 & 0xFF00)>>8;
-	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
-	messageOut.SlaveAddress = 0x50;
-	messageOut.NumOfBytes = 5;
-	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = on_off[i+5];
-	eepromWrite();
-	DelayUs(EEPROMWRITEDELAY);
-	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};*/
 
 	//write out counts values
 	messageOut.MemoryLowAddr = countsMessage1 & 0x00FF;
 	messageOut.MemoryHighAddr = (countsMessage1 & 0xFF00)>>8;
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
 	messageOut.SlaveAddress = 0x50;
-	messageOut.NumOfBytes = 3;
+	messageOut.NumOfBytes = 4;
 	for(i = 0; i < messageOut.NumOfBytes; i++) messageOut.MsgBuffer[i] = counts[i];
 	eepromWrite();
 	DelayUs(EEPROMWRITEDELAY);
 	while(messageOut.MsgStatus != I2C_MSGSTAT_INACTIVE){};
 
-	//write out counts values
+	//write out distortion values
 	messageOut.MemoryLowAddr = distortionMessage1 & 0x00FF;
 	messageOut.MemoryHighAddr = (distortionMessage1 & 0xFF00)>>8;
 	messageOut.MsgStatus = I2C_MSGSTAT_SEND_WITHSTOP;
@@ -314,77 +357,51 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	int i = 0;
 	//Calculate addresses based on presetNum
 	int locationMessage1 = (presetNum-1)*32;
-	int on_offMessage1 = locationMessage1 + 3;
-	int countsMessage1 = on_offMessage1 + 3;
-	int distortionMessage1 = countsMessage1+3;
+	int on_offMessage1 = locationMessage1 + 4;
+	int countsMessage1 = on_offMessage1 + 4;
+	int distortionMessage1 = countsMessage1+4;
 
 	//Read in first half of location array
 	messageIn.MemoryLowAddr = locationMessage1 & 0x00FF;
 	messageIn.MemoryHighAddr = (locationMessage1 & 0xFF00)>>8;
 	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
 	messageIn.SlaveAddress = 0x50;
-	messageIn.NumOfBytes = 3;
+	messageIn.NumOfBytes = 4;
 	eepromRead();
 	DelayUs(EEPROMREADDELAY);
-	for(i = 0; i < 3; i++) {
+	for(i = 0; i < messageIn.NumOfBytes; i++) {
 		location[i] = messageIn.MsgBuffer[i];
 		returnArray[i] = location[i];
 	}
 	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
-/*
-	//Read in second half of location array
-	messageIn.MemoryLowAddr = locationMessage2 & 0x00FF;
-	messageIn.MemoryHighAddr = (locationMessage2 & 0xFF00)>>8;
-	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
-	messageIn.SlaveAddress = 0x50;
-	messageIn.NumOfBytes = 5;
-	eepromRead();
-	DelayUs(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++) {
-		location[i+5] = messageIn.MsgBuffer[i];
-	}
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);*/
 
 	//Read in second half of on_off array
 	messageIn.MemoryLowAddr = on_offMessage1 & 0x00FF;
 	messageIn.MemoryHighAddr = (on_offMessage1 & 0xFF00)>>8;
 	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
 	messageIn.SlaveAddress = 0x50;
-	messageIn.NumOfBytes = 3;
+	messageIn.NumOfBytes = 4;
 	eepromRead();
 	DelayUs(EEPROMREADDELAY);
-	for(i = 0; i < 3; i++){
+	for(i = 0; i < messageIn.NumOfBytes; i++){
 		on_off[i] = messageIn.MsgBuffer[i];
 	}
 	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
-/*
-	//Read in second half of on_off array
-	messageIn.MemoryLowAddr = on_offMessage2 & 0x00FF;
-	messageIn.MemoryHighAddr = (on_offMessage2 & 0xFF00)>>8;
-	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
-	messageIn.SlaveAddress = 0x50;
-	messageIn.NumOfBytes = 5;
-	eepromRead();
-	DelayUs(EEPROMREADDELAY);
-	for(i = 0; i < 5; i++){
-		on_off[i+5] = messageIn.MsgBuffer[i];
-	}
-	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);*/
 
 	//Read in counts values
 	messageIn.MemoryLowAddr = countsMessage1 & 0x00FF;
 	messageIn.MemoryHighAddr = (countsMessage1 & 0xFF00)>>8;
 	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
 	messageIn.SlaveAddress = 0x50;
-	messageIn.NumOfBytes = 3;
+	messageIn.NumOfBytes = 4;
 	eepromRead();
 	DelayUs(EEPROMREADDELAY);
-	for(i = 0; i < 3; i++){
+	for(i = 0; i < messageIn.NumOfBytes; i++){
 		counts[i] = messageIn.MsgBuffer[i];
 	}
 	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
-	//Read in counts values
+	//Read in distortion value
 	messageIn.MemoryLowAddr = distortionMessage1 & 0x00FF;
 	messageIn.MemoryHighAddr = (distortionMessage1 & 0xFF00)>>8;
 	messageIn.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
@@ -392,20 +409,20 @@ void loadPreset(int presetNum, FUNC**pipeline, FUNC**list, int* location, int* o
 	messageIn.NumOfBytes = 1;
 	eepromRead();
 	DelayUs(EEPROMREADDELAY);
-	for(i = 0; i < 1; i++){
+	for(i = 0; i < messageIn.NumOfBytes; i++){
 		*distortion = messageIn.MsgBuffer[i];
 	}
 	while(messageIn.MsgStatus != I2C_MSGSTAT_INACTIVE);
 
 	//Dec location array by 1 because I don't want to save -1 in eeprom
-	for(i = 0; i < 3; i++){
+	for(i = 0; i < 4; i++){
 		int temp = location[i];
 		temp = temp - 1;
 		location[i] = temp;
 	}
 
 	*numQueued = 0;
-	for(i = 0; i < 3; i++){
+	for(i = 0; i < 4; i++){
 		int temp = location[i];
 		if(temp != -1){
 			location[i] = temp;

@@ -16,6 +16,8 @@ struct params{
 	int flangerDelay[600], flangerSweepCount, flangerCounter, flangerLimit, flangerStart, flangerCount;
 	double flangerSweep; //15 ms delay length at 44.1
 
+	double phaserx[3], phasery[3],phaserCount, phaserCounter;
+
 	int wahStart;
 	double yh[2], yb[2], yl[2], wahCount, wahCounter;
 };
