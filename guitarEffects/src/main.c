@@ -75,7 +75,7 @@ int load = 0, save = 0, presetNumber = 1;
 /********************************************************************************************************************************************************************/
 
 #pragma CODE_SECTION(cpu_timer0_isr, "secureRamFuncs")
-#pragma CODE_SECTION(cpu_timer1_isr, "secureRamFuncs")
+#pragma CODE_SECTION(timeout, "secureRamFuncs")
 #pragma CODE_SECTION(preset_up, "secureRamFuncs")
 #pragma CODE_SECTION(preset_down, "secureRamFuncs")
 #pragma CODE_SECTION(load_preset, "secureRamFuncs")
@@ -273,7 +273,7 @@ interrupt void cpu_timer0_isr(void){
 }
 
 //Timeout counter for Preset selection
-interrupt void presetTimeout(void){
+interrupt void timeout(void){
 
 	GpioDataRegs.GPADAT.bit.GPIO1 = 1;
 	CpuTimer1Regs.TCR.bit.TSS = 1;

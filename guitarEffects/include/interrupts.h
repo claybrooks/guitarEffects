@@ -9,7 +9,7 @@
 #define SYS_H_
 
 interrupt void cpu_timer0_isr(void);
-interrupt void presetTimeout(void);
+interrupt void timeout(void);
 
 interrupt void preset_up(void);
 interrupt void preset_down(void);

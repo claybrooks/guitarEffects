@@ -23,7 +23,7 @@ void initINTS(){
 		PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 	//Timer1
 		ConfigCpuTimer(&CpuTimer1, 150, 3000000);
-		PieVectTable.XINT13 = &presetTimeout;
+		PieVectTable.XINT13 = &timeout;
 		PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 
 	//External Interrupts
