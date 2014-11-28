@@ -2,7 +2,7 @@
  * spi.c
  *
  *  Created on: Sep 19, 2014
- *      Author: Clay
+ *      Author: Clay, Jonathan
  */
 #include "spi.h"
 #include "DSP28x_Project.h"

@@ -2,7 +2,7 @@
  * eeprom.h
  *
  *  Created on: Oct 17, 2014
- *      Author: Clay
+ *      Author: Clay, Jonathan
  */
 
 #ifndef EEPROM_H_

@@ -273,7 +273,7 @@ interrupt void cpu_timer0_isr(void){
 }
 
 //Timeout counter for Preset selection
-interrupt void cpu_timer1_isr(void){
+interrupt void presetTimeout(void){
 
 	GpioDataRegs.GPADAT.bit.GPIO1 = 1;
 	CpuTimer1Regs.TCR.bit.TSS = 1;

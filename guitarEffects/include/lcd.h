@@ -2,7 +2,7 @@
  * lcd.h
  *
  *  Created on: Sep 22, 2014
- *      Author: brks9622
+ *      Author: Clay, Jonathan
  */
 
 #ifndef LCD_H_

@@ -2,7 +2,7 @@
  * eeprom.c
  *
  *  Created on: Oct 17, 2014
- *      Author: Clay
+ *      Author: Clay, Jonathan
  */
 #include "eeprom.h"
 #include "DSP28x_Project.h"     // Device Headerfile and Examples Include File

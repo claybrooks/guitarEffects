@@ -1,3 +1,10 @@
+/*
+ * effect.h
+ *
+ *  Created on: Sep 22, 2014
+ *      Author: Clay, Jonathan
+ */
+
 #include "effect.h"
 #include "F28335_example.h"
 #include "math.h"

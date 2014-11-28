@@ -17,14 +17,13 @@ void initINTS(){
 	InitCpuTimers();
 	EALLOW;
 	//Timer0
-		ConfigCpuTimer(&CpuTimer0,150,50);
+		ConfigCpuTimer(&CpuTimer0,150,24);
 		PieVectTable.TINT0 = &cpu_timer0_isr;
 		CpuTimer0Regs.TCR.all = 0x4001;
 		PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 	//Timer1
 		ConfigCpuTimer(&CpuTimer1, 150, 3000000);
-		PieVectTable.XINT13 = &cpu_timer1_isr;
-		//CpuTimer1Regs.TCR.all = 0x4001;
+		PieVectTable.XINT13 = &presetTimeout;
 		PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 
 	//External Interrupts

@@ -1,3 +1,10 @@
+/*
+ * fft.h
+ *
+ *  Created on: Sep 22, 2014
+ *      Author: Clay, Jonathan
+ */
+
 #include "DSP28x_Project.h"
 #include "math.h"
 #include "fpu_rfft.h"

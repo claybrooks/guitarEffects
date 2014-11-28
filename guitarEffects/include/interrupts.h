@@ -2,14 +2,14 @@
  * interrupts.h
  *
  *  Created on: Sep 22, 2014
- *      Author: brks9622
+ *      Author: Clay, Jonathan
  */
 
 #ifndef SYS_H_
 #define SYS_H_
 
 interrupt void cpu_timer0_isr(void);
-interrupt void cpu_timer1_isr(void);
+interrupt void presetTimeout(void);
 
 interrupt void preset_up(void);
 interrupt void preset_down(void);

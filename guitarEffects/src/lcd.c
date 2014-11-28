@@ -2,7 +2,7 @@
  * lcd.c
  *
  *  Created on: Sep 19, 2014
- *      Author: Clay
+ *      Author: Clay, Jonathan
  */
 #include "lcd.h"
 #include "lcdCodes.h"

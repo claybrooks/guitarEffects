@@ -2,7 +2,7 @@
  * lcdCodes.h
  *
  *  Created on: Oct 5, 2014
- *      Author: Clay
+ *      Author: Clay, Jonathan
  */
 
 #ifndef LCDCODES_H_
