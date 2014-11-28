@@ -4,7 +4,7 @@
  *  Created on: Sep 19, 2014
  *      Author: Clay
  */
-#include "../include/spi.h"
+#include "spi.h"
 #include "DSP28x_Project.h"
 #include "F28335_example.h"
 

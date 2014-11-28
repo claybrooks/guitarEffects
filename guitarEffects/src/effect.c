@@ -36,17 +36,6 @@ Uint16 Error;
 void eepromWrite();
 void eepromRead();
 
-#define NZEROS 10
-#define NPOLES 10
-#define GAIN   2.015579946e+04
-static float xv[NZEROS+1], yv[NPOLES+1];
-
-#define nZEROS 1
-#define nPOLES 1
-#define gAIN   1.370620474e+01
-static float x[NZEROS+1], y[NPOLES+1];
-
-
 int returnArray[26];
 
 void initEffects(struct params* params){
@@ -69,10 +58,6 @@ void initEffects(struct params* params){
 	params->wahStart = 0;
 	int i;
 	for(i = 0; i < 600; i++) params->flangerDelay[i] = 0;
-	for(i = 0; i < NZEROS+1; i++){
-		xv[i] = 0;
-		yv[i] = 0;
-	}
 	for(i = 0; i < 3; i++){
 		params->phaserx[i] = 0;
 		params->phasery[i] = 0;
@@ -85,17 +70,6 @@ int process(int sample, int numQueued, int* on_off, FUNC**pipeline, struct param
 	int index;
 
 	sample -= 8500;
-	/* xv[0] = xv[1]; xv[1] = xv[2]; xv[2] = xv[3]; xv[3] = xv[4]; xv[4] = xv[5]; xv[5] = xv[6]; xv[6] = xv[7]; xv[7] = xv[8]; xv[8] = xv[9]; xv[9] = xv[10];
-	        xv[10] = sample / GAIN;
-	        yv[0] = yv[1]; yv[1] = yv[2]; yv[2] = yv[3]; yv[3] = yv[4]; yv[4] = yv[5]; yv[5] = yv[6]; yv[6] = yv[7]; yv[7] = yv[8]; yv[8] = yv[9]; yv[9] = yv[10];
-	        yv[10] =   (xv[0] + xv[10]) + 10 * (xv[1] + xv[9]) + 45 * (xv[2] + xv[8])
-	                     + 120 * (xv[3] + xv[7]) + 210 * (xv[4] + xv[6]) + 252 * xv[5]
-	                     + ( -0.0017696319 * yv[0]) + (  0.0283358587 * yv[1])
-	                     + ( -0.2089123247 * yv[2]) + (  0.9364034626 * yv[3])
-	                     + ( -2.8352616543 * yv[4]) + (  6.0842140836 * yv[5])
-	                     + ( -9.4233371622 * yv[6]) + ( 10.4762753570 * yv[7])
-	                     + ( -8.0944065927 * yv[8]) + (  3.9876543673 * yv[9]);
-	        sample = yv[10];*/
 
 	for(index = 0; index < numQueued; index++){
 		if(on_off[index]){
@@ -172,7 +146,7 @@ int processPhaser(int sample, struct params* p, int* counts){
 		int minf = 500;
 		int maxf = 3000;
 		double Fw = 3000;
-		double damp = .15;
+		//double damp = .15;
 		double Fs = 20000;//(double)counts[3]/(double)16 *(double)10000 + 10000;
 		double delta = Fw/Fs;
 
@@ -183,7 +157,7 @@ int processPhaser(int sample, struct params* p, int* counts){
 		double Q = .25;
 
 		double alpha = sin(Vc)/(2.0*Q);
-		double a0 = 1.0+alpha;
+		//double a0 = 1.0+alpha;
 		double a1 = -2.0*cos(Vc);
 		double a2 = 1.0-alpha;
 		double b0 = 1.0;
@@ -265,13 +239,13 @@ int processReverb(int sample, struct params* p, int* counts){
 		if(p->reverbStart){
 			int temp = p->reverbDelay[p->reverbCount];
 			sample += p->reverbDelay[p->reverbCount];
-
+/*
 			x[0] = x[1];
 			        x[1] = temp / GAIN;
 			        y[0] = y[1];
 			        y[1] =   (x[0] + x[1])
 			                     + (  0.8540806855 * y[0]);
-			        temp = y[1];
+			        temp = y[1];*/
 
 			p->reverbDelay[p->reverbCount] = (double)sample*decay + (double)temp;
 		}
