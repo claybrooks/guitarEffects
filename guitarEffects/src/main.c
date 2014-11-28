@@ -3,7 +3,7 @@
 #include "adc.h"
 #include "spi.h"
 #include "effect.h"
-#include "fft.h"
+#include "../include/fft.h"
 #include "sys.h"
 #include "PWM.h"
 #include "eeprom.h"
@@ -27,7 +27,7 @@ static struct params params;
 FUNC processTremolo,processReverb,processFlanger,processWah, processPhaser;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[numEffects] = {processTremolo,processPhaser,processWah, processWah};
+FUNC *list[numEffects] = {processTremolo,processReverb,processWah, processFlanger};
 
 /*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
@@ -85,8 +85,8 @@ int load = 0, save = 0, presetNumber = 1;
 #pragma CODE_SECTION(save_preset, "secureRamFuncs")
 #pragma CODE_SECTION(effects, "secureRamFuncs")
 
-
-
+int sample = 0;
+int iCount = 0;
 
 int main(){
 	InitSysCtrl();
@@ -96,6 +96,11 @@ int main(){
 	EALLOW;
 		GpioCtrlRegs.GPAMUX2.bit.GPIO20 = 0;
 		GpioCtrlRegs.GPADIR.bit.GPIO20 = 1;
+
+		GpioCtrlRegs.GPCDIR.bit.GPIO85 = 1;
+		GpioCtrlRegs.GPCDIR.bit.GPIO86 = 1;
+		GpioCtrlRegs.GPCDIR.bit.GPIO87 = 1;
+
 		//Initiliaze McBSP
 			InitMcbspbGpio();
 		//Initialize I2C
@@ -103,7 +108,12 @@ int main(){
 			I2CA_Init();
 		//Initialize ADC/DAC
 			init_mcbsp_spi();
-			mcbsp_xmit(0x02000100);
+			//Initialization for Expecting reference to be fed in
+			//mcbsp_xmit(0x02000100);
+
+			//Initialization for Using internal reference
+			mcbsp_xmit(0x38000100);
+
 			GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 0;
 			GpioCtrlRegs.GPADIR.bit.GPIO19 = 1;	//CONVST
 			init_adc_spi();
@@ -123,8 +133,8 @@ int main(){
 			//Run through save/load sequence to start I2C properly
 				initEffects(&params);
 
-				savePreset(20, location, on_off, inputs, distortion);
-				loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs,&distortion);
+				//savePreset(20, location, on_off, inputs, distortion);
+				//loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs,&distortion);
 			//Initialize Effects
 			distortion = 0;
 			toggleDistortion(distortion);
@@ -230,24 +240,25 @@ void getInputs(){
 
 
 interrupt void cpu_timer0_isr(void){
-	int sample = read_adc();	//Get sample from ADC
+	sample = read_adc();	//Get sample from ADC
 	if(distortion == 1){
-		GpioDataRegs.GPADAT.bit.GPIO20 = 0;
-//		GpioDataRegs.GPCDAT.bit.GPIO85 = 0;
-//		GpioDataRegs.GPCDAT.bit.GPIO86 = 1;
-//		GpioDataRegs.GPCDAT.bit.GPIO87 = 0;
+		//GpioDataRegs.GPADAT.bit.GPIO20 = 0;
+		GpioDataRegs.GPCDAT.bit.GPIO85 = 0;
+		GpioDataRegs.GPCDAT.bit.GPIO86 = 1;
+		GpioDataRegs.GPCDAT.bit.GPIO87 = 0;
 	}
 	else if(distortion == 2){
-//		GpioDataRegs.GPCDAT.bit.GPIO85 = 0;
-//		GpioDataRegs.GPCDAT.bit.GPIO86 = 0;
-//		GpioDataRegs.GPCDAT.bit.GPIO87 = 1;
+		GpioDataRegs.GPCDAT.bit.GPIO85 = 0;
+		GpioDataRegs.GPCDAT.bit.GPIO86 = 0;
+		GpioDataRegs.GPCDAT.bit.GPIO87 = 1;
 	}
 	else{
-		GpioDataRegs.GPADAT.bit.GPIO20 = 1;
-//		GpioDataRegs.GPCDAT.bit.GPIO85 = 1;
-//		GpioDataRegs.GPCDAT.bit.GPIO86 = 0;
-//		GpioDataRegs.GPCDAT.bit.GPIO87 = 0;
+	//	GpioDataRegs.GPADAT.bit.GPIO20 = 1;
+		GpioDataRegs.GPCDAT.bit.GPIO85 = 1;
+		GpioDataRegs.GPCDAT.bit.GPIO86 = 0;
+		GpioDataRegs.GPCDAT.bit.GPIO87 = 0;
 	}
+
 	if(tuner){// && sampleCount == 23){
 		if(storeFFT(sample - 5000)){
 			freq = findFrequency();
@@ -257,7 +268,7 @@ interrupt void cpu_timer0_isr(void){
 	//else sampleCount++;
 	else{
 
-	sample = process(sample,numQueued, on_off,&pipeline[0],&params, inputs);	//Process sample
+	//sample = process(sample,numQueued, on_off,&pipeline[0],&params, inputs);	//Process sample
 	write_dac(sample);			//write sample to DAC
 	updateInputs = 1;
 	}
@@ -287,6 +298,7 @@ interrupt void cpu_timer1_isr(void){
 interrupt void preset_up(void){
 	//If initial entry into preset, set up timer and flag
 	if(GpioDataRegs.GPADAT.bit.GPIO5 && currentChangeScreen == -1){
+		DelayUs(60000);
 		if(!preset){
 			CpuTimer1Regs.TCR.all = 0x4001;
 			preset = 1;
@@ -347,10 +359,11 @@ interrupt void save_preset(void){
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
 interrupt void effects(void){
-	int input = (GpioDataRegs.GPADAT.all & 0x000000F);
-	//int input = (GpioDataRegs.GPBDAT.all & 0x03FC0000) >> 18;
+	//int input = (GpioDataRegs.GPADAT.all & 0x000000F);
+	int input = (GpioDataRegs.GPBDAT.all & 0x03FC0000) >> 18;
 	if(input && !preset && currentChangeScreen == -1){
-		/*
+		//DelayUs(60000);
+		iCount++;
 		if(input == 0x80){
 			updateLcd = 1;
 			clearPipeline();
@@ -386,21 +399,21 @@ interrupt void effects(void){
 				effectToToggle = effect;
 			}
 		}
-		 */
 
+/*
 		if(input == 0x0008){
 			updateLcd = 1;
 			clearPipeline();
 			updateCode = CLEAR;
 		}
 		//Switch to tuning function
-		/*else if(input == 0x0004){
+		else if(input == 0x0004){
 			tuner ^= 1;			//signal for timer0 to not sample out to SPI
 			updateLcd = 1;
 			updateCode = TUNER;
 			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
 			else updateTimer0(44);		//FFT was toggled off, switch back to sample out to SPI
-		}*/
+		}
 
 		//Look to either queue effect or toggle state
 		else{
@@ -425,7 +438,7 @@ interrupt void effects(void){
 				}
 				effectToToggle = effect;
 			}
-		}
+		}*/
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }

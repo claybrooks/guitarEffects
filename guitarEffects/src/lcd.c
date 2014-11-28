@@ -530,8 +530,8 @@ void initLCD(){
 	GpioCtrlRegs.GPADIR.bit.GPIO15 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO25 = 0x1;
 	GpioCtrlRegs.GPADIR.bit.GPIO21 = 0x1;
-	//E = 48
-	//RS = 49
+	//E = 25
+	//RS = 21
 	//8 Bit Mode
 	//Write 38 for 1st function set
 	controlLCD(0x38);

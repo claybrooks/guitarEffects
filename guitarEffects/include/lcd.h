@@ -10,10 +10,10 @@
 
 #define TREMOLO			0
 #define REVERB	 		1
-#define FLANGER			4
-#define WAH		 		3
+#define FLANGER			3
+#define WAH		 		2
 #define DISTORTION 		5
-#define CRUNCH			2
+#define CRUNCH			4
 
 #define MAIN 			11
 #define CLEAR 			14
