@@ -1,11 +1,8 @@
-#include "spi.h"
 #include "lcd.h"
-#include "adc.h"
 #include "spi.h"
 #include "effect.h"
 #include "../include/fft.h"
-#include "sys.h"
-#include "PWM.h"
+#include "interrupts.h"
 #include "eeprom.h"
 #include "DSP2833x_Mcbsp.h"
 #include "F28335_example.h"
@@ -133,8 +130,8 @@ int main(){
 			//Run through save/load sequence to start I2C properly
 				initEffects(&params);
 
-				//savePreset(20, location, on_off, inputs, distortion);
-				//loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs,&distortion);
+			//savePreset(20, location, on_off, inputs, distortion);
+			//loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs,&distortion);
 			//Initialize Effects
 			distortion = 0;
 			toggleDistortion(distortion);
@@ -515,8 +512,8 @@ int toggleEffectOnDisplay(int effect){
 int indexLookup(int input){
 	if(input == 1) return 0;		//Tremolo
 	else if(input == 2) return 1;	//Reverb
-	else if(input == 4) return 2;	//Flanger
-	else if(input == 8) return 3;	//Wah
+	else if(input == 4) return 2;	//Wah
+	else if(input == 8) return 3;	//Flanger
 	else if(input == 16) return 4;	//DISTORTION
 	else return 5;					//CRUNCH
 }

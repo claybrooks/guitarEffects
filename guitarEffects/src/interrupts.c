@@ -1,10 +1,10 @@
 /*
- * sys.c
+ * interrupts.c
  *
  *  Created on: Sep 19, 2014
- *      Author: Clay
+ *      Author: Clay, Jonathan
  */
-#include "sys.h"
+#include "interrupts.h"
 #include "DSP28x_Project.h"
 
 void initINTS(){
@@ -17,10 +17,10 @@ void initINTS(){
 	InitCpuTimers();
 	EALLOW;
 	//Timer0
-			ConfigCpuTimer(&CpuTimer0,150,50);
-			PieVectTable.TINT0 = &cpu_timer0_isr;
-			CpuTimer0Regs.TCR.all = 0x4001;
-			PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
+		ConfigCpuTimer(&CpuTimer0,150,50);
+		PieVectTable.TINT0 = &cpu_timer0_isr;
+		CpuTimer0Regs.TCR.all = 0x4001;
+		PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
 	//Timer1
 		ConfigCpuTimer(&CpuTimer1, 150, 3000000);
 		PieVectTable.XINT13 = &cpu_timer1_isr;

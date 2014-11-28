@@ -33,14 +33,13 @@ $(GEN_CMDS__FLAG) \
 "./DSP2833x_headers/src/DSP2833x_Adc.obj" \
 "./DSP2833x_headers/src/DSP2833x_ADC_cal.obj" \
 "./DSP2833x_headers/src/CodeStartBranch.obj" \
-"./src/sys.obj" \
 "./src/spi.obj" \
 "./src/main.obj" \
 "./src/lcd.obj" \
+"./src/interrupts.obj" \
 "./src/fft.obj" \
 "./src/effect.obj" \
 "./src/eeprom.obj" \
-"./src/adc.obj" \
 "../cmd/F28335_nonBIOS_flash.cmd" \
 "../DSP2833x_headers/cmd/DSP2833x_Headers_nonBIOS.cmd" \
 -l"libc.a" \
@@ -183,8 +182,8 @@ guitarEffects.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "src\adc.pp" "src\eeprom.pp" "src\effect.pp" "src\fft.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "src\sys.pp" "DSP2833x_headers\src\DSP2833x_Adc.pp" "DSP2833x_headers\src\DSP2833x_CpuTimers.pp" "DSP2833x_headers\src\DSP2833x_EPwm.pp" "DSP2833x_headers\src\DSP2833x_EQep.pp" "DSP2833x_headers\src\DSP2833x_GlobalVariableDefs.pp" "DSP2833x_headers\src\DSP2833x_I2C.pp" "DSP2833x_headers\src\DSP2833x_Mcbsp.pp" "DSP2833x_headers\src\DSP2833x_Spi.pp" "DSP2833x_headers\src\DefaultIsr_nonBIOS.pp" "DSP2833x_headers\src\Flash.pp" "DSP2833x_headers\src\Gpio.pp" "DSP2833x_headers\src\PieCtrl_nonBIOS.pp" "DSP2833x_headers\src\PieVect_nonBIOS.pp" "DSP2833x_headers\src\RFFT_f32_sincostable.pp" "DSP2833x_headers\src\SysCtrl.pp" "DSP2833x_headers\src\Watchdog.pp" "DSP2833x_headers\src\Xintf.pp" 
-	-$(RM) "src\adc.obj" "src\eeprom.obj" "src\effect.obj" "src\fft.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "src\sys.obj" "DSP2833x_headers\src\CodeStartBranch.obj" "DSP2833x_headers\src\DSP2833x_ADC_cal.obj" "DSP2833x_headers\src\DSP2833x_Adc.obj" "DSP2833x_headers\src\DSP2833x_CpuTimers.obj" "DSP2833x_headers\src\DSP2833x_EPwm.obj" "DSP2833x_headers\src\DSP2833x_EQep.obj" "DSP2833x_headers\src\DSP2833x_GlobalVariableDefs.obj" "DSP2833x_headers\src\DSP2833x_I2C.obj" "DSP2833x_headers\src\DSP2833x_Mcbsp.obj" "DSP2833x_headers\src\DSP2833x_Spi.obj" "DSP2833x_headers\src\DefaultIsr_nonBIOS.obj" "DSP2833x_headers\src\DelayUs.obj" "DSP2833x_headers\src\Flash.obj" "DSP2833x_headers\src\Gpio.obj" "DSP2833x_headers\src\Passwords.obj" "DSP2833x_headers\src\PieCtrl_nonBIOS.obj" "DSP2833x_headers\src\PieVect_nonBIOS.obj" "DSP2833x_headers\src\RFFT_adc_f32.obj" "DSP2833x_headers\src\RFFT_adc_f32u.obj" "DSP2833x_headers\src\RFFT_f32_mag.obj" "DSP2833x_headers\src\RFFT_f32_sincostable.obj" "DSP2833x_headers\src\SetDBGIER.obj" 
+	-$(RM) "src\eeprom.pp" "src\effect.pp" "src\fft.pp" "src\interrupts.pp" "src\lcd.pp" "src\main.pp" "src\spi.pp" "DSP2833x_headers\src\DSP2833x_Adc.pp" "DSP2833x_headers\src\DSP2833x_CpuTimers.pp" "DSP2833x_headers\src\DSP2833x_EPwm.pp" "DSP2833x_headers\src\DSP2833x_EQep.pp" "DSP2833x_headers\src\DSP2833x_GlobalVariableDefs.pp" "DSP2833x_headers\src\DSP2833x_I2C.pp" "DSP2833x_headers\src\DSP2833x_Mcbsp.pp" "DSP2833x_headers\src\DSP2833x_Spi.pp" "DSP2833x_headers\src\DefaultIsr_nonBIOS.pp" "DSP2833x_headers\src\Flash.pp" "DSP2833x_headers\src\Gpio.pp" "DSP2833x_headers\src\PieCtrl_nonBIOS.pp" "DSP2833x_headers\src\PieVect_nonBIOS.pp" "DSP2833x_headers\src\RFFT_f32_sincostable.pp" "DSP2833x_headers\src\SysCtrl.pp" "DSP2833x_headers\src\Watchdog.pp" "DSP2833x_headers\src\Xintf.pp" 
+	-$(RM) "src\eeprom.obj" "src\effect.obj" "src\fft.obj" "src\interrupts.obj" "src\lcd.obj" "src\main.obj" "src\spi.obj" "DSP2833x_headers\src\CodeStartBranch.obj" "DSP2833x_headers\src\DSP2833x_ADC_cal.obj" "DSP2833x_headers\src\DSP2833x_Adc.obj" "DSP2833x_headers\src\DSP2833x_CpuTimers.obj" "DSP2833x_headers\src\DSP2833x_EPwm.obj" "DSP2833x_headers\src\DSP2833x_EQep.obj" "DSP2833x_headers\src\DSP2833x_GlobalVariableDefs.obj" "DSP2833x_headers\src\DSP2833x_I2C.obj" "DSP2833x_headers\src\DSP2833x_Mcbsp.obj" "DSP2833x_headers\src\DSP2833x_Spi.obj" "DSP2833x_headers\src\DefaultIsr_nonBIOS.obj" "DSP2833x_headers\src\DelayUs.obj" "DSP2833x_headers\src\Flash.obj" "DSP2833x_headers\src\Gpio.obj" "DSP2833x_headers\src\Passwords.obj" "DSP2833x_headers\src\PieCtrl_nonBIOS.obj" "DSP2833x_headers\src\PieVect_nonBIOS.obj" "DSP2833x_headers\src\RFFT_adc_f32.obj" "DSP2833x_headers\src\RFFT_adc_f32u.obj" "DSP2833x_headers\src\RFFT_f32_mag.obj" "DSP2833x_headers\src\RFFT_f32_sincostable.obj" "DSP2833x_headers\src\SetDBGIER.obj" 
 	-$(RM) "DSP2833x_headers\src\SysCtrl.obj" "DSP2833x_headers\src\Watchdog.obj" "DSP2833x_headers\src\Xintf.obj" 
 	-$(RM) "DSP2833x_headers\src\CodeStartBranch.pp" "DSP2833x_headers\src\DSP2833x_ADC_cal.pp" "DSP2833x_headers\src\DelayUs.pp" "DSP2833x_headers\src\Passwords.pp" "DSP2833x_headers\src\RFFT_adc_f32.pp" "DSP2833x_headers\src\RFFT_adc_f32u.pp" "DSP2833x_headers\src\RFFT_f32_mag.pp" "DSP2833x_headers\src\SetDBGIER.pp" 
 	-@echo 'Finished clean'

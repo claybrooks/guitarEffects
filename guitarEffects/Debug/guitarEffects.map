@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v6.2.7                      
 ******************************************************************************
->> Linked Fri Nov 28 10:52:53 2014
+>> Linked Fri Nov 28 10:59:38 2014
 
 OUTPUT FILE NAME:   <guitarEffects.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 00301eae
@@ -109,7 +109,7 @@ secureRamFuncs
                   003014bf    00000212     main.obj (.text)
                   003016d1    00000157     DSP2833x_Mcbsp.obj (.text)
                   00301828    00000138     RFFT_adc_f32.obj (.text)
-                  00301960    0000012d     sys.obj (.text)
+                  00301960    0000012d     interrupts.obj (.text)
                   00301a8d    00000001     --HOLE-- [fill = 0]
                   00301a8e    0000009e     RFFT_adc_f32u.obj (.text)
                   00301b2c    00000088     rts2800_fpu32.lib : fs_div.obj (.text)
@@ -519,29 +519,29 @@ address     data page           name
 0000ce9a     33a (0000ce80)     ___TI_cleanup_ptr
 0000ce9c     33a (0000ce80)     ___TI_dtors_ptr
 
-0000d000     340 (0000d000)     _resetTimer
-0000d001     340 (0000d000)     _sysStart
-0000d002     340 (0000d000)     _updateCode
-0000d003     340 (0000d000)     _updateChange
-0000d004     340 (0000d000)     _freq
-0000d005     340 (0000d000)     _updateLcd
+0000d000     340 (0000d000)     _sysStart
+0000d001     340 (0000d000)     _currentChangeScreen
+0000d002     340 (0000d000)     _resetTimer
+0000d003     340 (0000d000)     _updateCode
+0000d004     340 (0000d000)     _updateChange
+0000d005     340 (0000d000)     _freq
 0000d006     340 (0000d000)     _indexToToggle
 0000d007     340 (0000d000)     _toggleDist
 0000d008     340 (0000d000)     _toggle
 0000d009     340 (0000d000)     _preset
-0000d00a     340 (0000d000)     _currentChangeScreen
+0000d00a     340 (0000d000)     _updateLcd
 0000d00b     340 (0000d000)     _effectToToggle
 0000d00c     340 (0000d000)     _load
-0000d00d     340 (0000d000)     _numQueued
+0000d00d     340 (0000d000)     _previous
 0000d00e     340 (0000d000)     _presetNumber
-0000d00f     340 (0000d000)     _inputNumber
-0000d010     340 (0000d000)     _updateInputs
+0000d00f     340 (0000d000)     _updateInputs
+0000d010     340 (0000d000)     _numQueued
 0000d011     340 (0000d000)     _save
 0000d012     340 (0000d000)     _oldLevel
 0000d013     340 (0000d000)     _iCount
 0000d014     340 (0000d000)     _tuner
 0000d015     340 (0000d000)     _sample
-0000d016     340 (0000d000)     _previous
+0000d016     340 (0000d000)     _inputNumber
 0000d017     340 (0000d000)     _newLevel
 0000d018     340 (0000d000)     _updateFrequency
 0000d019     340 (0000d000)     _distortion
@@ -780,7 +780,7 @@ ffffffff   ___pinit__
 00301d98   _cos
 00008632   _cpu_timer0_isr
 000086b0   _cpu_timer1_isr
-0000d00a   _currentChangeScreen
+0000d001   _currentChangeScreen
 0000cc83   _currentPreset
 003017fc   _delay_loop
 0000d019   _distortion
@@ -793,7 +793,7 @@ ffffffff   ___pinit__
 000089b6   _findFrequency
 00301292   _findNote
 00301f68   _fmod
-0000d004   _freq
+0000d005   _freq
 003015b8   _getInputs
 0000819c   _goToMain
 00008940   _i2c_int1a_isr
@@ -806,7 +806,7 @@ ffffffff   ___pinit__
 00301397   _initLCD
 00008862   _init_adc_spi
 0000887a   _init_mcbsp_spi
-0000d00f   _inputNumber
+0000d016   _inputNumber
 0000d01a   _inputs
 0000d036   _list
 0000d00c   _load
@@ -823,7 +823,7 @@ ffffffff   ___pinit__
 0000d017   _newLevel
 0000ccc0   _noteChart
 0000cc80   _numInMainDisplay
-0000d00d   _numQueued
+0000d010   _numQueued
 0000d012   _oldLevel
 0000d02a   _on_off
 0000d02e   _pipeline
@@ -832,7 +832,7 @@ ffffffff   ___pinit__
 0000cc82   _presetScreen
 0000872a   _preset_down
 000086d2   _preset_up
-0000d016   _previous
+0000d00d   _previous
 0000d022   _previousInputs
 003011db   _printFlanger
 000082aa   _printFreq
@@ -852,7 +852,7 @@ ffffffff   ___pinit__
 0000ce42   _readDone
 00008851   _read_adc
 0000cc84   _reprint
-0000d000   _resetTimer
+0000d002   _resetTimer
 0000ce80   _returnArray
 0000c008   _rfft
 0000c004   _rfft_adc
@@ -869,7 +869,7 @@ ffffffff   ___pinit__
 00301e56   _sin
 00301fec   _sqrt
 00301e3a   _storeFFT
-0000d001   _sysStart
+0000d000   _sysStart
 0000d008   _toggle
 0000d007   _toggleDist
 00301227   _toggleDistortion
@@ -878,12 +878,12 @@ ffffffff   ___pinit__
 00301610   _toggleOn_Off
 0000d014   _tuner
 0000cc81   _tunerScreen
-0000d003   _updateChange
-0000d002   _updateCode
+0000d004   _updateChange
+0000d003   _updateCode
 0000d018   _updateFrequency
-0000d010   _updateInputs
+0000d00f   _updateInputs
 00008081   _updateLCD
-0000d005   _updateLcd
+0000d00a   _updateLcd
 0000803b   _updateLevel
 00301a7c   _updateTimer0
 0000ce40   _writeDone
@@ -1022,29 +1022,29 @@ address    name
 0000ce80   _returnArray
 0000ce9a   ___TI_cleanup_ptr
 0000ce9c   ___TI_dtors_ptr
-0000d000   _resetTimer
-0000d001   _sysStart
-0000d002   _updateCode
-0000d003   _updateChange
-0000d004   _freq
-0000d005   _updateLcd
+0000d000   _sysStart
+0000d001   _currentChangeScreen
+0000d002   _resetTimer
+0000d003   _updateCode
+0000d004   _updateChange
+0000d005   _freq
 0000d006   _indexToToggle
 0000d007   _toggleDist
 0000d008   _toggle
 0000d009   _preset
-0000d00a   _currentChangeScreen
+0000d00a   _updateLcd
 0000d00b   _effectToToggle
 0000d00c   _load
-0000d00d   _numQueued
+0000d00d   _previous
 0000d00e   _presetNumber
-0000d00f   _inputNumber
-0000d010   _updateInputs
+0000d00f   _updateInputs
+0000d010   _numQueued
 0000d011   _save
 0000d012   _oldLevel
 0000d013   _iCount
 0000d014   _tuner
 0000d015   _sample
-0000d016   _previous
+0000d016   _inputNumber
 0000d017   _newLevel
 0000d018   _updateFrequency
 0000d019   _distortion

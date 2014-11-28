@@ -3,8 +3,6 @@
 #include "math.h"
 #include "DSP28x_Project.h"
 #include "spi.h"
-#include "autoWah.h"
-#include "lowpass.h"
 #include "eeprom.h"
 #include "effect.h"
 
