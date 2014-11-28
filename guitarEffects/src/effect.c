@@ -1,4 +1,4 @@
-#include "../include/effect.h"
+#include "effect.h"
 #include "F28335_example.h"
 #include "math.h"
 #include "DSP28x_Project.h"

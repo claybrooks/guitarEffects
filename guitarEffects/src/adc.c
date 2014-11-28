@@ -1,4 +1,4 @@
-#include "../include/adc.h"
+#include "adc.h"
 #include "DSP28x_Project.h"
 #include "F28335_example.h"
 void initAdc(void)

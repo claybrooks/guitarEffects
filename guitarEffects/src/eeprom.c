@@ -4,7 +4,7 @@
  *  Created on: Oct 17, 2014
  *      Author: Clay
  */
-#include "../include/eeprom.h"
+#include "eeprom.h"
 #include "DSP28x_Project.h"     // Device Headerfile and Examples Include File
 
 #pragma CODE_SECTION(I2CA_Init, "secureRamFuncs")
