@@ -5,8 +5,8 @@
  *      Author: Clay, Jonathan
  */
 
-#ifndef SYS_H_
-#define SYS_H_
+#ifndef INTERRUPTS_H_
+#define INTERRUPTS_H_
 
 interrupt void cpu_timer0_isr(void);
 interrupt void timeout(void);
@@ -26,4 +26,4 @@ void initXINT1();
 void updateTimer0(float time);
 void initTimer0();
 
-#endif /* SYS_H_ */
+#endif /* INTERRUPTS_H_ */
