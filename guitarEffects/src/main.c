@@ -268,7 +268,7 @@ interrupt void cpu_timer0_isr(void){
 	//else sampleCount++;
 	else{
 
-	//sample = process(sample,numQueued, on_off,&pipeline[0],&params, inputs);	//Process sample
+	sample = process(sample,numQueued, on_off,&pipeline[0],&params, inputs);	//Process sample
 	write_dac(sample);			//write sample to DAC
 	updateInputs = 1;
 	}
@@ -287,7 +287,6 @@ interrupt void cpu_timer1_isr(void){
 
 	//Reset flag bits that may have caused this
 	preset = 0;
-	//bassChange = 0, volumeChange = 0, trebleChange = 0, midChange = 0, flangeChange = 0,delayChange = 0, chorusChange = 0, reverbChange = 0, tremoloChange = 0;
 	currentChangeScreen = -1;
 
 	//Acknowledge Interrupt
@@ -359,7 +358,6 @@ interrupt void save_preset(void){
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
 interrupt void effects(void){
-	//int input = (GpioDataRegs.GPADAT.all & 0x000000F);
 	int input = (GpioDataRegs.GPBDAT.all & 0x03FC0000) >> 18;
 	if(input && !preset && currentChangeScreen == -1){
 		//DelayUs(60000);
