@@ -130,10 +130,10 @@ int main(){
 			}
 
 			//Run through save/load sequence to start I2C properly
-				initEffects(&params);
+			initEffects(&params);
+			savePreset(20, location, on_off, inputs, distortion);
+			loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs,&distortion);
 
-			//savePreset(20, location, on_off, inputs, distortion);
-			//loadPreset(20, pipeline, list, location, on_off, &numQueued, inputs,&distortion);
 			//Initialize Effects
 			distortion = 0;
 			toggleDistortion(distortion);
