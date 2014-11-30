@@ -84,6 +84,8 @@ int load = 0, save = 0, presetNumber = 1;
 
 int sample = 0;
 int iCount = 0;
+int blocked = 0;
+int startTimeout = 0;
 
 int main(){
 	InitSysCtrl();
@@ -185,6 +187,11 @@ int main(){
 			printFreq(freq);
 			updateFrequency = 0;
 		}
+		//Start a 3 second display timeout for all user inputs.
+		if(startTimeout){
+			updateTimer1(3000000);
+			startTimeout = 0;
+		}
 	}
 }
 
@@ -203,8 +210,9 @@ interrupt void rotary(){
 		updateChange = 1;	//update an input
 		currentChangeScreen = inputNumber;
 		//Reset Timer
-		CpuTimer1Regs.TCR.all = 0x4001;
-		CpuTimer1Regs.TCR.bit.TRB = 1;
+//		CpuTimer1Regs.TCR.all = 0x4001;
+//		CpuTimer1Regs.TCR.bit.TRB = 1;
+		startTimeout = 1;
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;	//Clear flag to accept more interrupts
 }
@@ -229,8 +237,9 @@ void getInputs(){
 
 		if(!preset && change){
 			updateChange = 1;
-			CpuTimer1Regs.TCR.all = 0x4001;
-			CpuTimer1Regs.TCR.bit.TRB = 1;
+//			CpuTimer1Regs.TCR.all = 0x4001;
+//			CpuTimer1Regs.TCR.bit.TRB = 1;
+			startTimeout = 1;
 		}
 	}
 }
@@ -264,39 +273,44 @@ interrupt void cpu_timer0_isr(void){
 	}
 	//else sampleCount++;
 	else{
-
-	sample = process(sample,numQueued, on_off,&pipeline[0],&params, inputs);	//Process sample
-	write_dac(sample);			//write sample to DAC
-	updateInputs = 1;
+		sample = process(sample,numQueued, on_off,&pipeline[0],&params, inputs);	//Process sample
+		write_dac(sample);			//write sample to DAC
+		updateInputs = 1;
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;	//Clear flag to accept more interrupts
 }
 
 //Timeout counter for Preset selection
 interrupt void timeout(void){
-
-	GpioDataRegs.GPADAT.bit.GPIO1 = 1;
 	CpuTimer1Regs.TCR.bit.TSS = 1;
 
-	//Return to homescreen
-	updateLcd = 1;
-	updateCode = PRESETTIMEOUT;
+	//If debounce is over, go in to unblock user input.  If it is coming from a
+	//preset up/down signal, signal to start a new timer1 sequence of 3 seconds.
+	//If it's coming from the effect function, unblock and clear flag.
+	if(blocked){
+		blocked = 0;
+		if(preset) startTimeout = 1;
+	}
+	else{
+		//Return to homescreen
+		updateLcd = 1;
+		updateCode = PRESETTIMEOUT;
 
-	//Reset flag bits that may have caused this
-	preset = 0;
-	currentChangeScreen = -1;
-
+		//Reset flag bits that may have caused this
+		preset = 0;
+		currentChangeScreen = -1;
+	}
 	//Acknowledge Interrupt
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
-//Preset Up
 interrupt void preset_up(void){
 	//If initial entry into preset, set up timer and flag
-	if(GpioDataRegs.GPADAT.bit.GPIO5 && currentChangeScreen == -1){
-		DelayUs(60000);
+	if(GpioDataRegs.GPADAT.bit.GPIO5 && currentChangeScreen == -1 && !blocked){
+		blocked = 1;
 		if(!preset){
-			CpuTimer1Regs.TCR.all = 0x4001;
+			//CpuTimer1Regs.TCR.all = 0x4001;
+			updateTimer1(30000);
 			preset = 1;
 		}
 		else{
@@ -310,12 +324,14 @@ interrupt void preset_up(void){
 
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
-//Preset Down
+
 interrupt void preset_down(void){
 	//If initial entry into preset, set up timer and flag
-	if(GpioDataRegs.GPADAT.bit.GPIO6 && currentChangeScreen == -1){
+	if(GpioDataRegs.GPADAT.bit.GPIO6 && currentChangeScreen == -1 && !blocked){
+		blocked = 1;
 		if(!preset){
-			CpuTimer1Regs.TCR.all = 0x4001;
+			//CpuTimer1Regs.TCR.all = 0x4001;
+			updateTimer1(30000);
 			preset = 1;
 		}
 		else{
@@ -329,11 +345,13 @@ interrupt void preset_down(void){
 
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
-//Load Preset
+
 interrupt void load_preset(void){
 	//Stop timer and reset flag
-	if(GpioDataRegs.GPBDAT.bit.GPIO48 && preset){
-		CpuTimer1Regs.TCR.bit.TSS = 1;
+	if(GpioDataRegs.GPBDAT.bit.GPIO48 && preset && !blocked){
+		//CpuTimer1Regs.TCR.bit.TSS = 1;
+		blocked = 1;
+		updateTimer1(30000);
 		preset = 0;
 		load = 1;
 		updateLcd = 1;
@@ -341,23 +359,26 @@ interrupt void load_preset(void){
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
-//Save Preset
+
 interrupt void save_preset(void){
 	//Stop timer and reset flag
-	if(GpioDataRegs.GPBDAT.bit.GPIO49 && preset){
-		CpuTimer1Regs.TCR.bit.TSS = 1;
+	if(GpioDataRegs.GPBDAT.bit.GPIO49 && preset && !blocked){
+		//CpuTimer1Regs.TCR.bit.TSS = 1;
+		blocked = 1;
+		updateTimer1(30000);
 		preset = 0;
 		updateLcd = 1;
 		updateCode = SAVEPRESET;
 		save = 1;
 	}
-
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
+
 interrupt void effects(void){
 	int input = (GpioDataRegs.GPBDAT.all & 0x03FC0000) >> 18;
-	if(input && !preset && currentChangeScreen == -1){
-		//DelayUs(60000);
+	if(input && !preset && currentChangeScreen == -1 && !blocked){
+		blocked = 1;
+		updateTimer1(30000);
 		iCount++;
 		if(input == 0x80){
 			updateLcd = 1;
@@ -372,27 +393,26 @@ interrupt void effects(void){
 			else updateTimer0(44);		//FFT was toggled off, switch back to sample out to SPI
 		}
 		else{
-			if(!preset){
-				toggle = 1;
-				//Simple lookup vs mathematical computation gets the effect to be manipulated
-				int effect = indexLookup(input);
-				//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
-				if(!toggleOn_Off(effect)){
-					queueEffect(effect);					//queue the effect
-					mainDisplay[numQueued-1] = effect;		//queue the display
-				}
-				//Initialize Variables
-				int i = 0;//, inMainDisplay = 0;
-				//Loop through mainDisplay to see if the effect is already set to print to LCD
-				for(;i<10;i++){
-					//If it is in main display, break
-					if(mainDisplay[i] == effect){
-						indexToToggle = i;
-						break;
-					}
-				}
-				effectToToggle = effect;
+			toggle = 1;
+			//Simple lookup vs mathematical computation gets the effect to be manipulated
+			int effect = indexLookup(input);
+			//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
+			if(!toggleOn_Off(effect)){
+				queueEffect(effect);					//queue the effect
+				mainDisplay[numQueued-1] = effect;		//queue the display
 			}
+			//Initialize Variables
+			int i = 0;//, inMainDisplay = 0;
+			//Loop through mainDisplay to see if the effect is already set to print to LCD
+			for(;i<10;i++){
+				//If it is in main display, break
+				if(mainDisplay[i] == effect){
+					indexToToggle = i;
+					break;
+				}
+			}
+			effectToToggle = effect;
+
 		}
 
 /*

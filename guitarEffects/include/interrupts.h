@@ -24,6 +24,7 @@ interrupt void rotary(void);
 void initINTS();
 void initXINT1();
 void updateTimer0(float time);
+void updateTimer1(float time);
 void initTimer0();
 
 #endif /* INTERRUPTS_H_ */

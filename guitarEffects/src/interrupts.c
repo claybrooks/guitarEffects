@@ -111,3 +111,7 @@ void updateTimer0(float time){
 	ConfigCpuTimer(&CpuTimer0, 150, time);
 	CpuTimer0Regs.TCR.bit.TSS = 0;      // 1 = Stop timer, 0 = Start/Restart Timer
 }
+void updateTimer1(float time){
+	ConfigCpuTimer(&CpuTimer1, 150, time);
+	CpuTimer0Regs.TCR.bit.TSS = 0;      // 1 = Stop timer, 0 = Start/Restart Timer
+}
