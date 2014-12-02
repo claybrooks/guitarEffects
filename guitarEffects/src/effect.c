@@ -51,13 +51,16 @@ void initEffects(struct params* params){
 	params->tremoloCount = 0;
 	params->tremoloRate = 0;
 	params->tremoloLimit = 0;
+	//Reverb
 	params->reverbCount = 0;
 	params->reverbStart = 0;
+	//Flanger
 	params->flangerLimit = 20000;
 	params->flangerCounter = 0;
 	params->flangerStart = 0;
 	params->flangerCount = 0;
 	params->flangerSweep = 0;
+	//Wah
 	params->wahCount = 0;
 	params->wahCounter = 500;
 	params->wahStart = 0;
@@ -66,6 +69,9 @@ void initEffects(struct params* params){
 	for(i = 0; i < 3; i++){
 		params->phaserx[i] = 0;
 		params->phasery[i] = 0;
+		params->yh[i] = 0;
+		params->yb[i] = 0;
+		params->yl[i] = 0;
 	}
 	params->phaserCount = 0;
 	params->phaserCounter = 500;
@@ -73,15 +79,11 @@ void initEffects(struct params* params){
 
 int process(int sample, int numQueued, int* on_off, FUNC**pipeline, struct params* params, int* counts){
 	int index;
-
-	sample -= 8500;
-
 	for(index = 0; index < numQueued; index++){
 		if(on_off[index]){
 			sample = pipeline[index](sample, params, counts);  //pipeline[index] maps to a function, (sample, &params) is the prototype
 		}
 	}
-	sample += 8500;
 	return sample;
 }
 
@@ -91,13 +93,7 @@ int process(int sample, int numQueued, int* on_off, FUNC**pipeline, struct param
 int processTremolo(int sample, struct params* p, int* counts){
 	//Sets rate at which the effect runs
 		int pedal = counts[0];
-		//int temp1 = p->tremoloLimit;
 		p->tremoloLimit = (double)3000*((float)pedal/(float)16)+ 1000;
-		//temp1 = pedal>>12;
-		//temp1 <<= 12;
-		//temp1 = pedal + 4000;
-		//temp1 += 4000;
-		//p->tremoloLimit = pedal + 4000;
 
 		//Count up or down, if it hits upper limit then count up else count down
 		if(p->tremoloCounter >= p->tremoloLimit) p->tremoloCount = -1;
@@ -106,29 +102,28 @@ int processTremolo(int sample, struct params* p, int* counts){
 
 		//Calculate new tremolo sample
 		double temp = (double)p->tremoloCounter*.7/(double)p->tremoloLimit;//*(double)sample;
-		//double temp = temp1>>1;
-		//temp /= p->tremoloLimit;
 		sample = temp*(double)sample;
 		return sample;
 }
 int processWah(int sample, struct params* p, int* counts){
-	// sample = (int)AutoWah_process(sample);
+	//Auto wah, LFO with bandpass filter
 
-	double damp = .15;
+	double damp = .05;
 	int minf = 500;
 	int maxf = 3000;
 	double Fw = 3000;
 
-	double Fs = (double)counts[3]/(double)16 *(double)10000 + 10000;
-	double delta = Fw/Fs;
+	double Fs = 44000;//(double)counts[3]/(double)16 *(double)10000 + 10000;
+	double delta = Fw/Fs;  //Provides the increase/decrease step of the center frequency
 
-
+	//LFO, similar to autowah
 	if(p->wahCounter >= maxf) p->wahCount = -delta;
 	else if(p->wahCounter <= minf) p->wahCount = delta;
 	p->wahCounter+=p->wahCount;
 
-	double F1 = 2*sin(((double)PI*(double)p->wahCounter)/Fs);
-	double Q1 = 2*damp;
+	double F1 = 2*sin(((double)PI*(double)p->wahCounter)/Fs); //Calculate new F1
+	double Q1 = 2*damp;	//Quality factor
+	//If not started, initialize arrays to 0
 	if(!p->wahStart){
 		p->wahStart = 1;
 		p->yh[0] = sample;
@@ -136,57 +131,60 @@ int processWah(int sample, struct params* p, int* counts){
 		p->yl[0] = F1*p->yb[0];
 		p->yb[1] = sample;
 	}
+	//Bandpass IIR implementation
 	else{
 		p->yh[1] = (double)sample - p->yl[0] - Q1*p->yb[0];
 		p->yb[1] = F1*p->yh[1] + p->yb[0];
 		p->yl[1] = F1*p->yb[1] + p->yl[0];
 	}
-	sample = (int)p->yb[1] + 10;
+
+	//Shift samples through buffer
+	sample = (int)p->yb[1];
 	p->yb[0] = p->yb[1];
 	p->yl[0] = p->yl[1];
+
 	return sample;
 }
 int processPhaser(int sample, struct params* p, int* counts){
-	// sample = (int)AutoWah_process(sample);
-		int minf = 500;
-		int maxf = 3000;
-		double Fw = 3000;
-		//double damp = .15;
-		double Fs = 20000;//(double)counts[3]/(double)16 *(double)10000 + 10000;
-		double delta = Fw/Fs;
+	int minf = 500;
+	int maxf = 3000;
+	double Fw = 3000;
+	//double damp = .15;
+	double Fs = 20000;//(double)counts[3]/(double)16 *(double)10000 + 10000;
+	double delta = Fw/Fs;
 
-		if(p->phaserCounter >= maxf) p->phaserCount = -delta;
-		else if(p->phaserCounter <= minf) p->phaserCount = delta;
-		p->phaserCounter+=p->phaserCount;
-		double Vc = 2*PI*sin(((double)PI*(double)p->phaserCounter)/Fs);
-		double Q = .25;
+	if(p->phaserCounter >= maxf) p->phaserCount = -delta;
+	else if(p->phaserCounter <= minf) p->phaserCount = delta;
+	p->phaserCounter+=p->phaserCount;
+	double Vc = 2*PI*sin(((double)PI*(double)p->phaserCounter)/Fs);
+	double Q = .25;
 
-		double alpha = sin(Vc)/(2.0*Q);
-		//double a0 = 1.0+alpha;
-		double a1 = -2.0*cos(Vc);
-		double a2 = 1.0-alpha;
-		double b0 = 1.0;
-		double b1 = -2.0*cos(Vc);
-		double b2 = 1.0;
+	double alpha = sin(Vc)/(2.0*Q);
+	//double a0 = 1.0+alpha;
+	double a1 = -2.0*cos(Vc);
+	double a2 = 1.0-alpha;
+	double b0 = 1.0;
+	double b1 = -2.0*cos(Vc);
+	double b2 = 1.0;
 
-		p->phaserx[0] = (double)sample;
+	p->phaserx[0] = (double)sample;
 
 //		p->phasery[0] = (b0/a0)*p->phaserx[0]+(b1/a0)*p->phaserx[1]+(b2/a0)*p->phaserx[2] - (a1/a0)*p->phasery[1] - (a2/a0)*p->phasery[2];
 
-		p->phasery[0] =  b0 * p->phaserx[0];
-		p->phasery[0] += b1 * p->phaserx[1];
-		p->phasery[0] += b1 * p->phaserx[1];
-		p->phasery[0] += b2 * p->phaserx[2];
-		p->phasery[0] -= a1 * p->phasery[1];
-		p->phasery[0] -= a1 * p->phasery[1];
-		p->phasery[0] -= a2 * p->phasery[2];
+	p->phasery[0] =  b0 * p->phaserx[0];
+	p->phasery[0] += b1 * p->phaserx[1];
+	p->phasery[0] += b1 * p->phaserx[1];
+	p->phasery[0] += b2 * p->phaserx[2];
+	p->phasery[0] -= a1 * p->phasery[1];
+	p->phasery[0] -= a1 * p->phasery[1];
+	p->phasery[0] -= a2 * p->phasery[2];
 
-		p->phasery[2] = p->phasery[1];
-		p->phasery[1] = p->phasery[0];
-		p->phaserx[2] = p->phaserx[1];
-		p->phaserx[1] = p->phaserx[0];
+	p->phasery[2] = p->phasery[1];
+	p->phasery[1] = p->phasery[0];
+	p->phaserx[2] = p->phaserx[1];
+	p->phaserx[1] = p->phaserx[0];
 
-		return (int)p->phasery[0];
+	return (int)p->phasery[0];
 }
 int processFlanger(int sample, struct params* p, int* counts){
 	//Process sweep
@@ -233,45 +231,27 @@ int processFlanger(int sample, struct params* p, int* counts){
 	return sample;
 }
 int processReverb(int sample, struct params* p, int* counts){
-	//Reinitialize the reverb array on every start
+	//Reinitialize the reverb array on start
 	if(p->reverbCount == 800){
-			p->reverbStart = 1;
-			p->reverbCount = 0;
-		}
-		double decay = counts[1];
-		decay = ((double)decay / (double)16)*.45 + .15;
-		//Once reinitialized, start to process reverb
-		if(p->reverbStart){
-			int temp = p->reverbDelay[p->reverbCount];
-			sample += p->reverbDelay[p->reverbCount];
-/*
-			x[0] = x[1];
-			        x[1] = temp / GAIN;
-			        y[0] = y[1];
-			        y[1] =   (x[0] + x[1])
-			                     + (  0.8540806855 * y[0]);
-			        temp = y[1];*/
+		p->reverbStart = 1;
+		p->reverbCount = 0;
+	}
+	double decay = counts[1];
+	decay = ((double)decay / (double)16)*.28 + .15;
+	//Once reinitialized, start to process reverb
+	if(p->reverbStart){
+		//Grab sample at current delay index, add in to sample to be returned.  Take current delay index and store in the decayed
+		//sample plus the previous decayes samples.
+		int temp = p->reverbDelay[p->reverbCount];
+		sample += p->reverbDelay[p->reverbCount];
+		p->reverbDelay[p->reverbCount] = (double)sample*decay + (double)temp*decay;
+	}
+	//If not started, loop through and initialize buffer to remove garbage values
+	else p->reverbDelay[p->reverbCount] = (double)sample*decay;
 
-			p->reverbDelay[p->reverbCount] = (double)sample*decay + (double)temp;
-		}
-		else p->reverbDelay[p->reverbCount] = (double)sample*decay;
-
-		p->reverbCount++;
-		return sample;
-}
-int processChorus(int sample, struct params* p, int* counts){
+	p->reverbCount++;
 	return sample;
 }
-int processPitchShift(int sample, struct params* p, int* counts){
-	return sample;
-}
-
-
-
-
-
-
-
 
 void savePreset(int presetNum, int* location, int* on_off, int* counts, int distortion){
 	//Calculate addresses based on presetNum

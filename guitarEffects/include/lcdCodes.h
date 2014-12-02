@@ -44,8 +44,8 @@
 #define SPACE	0X20
 #define COLON	0x3A
 #define SHIFTR	0x14
-#define LEFT	0xBB
-#define RIGHT	0xBC
+#define LEFT	0x3C
+#define RIGHT	0x3E
 #define SHARP	0x23
 #define STAR	0x2A
 #define As		0xF0

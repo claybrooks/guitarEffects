@@ -21,10 +21,8 @@ void write_dac(int sample){
 }
 int read_adc(){
 	GpioDataRegs.GPADAT.bit.GPIO19 = 1;
-	//while(SpiaRegs.SPISTS.bit.INT_FLAG !=1) { }
 	DelayUs(1.3);
 	GpioDataRegs.GPADAT.bit.GPIO19 = 0;
-	//DELAY_US(.2);
 	SpiaRegs.SPITXBUF = 0xFFFF;
 	return SpiaRegs.SPIRXBUF;
 }

@@ -88,6 +88,7 @@ int blocked = 0;
 int startTimeout = 0;
 
 int main(){
+
 	InitSysCtrl();
 	//Copy from flash to ram
 	memcpy(&secureRamFuncs_runstart, &secureRamFuncs_loadstart, (Uint32)&secureRamFuncs_loadsize);
@@ -125,7 +126,7 @@ int main(){
 			int i = 0;
 			for(;i < numEffects; i++){
 				mainDisplay[i] = -1;
-				inputs[i] = 0;
+				inputs[i] = 8 ;
 				previousInputs[i] = 0;
 			}
 
@@ -189,7 +190,9 @@ int main(){
 		}
 		//Start a 3 second display timeout for all user inputs.
 		if(startTimeout){
-			updateTimer1(3000000);
+			ConfigCpuTimer(&CpuTimer1, 150, 3000000);
+			//CpuTimer1Regs.TCR.bit.TRB = 1;
+			CpuTimer1Regs.TCR.all = 0x4001;
 			startTimeout = 0;
 		}
 	}
@@ -199,7 +202,7 @@ interrupt void rotary(){
 	//If the LCD is currently displaying a change screen.  This stops inputs after
 	//A presetTimeout to incrememnt the inputNumber before the change screen is
 	//reprinted
-	if(!preset){
+	if(!preset && !blocked){
 		if(currentChangeScreen != -1){
 			inputNumber++;
 			if(inputNumber == numEffects) inputNumber = 0;
@@ -210,9 +213,10 @@ interrupt void rotary(){
 		updateChange = 1;	//update an input
 		currentChangeScreen = inputNumber;
 		//Reset Timer
-//		CpuTimer1Regs.TCR.all = 0x4001;
-//		CpuTimer1Regs.TCR.bit.TRB = 1;
-		startTimeout = 1;
+		blocked = 1;
+		ConfigCpuTimer(&CpuTimer1, 150, 240000);
+		CpuTimer1Regs.TCR.all = 0x4001;
+		//startTimeout = 1;
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;	//Clear flag to accept more interrupts
 }
@@ -237,8 +241,6 @@ void getInputs(){
 
 		if(!preset && change){
 			updateChange = 1;
-//			CpuTimer1Regs.TCR.all = 0x4001;
-//			CpuTimer1Regs.TCR.bit.TRB = 1;
 			startTimeout = 1;
 		}
 	}
@@ -248,21 +250,22 @@ void getInputs(){
 interrupt void cpu_timer0_isr(void){
 	sample = read_adc();	//Get sample from ADC
 	if(distortion == 1){
-		//GpioDataRegs.GPADAT.bit.GPIO20 = 0;
 		GpioDataRegs.GPCDAT.bit.GPIO85 = 0;
 		GpioDataRegs.GPCDAT.bit.GPIO86 = 1;
 		GpioDataRegs.GPCDAT.bit.GPIO87 = 0;
+		sample -= 5300;
 	}
 	else if(distortion == 2){
 		GpioDataRegs.GPCDAT.bit.GPIO85 = 0;
 		GpioDataRegs.GPCDAT.bit.GPIO86 = 0;
 		GpioDataRegs.GPCDAT.bit.GPIO87 = 1;
+		sample -= 5300;
 	}
 	else{
-	//	GpioDataRegs.GPADAT.bit.GPIO20 = 1;
 		GpioDataRegs.GPCDAT.bit.GPIO85 = 1;
 		GpioDataRegs.GPCDAT.bit.GPIO86 = 0;
 		GpioDataRegs.GPCDAT.bit.GPIO87 = 0;
+		sample -= 16270;
 	}
 
 	if(tuner){// && sampleCount == 23){
@@ -274,6 +277,10 @@ interrupt void cpu_timer0_isr(void){
 	//else sampleCount++;
 	else{
 		sample = process(sample,numQueued, on_off,&pipeline[0],&params, inputs);	//Process sample
+		if(distortion == 1 || distortion == 2){
+			sample += 5300;
+		}
+		else sample += 16270;
 		write_dac(sample);			//write sample to DAC
 		updateInputs = 1;
 	}
@@ -289,7 +296,7 @@ interrupt void timeout(void){
 	//If it's coming from the effect function, unblock and clear flag.
 	if(blocked){
 		blocked = 0;
-		if(preset) startTimeout = 1;
+		if(preset || (currentChangeScreen != -1 && !tuner)) startTimeout = 1;
 	}
 	else{
 		//Return to homescreen
@@ -308,16 +315,16 @@ interrupt void preset_up(void){
 	//If initial entry into preset, set up timer and flag
 	if(GpioDataRegs.GPADAT.bit.GPIO5 && currentChangeScreen == -1 && !blocked){
 		blocked = 1;
+		ConfigCpuTimer(&CpuTimer1, 150, 240000);
+		CpuTimer1Regs.TCR.all = 0x4001;
 		if(!preset){
-			//CpuTimer1Regs.TCR.all = 0x4001;
-			updateTimer1(30000);
 			preset = 1;
 		}
 		else{
 			presetNumber++;
 			if(presetNumber == 10) presetNumber= 1;
 		}
-		CpuTimer1Regs.TCR.bit.TRB = 1;
+		//CpuTimer1Regs.TCR.bit.TRB = 1;
 		updateLcd = 1;
 		updateCode = PRESETUP;
 	}
@@ -329,16 +336,15 @@ interrupt void preset_down(void){
 	//If initial entry into preset, set up timer and flag
 	if(GpioDataRegs.GPADAT.bit.GPIO6 && currentChangeScreen == -1 && !blocked){
 		blocked = 1;
+		ConfigCpuTimer(&CpuTimer1, 150, 240000);
+		CpuTimer1Regs.TCR.all = 0x4001;
 		if(!preset){
-			//CpuTimer1Regs.TCR.all = 0x4001;
-			updateTimer1(30000);
 			preset = 1;
 		}
 		else{
 			presetNumber--;
 			if(presetNumber == 0) presetNumber= 9;
 		}
-		CpuTimer1Regs.TCR.bit.TRB = 1;
 		updateLcd = 1;
 		updateCode = PRESETDOWN;
 	}
@@ -365,7 +371,7 @@ interrupt void save_preset(void){
 	if(GpioDataRegs.GPBDAT.bit.GPIO49 && preset && !blocked){
 		//CpuTimer1Regs.TCR.bit.TSS = 1;
 		blocked = 1;
-		updateTimer1(30000);
+		updateTimer1(120000);
 		preset = 0;
 		updateLcd = 1;
 		updateCode = SAVEPRESET;
@@ -378,7 +384,7 @@ interrupt void effects(void){
 	int input = (GpioDataRegs.GPBDAT.all & 0x03FC0000) >> 18;
 	if(input && !preset && currentChangeScreen == -1 && !blocked){
 		blocked = 1;
-		updateTimer1(30000);
+		updateTimer1(240000);
 		iCount++;
 		if(input == 0x80){
 			updateLcd = 1;
@@ -414,46 +420,6 @@ interrupt void effects(void){
 			effectToToggle = effect;
 
 		}
-
-/*
-		if(input == 0x0008){
-			updateLcd = 1;
-			clearPipeline();
-			updateCode = CLEAR;
-		}
-		//Switch to tuning function
-		else if(input == 0x0004){
-			tuner ^= 1;			//signal for timer0 to not sample out to SPI
-			updateLcd = 1;
-			updateCode = TUNER;
-			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
-			else updateTimer0(44);		//FFT was toggled off, switch back to sample out to SPI
-		}
-
-		//Look to either queue effect or toggle state
-		else{
-			if(!preset){
-				toggle = 1;
-				//Simple lookup vs mathematical computation gets the effect to be manipulated
-				int effect = indexLookup(input);
-				//toggleOn_Off returns 1 if it can be toggled, else 0 meaning its not in queue;
-				if(!toggleOn_Off(effect)){
-					queueEffect(effect);					//queue the effect
-					mainDisplay[numQueued-1] = effect;		//queue the display
-				}
-				//Initialize Variables
-				int i = 0;//, inMainDisplay = 0;
-				//Loop through mainDisplay to see if the effect is already set to print to LCD
-				for(;i<10;i++){
-					//If it is in main display, break
-					if(mainDisplay[i] == effect){
-						indexToToggle = i;
-						break;
-					}
-				}
-				effectToToggle = effect;
-			}
-		}*/
 	}
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP12;
 }
