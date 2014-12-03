@@ -12,14 +12,14 @@
 //Type definition for process*Effect* method prototypes
 struct params{
 	int tremoloCounter, tremoloRate, tremoloCount, tremoloLimit;
-	int reverbDelay[800], reverbCount, reverbStart; //15 ms delay length at 44.1 kHz
+	int reverbDelay[1600], reverbCount, reverbStart; //15 ms delay length at 44.1 kHz
 	int flangerDelay[600], flangerSweepCount, flangerCounter, flangerLimit, flangerStart, flangerCount;
 	double flangerSweep; //15 ms delay length at 44.1
 
 	double phaserx[3], phasery[3],phaserCount, phaserCounter;
 
 	int wahStart;
-	double yh[2], yb[2], yl[2], wahCount, wahCounter;
+	double yh[2], yb[2], yl[2], yn[2], wahCount, wahCounter;
 };
 
 typedef int FUNC(int, struct params*, int*);

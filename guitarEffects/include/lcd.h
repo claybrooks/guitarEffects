@@ -10,10 +10,11 @@
 
 #define TREMOLO			0
 #define REVERB	 		1
-#define FLANGER			3
+#define PHASER			3
 #define WAH		 		2
 #define DISTORTION 		5
 #define CRUNCH			4
+#define FLANGER 		6
 
 #define MAIN 			11
 #define CLEAR 			14
@@ -25,8 +26,9 @@
 #define PRESETTIMEOUT	20
 #define CHANGETREMOLO	21
 #define CHANGEREVERB	22
-#define CHANGEFLANGER	23
+#define CHANGEPHASER	23
 #define CHANGEWAH		24
+#define CHANGEFLANGER 	25
 
 
 

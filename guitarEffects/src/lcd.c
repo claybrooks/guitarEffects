@@ -63,6 +63,17 @@ void printFlanger(){
 	printLCD(R+lc);
 	controlLCD(HOME); //Return cursor to home;
 }
+void printPhaser(){
+	controlLCD(CL);
+	controlLCD(SECOND);
+	printLCD(P);
+	printLCD(H+lc);
+	printLCD(A+lc);
+	printLCD(S+lc);
+	printLCD(E+lc);
+	printLCD(R+lc);
+	controlLCD(HOME); //Return cursor to home;
+}
 void printWah(){
 	controlLCD(CL);
 	controlLCD(SECOND);
@@ -208,6 +219,10 @@ void updateLCD(int* update, int* mainDisplay, int* on_off, int* currentPreset, i
 		reprint = 1;
 		printFlanger();
 	}
+	else if(*update == CHANGEPHASER){
+		reprint = 1;
+		printPhaser();
+	}
 }
 
 void loadPresetScreen(int* location, int* mainDisplay, int* numQueued){
@@ -271,15 +286,15 @@ void goToMain(int* mainDisplay, int* on_off, int* numQueued, int distortion){
 	int i;
 	for(i = 0; i < *numQueued; i++){
 		if(on_off[i]){
-			printLCD(i+1 + 0x30);
-			printLCD(0x3A);
+			//printLCD(i+1 + 0x30);
+			//printLCD(0x3A);
 			addToLCD(mainDisplay[i]);
 		}
 		else{
 			printLCD(SPACE);
 			printLCD(SPACE);
-			printLCD(SPACE);
-			printLCD(SPACE);
+			//printLCD(SPACE);
+			//printLCD(SPACE);
 		}
 		printLCD(SPACE);
 	}
@@ -291,9 +306,9 @@ void addToLCD(int effect){
 		printLCD(R);
 	}
 	else if(effect == REVERB){
-			printLCD(R);
-			printLCD(E);
-		}
+		printLCD(R);
+		printLCD(E);
+	}
 	else if(effect == DISTORTION){
 		printLCD(D);
 		printLCD(I);
@@ -309,6 +324,10 @@ void addToLCD(int effect){
 	else if(effect == FLANGER){
 		printLCD(F);
 		printLCD(L);
+	}
+	else if(effect == PHASER){
+		printLCD(P);
+		printLCD(H);
 	}
 }
 void toggleDistortion(int distortion){
@@ -356,22 +375,25 @@ void toggleLCD(int effect, int index, int on, int numQueued){
 	//Shift to beggining of section that needs to be changed
 	if(effect != CRUNCH && effect != DISTORTION){
 		int i;
-		int cursorShift = 0x80 | (index*5);
+		//int cursorShift = 0x80 | (index*5);
+		int cursorShift = 0x80 | (index*3);
 		controlLCD(cursorShift);
 
 
 		//Went from off to on, reprint effect in proper spot.  Fill in proper vales
 		if(on){
-			printLCD(index+1 + 0x30);
-			printLCD(0x3A);
+			//printLCD(index+1 + 0x30);
+			//printLCD(0x3A);
 			addToLCD(effect);
 		}
 
 		//Went from on to off, remove effect from spot
 		else{
-			for(i = 0; i < 4; i++) printLCD(0x20);
+			//for(i = 0; i < 4; i++) printLCD(0x20);
+			for(i = 0; i < 2; i++) printLCD(0x20);
 		}
-	cursorShift = 0x80 | (numQueued*5);
+	//cursorShift = 0x80 | (numQueued*5);
+		cursorShift = 0x80 | (numQueued*3);
 	controlLCD(cursorShift);
 	}
 
@@ -380,6 +402,7 @@ void toggleLCD(int effect, int index, int on, int numQueued){
 
 void printFreq(int data){
 	int frequency = data;
+	/*
 	controlLCD(SECOND); //Second line;
 	int i;
 	for(i = 0; i < 3; i++){
@@ -398,7 +421,7 @@ void printFreq(int data){
 	array -= 1;
 	for(; counter > 0; counter--, array--){
 		printLCD(*array+0x30);
-	}
+	}*/
 	findNote(frequency);
 
 	controlLCD(HOME); //Return cursor to home;

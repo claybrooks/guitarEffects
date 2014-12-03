@@ -24,7 +24,7 @@ static struct params params;
 FUNC processTremolo,processReverb,processFlanger,processWah, processPhaser;
 
 //Static list of available effects, GPIO must match this
-FUNC *list[numEffects] = {processTremolo,processReverb,processWah, processFlanger};
+FUNC *list[numEffects] = {processTremolo,processReverb,processWah, processPhaser};
 
 /*The indices of this array map  directly to the *list array.  This location array holds the location of the effect in the pipeline array.
  * Index 0 of the location array maps to index 0 of the list array.  But the data at index 0 of the location arary points to
@@ -127,7 +127,7 @@ int main(){
 			for(;i < numEffects; i++){
 				mainDisplay[i] = -1;
 				inputs[i] = 8 ;
-				previousInputs[i] = 0;
+				previousInputs[i] = 8;
 			}
 
 			//Run through save/load sequence to start I2C properly
@@ -396,7 +396,7 @@ interrupt void effects(void){
 			updateLcd = 1;
 			updateCode = TUNER;
 			if(tuner) updateTimer0(1000);	//Slower sample rate for FFT analysis = Higher bin resolution
-			else updateTimer0(44);		//FFT was toggled off, switch back to sample out to SPI
+			else updateTimer0(24);		//FFT was toggled off, switch back to sample out to SPI
 		}
 		else{
 			toggle = 1;
@@ -476,7 +476,7 @@ void clearPipeline(){
 		location[i] = -1;
 		on_off[i] = 0;
 		mainDisplay[i] = -1;
-		inputs[i] = 0;
+		inputs[i] = 8;
 	}
 	distortion = 0;
 	numQueued = 0;

@@ -43,6 +43,15 @@ void eepromRead();
 
 int returnArray[26];
 
+#define wahMin 250;
+#define wahMax 1700;
+
+#define NZEROS 2
+#define NPOLES 2
+#define GAIN   5.807622925e+02
+
+static float xv[NZEROS+1], yv[NPOLES+1];
+
 void initEffects(struct params* params){
 	//Clear the queue
 	clearPipeline();
@@ -62,7 +71,7 @@ void initEffects(struct params* params){
 	params->flangerSweep = 0;
 	//Wah
 	params->wahCount = 0;
-	params->wahCounter = 500;
+	params->wahCounter = wahMin;
 	params->wahStart = 0;
 	int i;
 	for(i = 0; i < 600; i++) params->flangerDelay[i] = 0;
@@ -72,6 +81,11 @@ void initEffects(struct params* params){
 		params->yh[i] = 0;
 		params->yb[i] = 0;
 		params->yl[i] = 0;
+		params->yn[i] = 0;
+	}
+	for(i = 0; i < NPOLES; i++){
+		xv[i] = 0;
+		yv[i] = 0;
 	}
 	params->phaserCount = 0;
 	params->phaserCounter = 500;
@@ -92,8 +106,8 @@ int process(int sample, int numQueued, int* on_off, FUNC**pipeline, struct param
  */
 int processTremolo(int sample, struct params* p, int* counts){
 	//Sets rate at which the effect runs
-		int pedal = counts[0];
-		p->tremoloLimit = (double)3000*((float)pedal/(float)16)+ 1000;
+		int pedal = 16-counts[0];
+		p->tremoloLimit = (double)9000*((float)pedal/(float)16)+ 5000;
 
 		//Count up or down, if it hits upper limit then count up else count down
 		if(p->tremoloCounter >= p->tremoloLimit) p->tremoloCount = -1;
@@ -109,11 +123,11 @@ int processWah(int sample, struct params* p, int* counts){
 	//Auto wah, LFO with bandpass filter
 
 	double damp = .05;
-	int minf = 500;
-	int maxf = 3000;
-	double Fw = 3000;
+	int minf = wahMin;
+	int maxf = wahMax;
+	double Fw = (double)counts[3]/(double)16 *(double)7000+ wahMax;
 
-	double Fs = 44000;//(double)counts[3]/(double)16 *(double)10000 + 10000;
+	double Fs = 44000;
 	double delta = Fw/Fs;  //Provides the increase/decrease step of the center frequency
 
 	//LFO, similar to autowah
@@ -146,45 +160,42 @@ int processWah(int sample, struct params* p, int* counts){
 	return sample;
 }
 int processPhaser(int sample, struct params* p, int* counts){
-	int minf = 500;
-	int maxf = 3000;
-	double Fw = 3000;
-	//double damp = .15;
-	double Fs = 20000;//(double)counts[3]/(double)16 *(double)10000 + 10000;
-	double delta = Fw/Fs;
+	double damp = .05;
+		int minf = 100;
+		int maxf = 3000;
+		double Fw = (double)counts[3]/(double)16 *(double)7000+ wahMax;
 
-	if(p->phaserCounter >= maxf) p->phaserCount = -delta;
-	else if(p->phaserCounter <= minf) p->phaserCount = delta;
-	p->phaserCounter+=p->phaserCount;
-	double Vc = 2*PI*sin(((double)PI*(double)p->phaserCounter)/Fs);
-	double Q = .25;
+		double Fs = 44000;
+		double delta = Fw/Fs;  //Provides the increase/decrease step of the center frequency
 
-	double alpha = sin(Vc)/(2.0*Q);
-	//double a0 = 1.0+alpha;
-	double a1 = -2.0*cos(Vc);
-	double a2 = 1.0-alpha;
-	double b0 = 1.0;
-	double b1 = -2.0*cos(Vc);
-	double b2 = 1.0;
+		//LFO, similar to autowah
+		if(p->wahCounter >= maxf) p->wahCount = -delta;
+		else if(p->wahCounter <= minf) p->wahCount = delta;
+		p->wahCounter+=p->wahCount;
 
-	p->phaserx[0] = (double)sample;
+		double F1 = 2*sin(((double)PI*(double)p->wahCounter)/Fs); //Calculate new F1
+		double Q1 = 2*damp;	//Quality factor
+		//If not started, initialize arrays to 0
+		if(!p->wahStart){
+			p->wahStart = 1;
+			p->yh[0] = sample;
+			p->yb[0] = F1*p->yh[0];
+			p->yl[0] = F1*p->yb[0];
+			p->yb[1] = sample;
+		}
+		//Bandpass IIR implementation
+		else{
+			p->yh[1] = (double)sample - p->yl[0] - Q1*p->yb[0];
+			p->yb[1] = F1*p->yh[1] + p->yb[0];
+			p->yl[1] = F1*p->yb[1] + p->yl[0];
+		}
 
-//		p->phasery[0] = (b0/a0)*p->phaserx[0]+(b1/a0)*p->phaserx[1]+(b2/a0)*p->phaserx[2] - (a1/a0)*p->phasery[1] - (a2/a0)*p->phasery[2];
+		//Shift samples through buffer
+		sample =  p->yh[1] + p->yl[1];
+		p->yb[0] = p->yb[1];
+		p->yl[0] = p->yl[1];
 
-	p->phasery[0] =  b0 * p->phaserx[0];
-	p->phasery[0] += b1 * p->phaserx[1];
-	p->phasery[0] += b1 * p->phaserx[1];
-	p->phasery[0] += b2 * p->phaserx[2];
-	p->phasery[0] -= a1 * p->phasery[1];
-	p->phasery[0] -= a1 * p->phasery[1];
-	p->phasery[0] -= a2 * p->phasery[2];
-
-	p->phasery[2] = p->phasery[1];
-	p->phasery[1] = p->phasery[0];
-	p->phaserx[2] = p->phaserx[1];
-	p->phaserx[1] = p->phaserx[0];
-
-	return (int)p->phasery[0];
+		return sample;
 }
 int processFlanger(int sample, struct params* p, int* counts){
 	//Process sweep
@@ -232,19 +243,27 @@ int processFlanger(int sample, struct params* p, int* counts){
 }
 int processReverb(int sample, struct params* p, int* counts){
 	//Reinitialize the reverb array on start
-	if(p->reverbCount == 800){
+	if(p->reverbCount == 1600){
 		p->reverbStart = 1;
 		p->reverbCount = 0;
 	}
 	double decay = counts[1];
-	decay = ((double)decay / (double)16)*.28 + .15;
+	decay = ((double)decay / (double)16)*.8;
 	//Once reinitialized, start to process reverb
 	if(p->reverbStart){
 		//Grab sample at current delay index, add in to sample to be returned.  Take current delay index and store in the decayed
 		//sample plus the previous decayes samples.
 		int temp = p->reverbDelay[p->reverbCount];
-		sample += p->reverbDelay[p->reverbCount];
-		p->reverbDelay[p->reverbCount] = (double)sample*decay + (double)temp*decay;
+
+		xv[0] = xv[1]; xv[1] = xv[2];
+		        xv[2] = temp / GAIN;
+		        yv[0] = yv[1]; yv[1] = yv[2];
+		        yv[2] =   (xv[0] + xv[2]) + 2 * xv[1]
+		                     + ( -0.8861273417 * yv[0]) + (  1.8792398422 * yv[1]);
+		        temp = yv[2];
+
+		p->reverbDelay[p->reverbCount] = (double)sample + (double)temp*decay;
+		sample += temp;
 	}
 	//If not started, loop through and initialize buffer to remove garbage values
 	else p->reverbDelay[p->reverbCount] = (double)sample*decay;
