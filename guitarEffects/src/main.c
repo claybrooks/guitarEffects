@@ -138,6 +138,9 @@ int main(){
 			//Initialize Effects
 			distortion = 0;
 			toggleDistortion(distortion);
+
+			updateLcd = 1;
+			updateCode = CLEAR;
 	while(1){
 		//Wait for signals
 		//Retrieve inputs from rotary switch
