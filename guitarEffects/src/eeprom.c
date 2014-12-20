@@ -11,8 +11,7 @@
 #pragma CODE_SECTION(I2CA_WriteData, "secureRamFuncs")
 #pragma CODE_SECTION(I2CA_ReadData, "secureRamFuncs")
 
-void I2CA_Init(void)
-{
+void I2CA_Init(void){
    // Initialize I2C
    I2caRegs.I2CSAR = 0x0050;		// Slave address - EEPROM control code
 
